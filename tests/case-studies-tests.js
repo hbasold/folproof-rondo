@@ -16,7 +16,8 @@ for (var i=0, l=srcs.length; i<l; i++) {
       var src = fs.readFileSync(path, "utf8");
 			var ast = parser.parse(src);
       test.ok(ast);
-			test.ok(Verifier.verifyFromAST(ast).valid);
+      var result = Verifier.verifyFromAST(ast);
+			test.ok(result.valid);
 			test.done();
     };
   })(__dirname + baseDir + srcs[i]);

@@ -47,49 +47,34 @@ with
 	;
 
 sentence
-	: e_iff
+	: e_top
 	| error
 	{ $$ = ['error', yytext]; }
 	;
 
-e_iff
-	: e_iff IFF e_imp
-	{ $$ = ['iff', $e_iff, $e_imp]; }
-	| e_imp
-	{ $$ = $1; }
-	;
-
-e_imp
-	: e_exists IMPLIES e_imp
-	{ $$ = ['->', $e_exists, $e_imp]; }
-	| e_exists
-	{ $$ = $1; }
-	;
-
-e_exists
-	: EXISTS ID e_exists
-	{ $$ = ['exists', $ID, $e_exists]; }
-	| e_forall
-	{ $$ = $1; }
-	;
-
-e_forall
-	: FORALL ID e_forall
-	{ $$ = ['forall', $ID, $e_forall]; }
+e_top
+	: EXISTS ID DOT e_top
+	{ $$ = ['exists', $ID, $e_top]; }
+	| FORALL ID DOT e_top
+	{ $$ = ['forall', $ID, $e_top]; }
+	| e_or IFF e_top
+	{ $$ = ['<->', $e_or, $e_top]; }
+	| e_or IMPLIES e_top
+	{ $$ = ['->', $e_or, $e_top]; }
 	| e_or
-	{ $$ = $e_or; }
+	{ $$ = $1; }
 	;
 
 e_or
-	: e_or OR e_and
-	{ $$ = ['or', $e_or, $e_and]; }
+	: e_and OR e_or
+	{ $$ = ['or', $e_and, $e_or]; }
 	| e_and
 	{ $$ = $1; }
 	;
 
 e_and
-	: e_and AND e_eq
-	{ $$ = ['and', $e_and, $e_eq]; }
+	: e_eq AND e_and
+	{ $$ = ['and', $e_eq, $e_and]; }
 	| e_eq
 	{ $$ = $1; }
 	;
@@ -111,22 +96,34 @@ e_not
 atom
 	: term
 	{ $$ = $term; }
+	| BOTTOM
+	{ $$ = ['bot']; }
 	| LPAREN sentence RPAREN
 	{ $$ = $sentence; $$.userParens = true; }
 	;
+
+/* pred
+	: ID LPAREN term_list RPAREN
+	{ $$ = ['id', $ID, $term_list]; }
+	| ID LPAREN RPAREN
+	{ $$ = ['id', $ID, []]; }
+	| ID
+	{ $$ = ['id', $ID]; }
+	;
+*/
 
 term_list
 	: term
 	{ $$ = [$term]; }
 	| term COMMA term_list
 	{ $$ = $term_list; $$.unshift($term); }
+  | /* empty */
+	{ $$ = []; }
 	;
 
 term
 	: ID LPAREN term_list RPAREN
 	{ $$ = ['id', $ID, $term_list]; }
-	| ID LPAREN RPAREN
-	{ $$ = ['id', $ID, []]; }
 	| ID
 	{ $$ = ['id', $ID]; }
 	;

@@ -92,10 +92,10 @@ var rules = {
 			elimination : new Justifier(
 				{ hasPart : false, stepRefs : ["num"], subst : false },
 				function(proof, step, part, steps) {
-					var refStep = proof.steps[steps[0]].getSentence();
-					if (refStep[0] != 'id' || (refStep[1] != 'contradiction' && refStep[1] != '_|_'))
+				var refStep = proof.steps[steps[0]].getSentence();
+        if (!isContradiction(refStep))
+					// if (refStep[0] != 'id' || (refStep[1] != 'contradiction' && refStep[1] != '_|_'))
 						return "Contra-elim: Referenced step is not a contradiction.";
-
 					return true;
 				})
 		}),
@@ -266,7 +266,7 @@ var rules = {
 			function(proof, step, part, steps) {
 				var s = proof.steps[step].getSentence();
 				if (! isContradiction(s))
-					return "Not-Elim: Current step is not a contradiction." + proof.steps[step].getSentence();
+					return "Not-Elim: Current step is not a contradiction. " + proof.steps[step].getSentence();
 
 				var step1expr = proof.steps[steps[0]].getSentence();
 				var step2expr = proof.steps[steps[1]].getSentence();
@@ -491,6 +491,8 @@ function semanticEq(A, B, suba, subb) {
 				return true;
 			}
 			return false;
+    } else if (a[0] === "bot"){
+        return b[0] === "bot";
 		} else if (a[0] === "id") {
 			if (b && a[1] !== b[1]) return false;
 			if (a.length == 2 && b.length == 2) {
@@ -514,7 +516,8 @@ function semanticEq(A, B, suba, subb) {
 }
 
 function isContradiction(s) {
-	return (s[0] === 'id' && (s[1] === '_|_' || s[1] === 'contradiction'));
+	  // return (s[0] === 'id' && (s[1] === '_|_' || s[1] === 'contradiction'));
+    return s[0] == 'bot';
 }
 
 function arrayContains(arr, el) {

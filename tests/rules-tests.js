@@ -2,9 +2,9 @@ var v = require("../src/verifier.js").Verifier;
 var p = require("../folproof-parser.js");
 
 exports["Substitution (= elim) works for unbound vars."] = function(test) {
-	var src = "a -> A.a(a -> c) -> b\n"
+	var src = "a -> A a.(a -> c) -> b\n"
 				  + "a = x\n"
-					+ "x -> A.a(a -> c) -> b : = e 2,1\n";
+					+ "x -> A a.(a -> c) -> b : = e 2,1\n";
 
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
@@ -13,20 +13,20 @@ exports["Substitution (= elim) works for unbound vars."] = function(test) {
 }
 	
 exports["Substitution (= elim) fails for bound vars."] = function(test) {
-	var src = "a -> A.a(a -> c) -> b\n"
+	var src = "a -> A a.(a -> c) -> b\n"
 				  + "a = x\n"
-					+ "x -> A.a(x -> c) -> b : = e 2,1\n";
+					+ "x -> A a.(x -> c) -> b : = e 2,1\n";
 
 	var ast = p.parse(src);
-	var result = v.verifyFromAST(ast);
+  var result = v.verifyFromAST(ast);
 	test.ok(!result.valid);
 	test.done();
 }
 	
 exports["Substitution (= elim) works for any # of unbound vars."] = function(test) {
-	var src = "a -> A.a(a -> c) -> b or a and a \n"
+	var src = "a -> (A a.a -> c) -> b or a and a \n"
 				  + "a = x\n"
-					+ "x -> A.a(a -> c) -> b or a and x : = e 2,1\n";
+			    + "x -> (A a.a -> c) -> b or a and x : = e 2,1\n";
 
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
@@ -286,7 +286,7 @@ exports["Implication elimination fails when right side doesn't match current ste
 }
 
 exports["Forall elimination succeeds when referenced step matches after substition."] = function(test) {
-	var src = "A.x P(x)\nP(a) : A.x/a elim 1";
+	var src = "A x. P(x)\nP(a) : A.x/a elim 1";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(result.valid, result.message);
@@ -294,7 +294,7 @@ exports["Forall elimination succeeds when referenced step matches after substiti
 }
 
 exports["Forall elimination fails when referenced step doesn't match."] = function(test) {
-	var src = "A.x P(x)\nQ(a) : A.x/a elim 1";
+	var src = "A x. P(x)\nQ(a) : A.x/a elim 1";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);
@@ -302,7 +302,7 @@ exports["Forall elimination fails when referenced step doesn't match."] = functi
 }
 
 exports["Forall introduction succeeds when ref is assumption and final step matches current step, under subst."] = function(test) {
-	var src = "| with x0\n| P(x0) : assumption\nA.x P(x) : A.x/x0 i 1-1";
+	var src = "| with x0\n| P(x0) : assumption\nA x. P(x) : A.x/x0 i 1-1";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(result.valid, result.message);
@@ -310,7 +310,7 @@ exports["Forall introduction succeeds when ref is assumption and final step matc
 }
 
 exports["Forall introduction fails when reference range is not an assumption."] = function(test) {
-	var src = "P(x) : premise\nA.x P(x) : A.x/x i 1-1";
+	var src = "P(x) : premise\nA x. P(x) : A.x/x i 1-1";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);
@@ -319,7 +319,7 @@ exports["Forall introduction fails when reference range is not an assumption."] 
 }
 
 exports["Forall introduction fails when reference range is not a scoping assumption."] = function(test) {
-	var src = "| P(x) : assumption\nA.x P(x) : A.x/x i 1-1";
+	var src = "| P(x) : assumption\nA x. P(x) : A.x/x i 1-1";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);
@@ -328,7 +328,7 @@ exports["Forall introduction fails when reference range is not a scoping assumpt
 }
 
 exports["Forall introduction fails when reference range ending step doesn't match current step under subst."] = function(test) {
-	var src = "| with x0\n| P(x0) : assumption\nA.x Q(x) : A.x/x0 i 1-1";
+	var src = "| with x0\n| P(x0) : assumption\nA x. Q(x) : A.x/x0 i 1-1";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);
@@ -337,7 +337,7 @@ exports["Forall introduction fails when reference range ending step doesn't matc
 }
 
 exports["Exists introduction succeeds when referenced step matches after substitution."] = function(test) {
-	var src = "P(a)\nE.x P(x) : E.x/a intro 1";
+	var src = "P(a)\nE x. P(x) : E.x/a intro 1";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(result.valid, result.message);
@@ -345,11 +345,11 @@ exports["Exists introduction succeeds when referenced step matches after substit
 }
 
 exports["Exists introduction fails when referenced step doesn't match after substitution."] = function(test) {
-	var src = "P(a)\nE.x Q(x) : E.x/a intro 1";
+	var src = "P(a)\nE x. Q(x) : E.x/a intro 1";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);
-	src = "P(a)\nE.y P(y) : E.x/a intro 1";
+	src = "P(a)\nE y. P(y) : E.x/a intro 1";
 	ast = p.parse(src);
 	result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);
@@ -357,7 +357,7 @@ exports["Exists introduction fails when referenced step doesn't match after subs
 }
 
 exports["Exists elimination succeeds when referenced step range is assumption & concl. matches current step."] = function(test) {
-	var src = "E.a P(a)\n| with x0\n| P(x0) : assumption\n| P(x0) or Q(x0)\n : or i1 2\n| E.a(P(a) or Q(a)) : E.a/x0 i 3\nE.a(P(a) or Q(a)) : E.a/x0 elim 1,2-4";
+	var src = "E a. P(a)\n| with x0\n| P(x0) : assumption\n| P(x0) or Q(x0)\n : or i1 2\n| E a.(P(a) or Q(a)) : E.a/x0 i 3\nE a.(P(a) or Q(a)) : E.a/x0 elim 1,2-4";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(result.valid, result.message);
@@ -365,7 +365,7 @@ exports["Exists elimination succeeds when referenced step range is assumption & 
 }
 
 exports["Exists elimination fails when referenced step range is not assumption."] = function(test) {
-	var src = "E.a P(a)\nE.a P(a) or Q(a)\n : or i1 2\nE.a P(a) or Q(a) : E.x/a elim 1,2-2";
+	var src = "E a. P(a)\nE a. P(a) or Q(a)\n : or i1 2\nE a. P(a) or Q(a) : E.x/a elim 1,2-2";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);
@@ -373,7 +373,7 @@ exports["Exists elimination fails when referenced step range is not assumption."
 }
 
 exports["Exists elimination fails when referenced step range is not scoping assumption."] = function(test) {
-	var src = "E.a P(a)\n| P(x0) : assumption\n| P(x0) or Q(x0)\n : or i1 2\n| E.a(P(a) or Q(a)) : E.a/x0 i 3\nE.a(P(a) or Q(a)) : E.a/x0 elim 1,2-4";
+	var src = "E a. P(a)\n| P(x0) : assumption\n| P(x0) or Q(x0)\n : or i1 2\n| E a.(P(a) or Q(a)) : E.a/x0 i 3\nE a.(P(a) or Q(a)) : E.a/x0 elim 1,2-4";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);
@@ -381,7 +381,7 @@ exports["Exists elimination fails when referenced step range is not scoping assu
 }
 
 exports["Exists elimination fails when assumption conclusion doesn't match current step."] = function(test) {
-	var src = "E.a P(a)\n| with x0\n| P(x0) : assumption\n| P(x0) or Q(x0)\n : or i1 2\nE.a(P(a) or Q(a)) : E.a/x0 elim 1,2-3";
+	var src = "E a. P(a)\n| with x0\n| P(x0) : assumption\n| P(x0) or Q(x0)\n : or i1 2\nE a.(P(a) or Q(a)) : E.a/x0 elim 1,2-3";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);
@@ -390,7 +390,7 @@ exports["Exists elimination fails when assumption conclusion doesn't match curre
 }
 
 exports["Exists elimination fails when assumption start doesn't match first exists ref step."] = function(test) {
-	var src = "E.a Q(a)\n| with x0\n| P(x0) : assumption\n| P(x0) or Q(x0)\n : or i1 2\nE.a(P(a) or Q(a)) : E.a/x0 elim 1,2-3";
+	var src = "E a. Q(a)\n| with x0\n| P(x0) : assumption\n| P(x0) or Q(x0)\n : or i1 2\nE a.(P(a) or Q(a)) : E.a/x0 elim 1,2-3";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);

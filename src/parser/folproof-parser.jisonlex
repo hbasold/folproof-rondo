@@ -1,21 +1,21 @@
-id				[a-zA-Z_][a-zA-Z_'"0-9\|]*
+/*objid     [a-z_][a-zA-Z_'"0-9\|]*
+predid    [a-zA-Z][a-zA-Z_'"0-9\|]* */
+id    [a-zA-Z_][a-zA-Z_'"0-9\|]*
 spc				[\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000]
 numrange			[0-9]+(\-[0-9]+)?
 justify				":".*
 
 %%
 [\n\r]?"#".*			/* comments are ignored */
-"and"				return 'AND';
-"or"				return 'OR';
-"implies"|"->"|"=>"		return 'IMPLIES';
-"iff"|"<->"|"=>"		return 'IFF';
-"not"|"~"|"!"			return 'NOT';
-"union"				return 'UNION';
-"intersection"			return 'INTERSECTION';
+"and"|"∧"|"&"				return 'AND';
+"or"|"∨"|"v"				return 'OR';
+"implies"|"->"		return 'IMPLIES';
+"iff"|"<->"		return 'IFF';
+"not"|"~"			return 'NOT';
 "="				return 'EQUALS';
-"every"				return 'EVERY';
+/* "every"				return 'EVERY'; */
 "with"				return 'WITH';
-"of"				return "OF";
+/* "of"				return "OF"; */
 \d+				/* ignore digits, for now */
 {justify}			%{
 				// Syntax: "[...] : ruleName [[elim/intro] [NumOrRange[, NumOrRange]*]]
@@ -51,14 +51,19 @@ justify				":".*
 				yytext = [name, rtype, side, lineranges, sub];
 				return 'JUSTIFICATION';
 				%};
-"E."				return 'EXISTS';
+"E"				return 'EXISTS';
 "in"				return 'IN';
 "empty"				return 'EMPTYSET';
-"A."				return 'FORALL';
+"A"				return 'FORALL';
+/* "()"				return 'DOUBLEPAREN'; */
 "("				return 'LPAREN';
 ")"				return 'RPAREN';
+"_|_"     return 'BOTTOM';
+/* {objid}				return 'OBJID';
+{predid}				return 'PREDID'; */
 {id}				return 'ID';
 ","				return 'COMMA';
+"."				return 'DOT';
 [\n\r]*<<EOF>>		%{
 				// remaining DEBOXes implied by EOF
 				var tokens = [];
