@@ -1,5 +1,5 @@
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.folproof=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
-var u = _dereq_("./util");
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.folproof = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+var u = require("./util");
 
 var Justifier = function Justifier(format, fn) {
 	// format = { hasPart : (true/false), stepRefs : ("num" | "range")*, subst : (true/false) };
@@ -79,7 +79,7 @@ var Justifier = function Justifier(format, fn) {
 
 module.exports = Justifier;
 
-},{"./util":4}],2:[function(_dereq_,module,exports){
+},{"./util":4}],2:[function(require,module,exports){
 var Rule = function Rule(options) {
 	// { name : name,
 	//   type : ["simple", "derived", "normal"], 
@@ -96,10 +96,10 @@ var Rule = function Rule(options) {
 
 module.exports = Rule;
 
-},{}],3:[function(_dereq_,module,exports){
-var u = _dereq_("./util");
-var Rule = _dereq_("./rule.js");
-var Justifier = _dereq_("./justifier.js");
+},{}],3:[function(require,module,exports){
+var u = require("./util");
+var Rule = require("./rule.js");
+var Justifier = require("./justifier.js");
 
 var rules = {
 	"premise" : new Rule({
@@ -191,10 +191,10 @@ var rules = {
 			elimination : new Justifier(
 				{ hasPart : false, stepRefs : ["num"], subst : false },
 				function(proof, step, part, steps) {
-					var refStep = proof.steps[steps[0]].getSentence();
-					if (refStep[0] != 'id' || (refStep[1] != 'contradiction' && refStep[1] != '_|_'))
+				var refStep = proof.steps[steps[0]].getSentence();
+        if (!isContradiction(refStep))
+					// if (refStep[0] != 'id' || (refStep[1] != 'contradiction' && refStep[1] != '_|_'))
 						return "Contra-elim: Referenced step is not a contradiction.";
-
 					return true;
 				})
 		}),
@@ -365,7 +365,7 @@ var rules = {
 			function(proof, step, part, steps) {
 				var s = proof.steps[step].getSentence();
 				if (! isContradiction(s))
-					return "Not-Elim: Current step is not a contradiction." + proof.steps[step].getSentence();
+					return "Not-Elim: Current step is not a contradiction. " + proof.steps[step].getSentence();
 
 				var step1expr = proof.steps[steps[0]].getSentence();
 				var step2expr = proof.steps[steps[1]].getSentence();
@@ -590,6 +590,8 @@ function semanticEq(A, B, suba, subb) {
 				return true;
 			}
 			return false;
+    } else if (a[0] === "bot"){
+        return b[0] === "bot";
 		} else if (a[0] === "id") {
 			if (b && a[1] !== b[1]) return false;
 			if (a.length == 2 && b.length == 2) {
@@ -613,7 +615,8 @@ function semanticEq(A, B, suba, subb) {
 }
 
 function isContradiction(s) {
-	return (s[0] === 'id' && (s[1] === '_|_' || s[1] === 'contradiction'));
+	  // return (s[0] === 'id' && (s[1] === '_|_' || s[1] === 'contradiction'));
+    return s[0] == 'bot';
 }
 
 function arrayContains(arr, el) {
@@ -631,24 +634,25 @@ function clone(obj) {
 	return newo;
 }
 
-if (typeof _dereq_ !== 'undefined' && typeof exports !== 'undefined') {
+if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
 	module.exports = rules;
 }
 
-},{"./justifier.js":1,"./rule.js":2,"./util":4}],4:[function(_dereq_,module,exports){
+},{"./justifier.js":1,"./rule.js":2,"./util":4}],4:[function(require,module,exports){
 var util = {};
+// debugMode = true;
 util.debug = function debug() {
 	if (typeof debugMode !== "undefined" && debugMode)
 		console.log.apply(console, Array.prototype.slice.call(arguments));
 };
 
-if (typeof _dereq_ !== 'undefined' && typeof exports !== 'undefined') {
+if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
 	module.exports = util;
 }
 
-},{}],5:[function(_dereq_,module,exports){
-var rules = _dereq_("./rules");
-var u = _dereq_("./util");
+},{}],5:[function(require,module,exports){
+var rules = require("./rules");
+var u = require("./util");
 
 var Verifier = (function() {
 	var debugMode = false;
@@ -775,10 +779,9 @@ var Verifier = (function() {
 	return obj;
 })();
 
-if (typeof _dereq_ !== 'undefined' && typeof exports !== 'undefined') {
+if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
 	exports.Verifier = Verifier;
 }
 
-},{"./rules":3,"./util":4}]},{},[5])
-(5)
+},{"./rules":3,"./util":4}]},{},[5])(5)
 });
