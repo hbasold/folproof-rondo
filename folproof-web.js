@@ -59,7 +59,7 @@ var folproofWeb = (function() {
 			var wrapper = $("<span class='folproof-quantifier'></span>");
 			wrapper.append(op);
 			t = renderTerm(ast[1], options);
-			wrapper.append(t," ");
+			wrapper.append(t,". ");
 			c = renderClause(ast[2], options);
 			wrapper.append(c);
 			
@@ -128,7 +128,9 @@ var folproofWeb = (function() {
 	var infixTerms = ['='];
 	function renderTerm(ast, options) {
 		if (ast instanceof Array) {
-			if (ast.length === 2) {
+			if (ast.length === 1) {
+				return $("<span></span>").append(renderSimpleTerm(ast[0], options));
+			} else if (ast.length === 2) {
 				return $("<span></span>").append(renderSimpleTerm(ast[1], options));
 			} else if (ast.length >= 3) {
 				var term = $("<span class='term parameterized'></span>");
@@ -152,7 +154,7 @@ var folproofWeb = (function() {
 	function renderSimpleTerm(t, options) {
 		var symbols = "alpha beta gamma delta epsilon zeta eta theta iota kappa lambda mu nu xi omicron pi rho sigma tau upsilon phi chi psi omega".split(" ");
 		var others = {
-			"_|_" : "&perp;", "contradiction" : "&perp;"
+			"bot" : "&perp;", "contradiction" : "&perp;"
 		};
 		var parts = t.match(/(.*?)(\d+)?$/);
 		var sym = parts[1];
