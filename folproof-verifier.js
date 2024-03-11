@@ -163,8 +163,8 @@ var rules = {
 			return true;
 		})
 	}),
-	"pbc" : new Rule({
-		name : "PBC",
+	"contra" : new Rule({
+		name : "Contra",
 		type : "derived",
 		verifier : new Justifier(
 		{ hasPart : false, stepRefs : ["range"], subst : false },
@@ -172,21 +172,21 @@ var rules = {
 			var assumptionExpr = proof.steps[steps[0][0]].getSentence();
 			var contraExpr = proof.steps[steps[0][1]].getSentence();
 			if (! isContradiction(contraExpr)) {
-			return "PBC: Final step in range must be a contradiction.";
+			return "Contra: Final step in range must be a contradiction.";
 			}
 	
 			if (assumptionExpr[0] !== 'not')
-			return "PBC: Assumption is not a negation. Might you be thinking of not-introduction?";
+			return "Contra: Assumption is not a negation. Might you be thinking of not-introduction?";
 		
 			var semEq = semanticEq(assumptionExpr[1], proof.steps[step].getSentence());
 			if (semEq)
 			return true;
 
-			return "PBC: Negation of assumption doesn't match current step.";
+			return "Contra: Negation of assumption doesn't match current step.";
 		})
 		}),
-	"contra" : new Rule({
-			name : "Contradiction",
+	"bot" : new Rule({
+			name : "Absurdity",
 			type : "normal",
 			elimination : new Justifier(
 				{ hasPart : false, stepRefs : ["num"], subst : false },
@@ -194,7 +194,7 @@ var rules = {
 				var refStep = proof.steps[steps[0]].getSentence();
         if (!isContradiction(refStep))
 					// if (refStep[0] != 'id' || (refStep[1] != 'contradiction' && refStep[1] != '_|_'))
-						return "Contra-elim: Referenced step is not a contradiction.";
+						return "Bot-elim: Referenced step is not absurdity.";
 					return true;
 				})
 		}),
@@ -338,8 +338,8 @@ var rules = {
 				return true;
 			})
 	}),
-	"not" : new Rule({
-		name : "Not",
+	"neg" : new Rule({
+		name : "Neg",
 		type : "normal",
 		introduction : new Justifier(
 			{ stepRefs: ["range"] },
@@ -347,17 +347,17 @@ var rules = {
 				var assumptionExpr = proof.steps[steps[0][0]].getSentence();
 				var contraExpr = proof.steps[steps[0][1]].getSentence();
 				if (! isContradiction(contraExpr)) {
-					return "Not-Intro: Final step in range must be a contradiction.";
+					return "Neg-Intro: Final step in range must be absurdity.";
 				}
 				var curStep = proof.steps[step].getSentence();
 				if (curStep[0] !== 'not') {
-					return "Not-Intro: Current step is not a negation. Might you be thinking of PBC?";
+					return "Neg-Intro: Current step is not a negation. Might you be thinking of Contra?";
 				} else {
 					var semEq = semanticEq(assumptionExpr, curStep[1]);
 					if (semEq)
 						return true;
 
-					return "Not-Intro: Negation of assumption doesn't match current step.";
+					return "Neg-Intro: Negation of assumption doesn't match current step.";
 				}
 			}),
 		elimination : new Justifier(
@@ -365,7 +365,7 @@ var rules = {
 			function(proof, step, part, steps) {
 				var s = proof.steps[step].getSentence();
 				if (! isContradiction(s))
-					return "Not-Elim: Current step is not a contradiction. " + proof.steps[step].getSentence();
+					return "Neg-Elim: Current step is not absurdity. " + proof.steps[step].getSentence();
 
 				var step1expr = proof.steps[steps[0]].getSentence();
 				var step2expr = proof.steps[steps[1]].getSentence();
@@ -375,12 +375,12 @@ var rules = {
 				} else if (step2expr[0] === 'not') {
 					semEq = semanticEq(step2expr[1], step1expr);
 				} else {
-					return "Not-Elim: Neither referenced proof step is a 'not' expression.";
+					return "Neg-Elim: Neither referenced proof step is a 'not' expression.";
 				}
 
 				if (semEq) return true;
 		
-				return "Not-Elim: Subexpression in not-expr does not match other expr.";
+				return "Neg-Elim: Subexpression in not-expr does not match other expr.";
 			})
 	}),
 	"a." : new Rule({

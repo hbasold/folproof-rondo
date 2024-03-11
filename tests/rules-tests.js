@@ -43,7 +43,7 @@ exports["_|_ elimination fails when reference line not contradiction."] = functi
 }	
 
 exports["_|_ elimination succeeds when reference line is contradiction."] = function(test) {
-	var src = "_|_\na -> b : contra e 1\n";	
+	var src = "_|_\na -> b : bot e 1\n";	
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(result.valid);
@@ -159,8 +159,8 @@ exports["And elimination succeeds when reference side matches current step."] = 
 }
 
 exports["Or elimination succeeds when assumptions produce same result."] = function(test) {
-	var src = "a or b\n~a\n~b\n| a : assumption\n| _|_ : not e 2,4\n---\n"
-					+ "| b : assumption\n| _|_ : not e 3,6\n_|_ : or e 1,4-5,6-7";
+	var src = "a or b\n~a\n~b\n| a : assumption\n| _|_ : neg e 2,4\n---\n"
+					+ "| b : assumption\n| _|_ : neg e 3,6\n_|_ : or e 1,4-5,6-7";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(result.valid, result.message);
@@ -177,8 +177,8 @@ exports["Or elimination fails when assumptions don't begin with or side."] = fun
 }
 
 exports["Or elimination fails when assumptions don't produce same result."] = function(test) {
-	var src = "a or b\n~a\n~b\n| a : assumption\n| _|_ : not e 2,4\n---\n"
-					+ "| b : assumption\n| _|_ : not e 3,6\n| c : contra e 6\n_|_ : or e 1,4-5,6-8";
+	var src = "a or b\n~a\n~b\n| a : assumption\n| _|_ : neg e 2,4\n---\n"
+					+ "| b : assumption\n| _|_ : neg e 3,6\n| c : contra e 6\n_|_ : or e 1,4-5,6-8";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);
@@ -209,32 +209,32 @@ exports["Or introduction fails when side does not match reference."] = function(
 	test.done();
 }
 
-exports["Not introduction succeeds when reference is contradiction."] = function(test) {
-	var src = "a\n| ~a : assumption\n| _|_ : not e 1,2\n~~a : not i 2-3";
+exports["Neg introduction succeeds when reference is contradiction."] = function(test) {
+	var src = "a\n| ~a : assumption\n| _|_ : neg e 1,2\n~~a : neg i 2-3";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(result.valid, result.message);
 	test.done();
 }
 
-exports["Not introduction fails when reference is not contradiction."] = function(test) {
-	var src = "a\n| ~a : assumption\n~~a : not i 2-2";
+exports["Neg introduction fails when reference is not contradiction."] = function(test) {
+	var src = "a\n| ~a : assumption\n~~a : neg i 2-2";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);
 	test.done();
 }
 
-exports["Not elimination succeeds when reference is negation of current step."] = function(test) {
-	var src = "a\n~a\n_|_ : not e 1,2";
+exports["Neg elimination succeeds when reference is negation of current step."] = function(test) {
+	var src = "a\n~a\n_|_ : neg e 1,2";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(result.valid, result.message);
 	test.done();
 }
 
-exports["Not elimination fails when reference is not a negation of current step."] = function(test) {
-	var src = "a\n~b\n_|_ : not e 1,2";
+exports["Neg elimination fails when reference is not a negation of current step."] = function(test) {
+	var src = "a\n~b\n_|_ : neg e 1,2";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);

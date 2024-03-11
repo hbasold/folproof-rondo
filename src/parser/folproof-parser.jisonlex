@@ -9,9 +9,9 @@ justify				":".*
 [\n\r]?"#".*			/* comments are ignored */
 "and"|"∧"|"&"				return 'AND';
 "or"|"∨"|"v"				return 'OR';
-"implies"|"->"		return 'IMPLIES';
+"implies"|"->"|"→"		return 'IMPLIES';
 "iff"|"<->"		return 'IFF';
-"not"|"~"			return 'NOT';
+"not"|"~"|"¬"			return 'NOT';
 "="				return 'EQUALS';
 /* "every"				return 'EVERY'; */
 "with"				return 'WITH';
@@ -51,14 +51,14 @@ justify				":".*
 				yytext = [name, rtype, side, lineranges, sub];
 				return 'JUSTIFICATION';
 				%};
-"E"				return 'EXISTS';
-"in"				return 'IN';
-"empty"				return 'EMPTYSET';
-"A"				return 'FORALL';
+"E"|"∃"				return 'EXISTS';
+/* "in"				return 'IN';*/
+/*"empty"				return 'EMPTYSET';*/
+"A"|"∀"				return 'FORALL';
 /* "()"				return 'DOUBLEPAREN'; */
 "("				return 'LPAREN';
 ")"				return 'RPAREN';
-"_|_"     return 'BOTTOM';
+"_|_"|"⊥"     return 'BOTTOM';
 /* {objid}				return 'OBJID';
 {predid}				return 'PREDID'; */
 {id}				return 'ID';
