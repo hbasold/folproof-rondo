@@ -35,13 +35,13 @@ Operator    | Precedence   | LTR/RTL
 ------------|--------------|--------
 term(a,..)  | 1            | N/A
 not         | 1            | N/A
-and         | 2            | LTR
-or          | 3            | LTR
-A.x         | 4            | N/A
-E.x         | 4            | N/A
-->          | 5            | RTL
+and         | 2            | RTL
+or          | 3            | RTL
+->          | 4            | RTL
+A x.        | 5            | N/A
+E x.        | 5            | N/A
 
-The fact that 'and' and 'or' bind stronger than the quantifiers A.x and E.x means that, for example, `A.x Q(x) and P(x)` is interpreted as `A.x (Q(x) and P(x))` and *not* `(A.x Q(x)) and P(x)`, while `A.x Q(x) -> P(x)` is interpreted as `(A.x Q(X)) -> P(x)`.
+The fact that 'and' and 'or' bind stronger than the quantifiers A x. and E x. means that, for example, `A x. Q(x) and P(x)` is interpreted as `A x. (Q(x) and P(x))` and *not* `(A.x Q(x)) and P(x)`, while `A x. Q(x) -> P(x)` is interpreted as `A x. (Q(X) -> P(x))`.
 
 ## Justifications
 

@@ -731,25 +731,21 @@ case 9:
 break;
 case 10:return 19;
 break;
-case 11:return 'IN';
+case 11:return 21;
 break;
-case 12:return 'EMPTYSET';
+case 12:return 35;
 break;
-case 13:return 21;
+case 13:return 36;
 break;
-case 14:return 35;
+case 14:return 34;
 break;
-case 15:return 36;
+case 15:return 17;
 break;
-case 16:return 34;
+case 16:return 38;
 break;
-case 17:return 17;
+case 17:return 20;
 break;
-case 18:return 38;
-break;
-case 19:return 20;
-break;
-case 20:
+case 18:
 				// remaining DEBOXes implied by EOF
 				var tokens = [];
 
@@ -761,15 +757,15 @@ case 20:
 				if (tokens.length) return tokens;
 				
 break;
-case 21: /* manually close an assumption box */
+case 19: /* manually close an assumption box */
 				this._log("MANUAL DEBOX");
 				this._iemitstack.shift();
 				return ['DEBOX', 'EOL'];
 				
 break;
-case 22:/* eat blank lines */
+case 20:/* eat blank lines */
 break;
-case 23:
+case 21:
 				/* Similar to the idea of semantic whitespace, we keep track of virtual
 				 * BOX/DEBOX characters based on a stack of | occurrences
 				 */
@@ -793,16 +789,16 @@ case 23:
 				    return tokens;
 				
 break;
-case 24:return 8; 
+case 22:return 8; 
 break;
-case 25:/* ignore whitespace */
+case 23:/* ignore whitespace */
 break;
-case 26:return 2;
+case 24:return 2;
 break;
 }
 },
-rules: [/^(?:[\n\r]?#.*)/,/^(?:and|∧|&)/,/^(?:or|∨|v\b)/,/^(?:implies|->)/,/^(?:iff|<->)/,/^(?:not|~)/,/^(?:=)/,/^(?:with\b)/,/^(?:\d+)/,/^(?:(:.*))/,/^(?:E\b)/,/^(?:in\b)/,/^(?:empty\b)/,/^(?:A\b)/,/^(?:\()/,/^(?:\))/,/^(?:_\|_\b)/,/^(?:([a-zA-Z_][a-zA-Z_'"0-9\|]*))/,/^(?:,)/,/^(?:\.)/,/^(?:[\n\r]*$)/,/^(?:\n([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*-+)/,/^(?:[\n\r]+([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*(?![^\n\r]))/,/^(?:[\n|^]([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\d*([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)/,/^(?:\n)/,/^(?:([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+)/,/^(?:.*)/],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],"inclusive":true}}
+rules: [/^(?:[\n\r]?#.*)/,/^(?:and|∧|&)/,/^(?:or|∨|v\b)/,/^(?:implies|->|→)/,/^(?:iff|<->)/,/^(?:not|~|¬)/,/^(?:=)/,/^(?:with\b)/,/^(?:\d+)/,/^(?:(:.*))/,/^(?:E|∃)/,/^(?:A|∀)/,/^(?:\()/,/^(?:\))/,/^(?:_\|_|⊥)/,/^(?:([a-zA-Z_][a-zA-Z_'"0-9\|]*))/,/^(?:,)/,/^(?:\.)/,/^(?:[\n\r]*$)/,/^(?:\n([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*-+)/,/^(?:[\n\r]+([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*(?![^\n\r]))/,/^(?:[\n|^]([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\d*([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)/,/^(?:\n)/,/^(?:([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+)/,/^(?:.*)/],
+conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"inclusive":true}}
 });
 jisonLexerFn = lexer.setInput;
 lexer.setInput = function(input) {
