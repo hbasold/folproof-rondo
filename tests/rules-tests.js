@@ -336,6 +336,37 @@ exports["Forall introduction fails when reference range ending step doesn't matc
 	test.done();
 }
 
+exports["Forall introduction nested inside implication introduction."] = function(test) {
+	var src =
+      "∀x.P(c, x)      : premise \n" +
+      "| r \n" +
+      "|| with x0 \n" +
+      "|| P(c,x0)      : A.x/x0 e 1 \n" +
+      "| ∀x.P(c,x)     : A.x/x0 i 3-3 \n" +
+      "r -> ∀x.P(c,x)  : -> i 2-4";
+	var ast = p.parse(src);
+	var result = v.verifyFromAST(ast);
+	test.ok(result.valid, result.message);
+	test.done();
+}
+
+exports["Forall introduction nested."] = function(test) {
+	var src =
+      "∀x.Ay.P(x, y)     : premise \n" +
+      "| with x0 \n" +
+      "|| with y0 \n" +
+      "|| Ay.P(x0, y)    : A.x/x0 e 1 \n" +
+      "|| P(x0,y0)       : A.y/y0 e 2 \n" +
+      "| ∀y.P(x0,y)      : A.y/y0 i 2-3 \n" +
+      "∀x.Ay.P(x, y)"
+    ;
+	var ast = p.parse(src);
+	var result = v.verifyFromAST(ast);
+	test.ok(result.valid, result.message);
+	test.done();
+}
+
+
 exports["Exists introduction succeeds when referenced step matches after substitution."] = function(test) {
 	var src = "P(a)\nE x. P(x) : E.x/a intro 1";
 	var ast = p.parse(src);

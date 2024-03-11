@@ -397,12 +397,13 @@ var rules = {
 				var endExpr = proof.steps[steps[0][1]].getSentence();
 				if (currExpr[0] !== 'forall')
 					return "All-x-Intro: Current step is not a 'for-all' expression.";
-				if (scope.length == 0 || scope[0] == null)
+          u.debug("step", step, "steps", steps[0][0], "startStep", startStep, "Scope", scope);
+				if (scope.length == 0 || scope[scope.length - 1] == null)
 					return "All-x-Intro: Not valid without a scoping assumption (e.g., an x0 box).";
 			
 				// check if any substitutions from our scope match refExpr
 				var scopeVar = scope[scope.length-1];
-				var found = scope.slice().reverse().reduce(function(a,e) { return a && (e == null || e == subst[1]); }, true);
+				var found = scope.slice().reverse().reduce(function(a,e) { return a || (e == null || e == subst[1]); }, true);
 				if (! found)
 					return "All-x-intro: Substitution " + subst[1] + " doesn't match scope: " + scope.filter(function(e) { if (e != null) return e; }).join(", ");
 
