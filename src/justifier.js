@@ -5,7 +5,7 @@ var Justifier = function Justifier(format, fn) {
 	var self = this;
 
 	this.exec = function(proof, step, part, steps, subst) {
-		u.debug(step, part, steps, subst);
+		u.debug("Justifier", step, part, steps, subst);
 		var checked = self.checkParams(step, part, steps, subst);
 		if (typeof checked === "string") return checked;
 		return fn(proof, step, checked[0], checked[1], checked[2]);

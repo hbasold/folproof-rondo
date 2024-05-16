@@ -6,7 +6,7 @@ var Justifier = function Justifier(format, fn) {
 	var self = this;
 
 	this.exec = function(proof, step, part, steps, subst) {
-		u.debug(step, part, steps, subst);
+		u.debug("Justifier", step, part, steps, subst);
 		var checked = self.checkParams(step, part, steps, subst);
 		if (typeof checked === "string") return checked;
 		return fn(proof, step, checked[0], checked[1], checked[2]);
@@ -369,8 +369,6 @@ var rules = {
 			{ stepRefs: ["num", "num"] },
 			function(proof, step, part, steps) {
 				var s = proof.steps[step].getSentence();
-				if (! isContradiction(s))
-					return "Neg-Elim: Current step is not absurdity. " + proof.steps[step].getSentence();
 
 				var step1expr = proof.steps[steps[0]].getSentence();
 				var step2expr = proof.steps[steps[1]].getSentence();
@@ -646,7 +644,7 @@ if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
 
 },{"./justifier.js":1,"./rule.js":2,"./util":4}],4:[function(require,module,exports){
 var util = {};
-// debugMode = true;
+debugMode = false;
 util.debug = function debug() {
 	if (typeof debugMode !== "undefined" && debugMode)
 		console.log.apply(console, Array.prototype.slice.call(arguments));
@@ -695,7 +693,18 @@ var Verifier = (function() {
 			return;
 		}
 
-		var why = stmt.getJustification();
+    var why = stmt.getJustification();
+    u.debug('why', why);
+    if(why[0] == "premise") {
+      if(!result.premiseAllowed) {
+			  result.valid = false;
+			  result.message = "Introducing premises is only allowed at the start of a proof.";
+			  result.errorStep = step + 1;
+			  return;
+      }
+    } else {
+      result.premiseAllowed = false;
+    }
 		var newv = null;
 		if (why[0].split('.').length == 2)
 			newv = why[0].split('.')[1];
@@ -761,7 +770,8 @@ var Verifier = (function() {
 		return proof;
 	}
 
-	obj.preprocessBox = function preprocessBox(proof, ast, step, scope) {
+  obj.preprocessBox = function preprocessBox(proof, ast, step, scope) {
+      u.debug('ast', ast);
 		for(var i=0; i<ast.length; i++) {
 			if (ast[i][0] === 'rule') {
 				proof.steps[step] = new Statement(ast[i][1], ast[i][2], scope, ast[i][3], i == 0, i == ast.length - 1);
@@ -770,10 +780,12 @@ var Verifier = (function() {
 				var newScope = scope.slice(0)
 				newScope.push(ast[i][2][1]);
 				step = obj.preprocessBox(proof, ast[i][1], step, newScope);
+        u.debug('folbox', 'step', step, 'scope', scope, 'newScope', newScope);
 			} else if (ast[i][0] === 'box') {
 				var newScope = scope.slice(0)
 				newScope.push(null);
 				step = obj.preprocessBox(proof, ast[i][1], step, newScope);
+        u.debug('box', 'step', step, 'scope', scope, 'newScope', newScope);
 			} else if (ast[i][0] === 'error') {
 				proof.steps[step] = ast[i];
 			}

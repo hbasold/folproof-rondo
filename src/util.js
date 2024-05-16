@@ -1,5 +1,5 @@
 var util = {};
-// debugMode = true;
+debugMode = false;
 util.debug = function debug() {
 	if (typeof debugMode !== "undefined" && debugMode)
 		console.log.apply(console, Array.prototype.slice.call(arguments));

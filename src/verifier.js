@@ -36,7 +36,18 @@ var Verifier = (function() {
 			return;
 		}
 
-		var why = stmt.getJustification();
+    var why = stmt.getJustification();
+    u.debug('why', why);
+    if(why[0] == "premise") {
+      if(!result.premiseAllowed) {
+			  result.valid = false;
+			  result.message = "Introducing premises is only allowed at the start of a proof.";
+			  result.errorStep = step + 1;
+			  return;
+      }
+    } else {
+      result.premiseAllowed = false;
+    }
 		var newv = null;
 		if (why[0].split('.').length == 2)
 			newv = why[0].split('.')[1];
@@ -102,7 +113,8 @@ var Verifier = (function() {
 		return proof;
 	}
 
-	obj.preprocessBox = function preprocessBox(proof, ast, step, scope) {
+  obj.preprocessBox = function preprocessBox(proof, ast, step, scope) {
+      u.debug('ast', ast);
 		for(var i=0; i<ast.length; i++) {
 			if (ast[i][0] === 'rule') {
 				proof.steps[step] = new Statement(ast[i][1], ast[i][2], scope, ast[i][3], i == 0, i == ast.length - 1);
@@ -111,10 +123,12 @@ var Verifier = (function() {
 				var newScope = scope.slice(0)
 				newScope.push(ast[i][2][1]);
 				step = obj.preprocessBox(proof, ast[i][1], step, newScope);
+        u.debug('folbox', 'step', step, 'scope', scope, 'newScope', newScope);
 			} else if (ast[i][0] === 'box') {
 				var newScope = scope.slice(0)
 				newScope.push(null);
 				step = obj.preprocessBox(proof, ast[i][1], step, newScope);
+        u.debug('box', 'step', step, 'scope', scope, 'newScope', newScope);
 			} else if (ast[i][0] === 'error') {
 				proof.steps[step] = ast[i];
 			}
