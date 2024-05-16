@@ -145,9 +145,9 @@ var Verifier = (function() {
 				step = obj.preprocessBox(proof, ast[i][1], step, newScope);
 			} else if (ast[i][0] === 'box') {
 				var newScope = scope.slice(0)
-				newScope.push(null);
-				step = obj.preprocessBox(proof, ast[i][1], step, newScope);
+				// newScope.push(null);
         u.debug('box', 'step', step, 'scope', scope, 'newScope', newScope);
+				step = obj.preprocessBox(proof, ast[i][1], step, newScope);
 			} else if (ast[i][0] === 'error') {
 				proof.steps[step] = ast[i];
 			}
