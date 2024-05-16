@@ -265,8 +265,6 @@ var rules = {
 			{ stepRefs: ["num", "num"] },
 			function(proof, step, part, steps) {
 				var s = proof.steps[step].getSentence();
-				if (! isContradiction(s))
-					return "Neg-Elim: Current step is not absurdity. " + proof.steps[step].getSentence();
 
 				var step1expr = proof.steps[steps[0]].getSentence();
 				var step2expr = proof.steps[steps[1]].getSentence();
