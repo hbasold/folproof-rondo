@@ -107,6 +107,11 @@ var rules = {
 		type : "simple",
 		verifier : new Justifier(null, function(proof, step) { return true; })
 		}),
+	"sorry" : new Rule({
+		name : "Sorry",
+		type : "simple",
+		verifier : new Justifier(null, function(proof, step) { return true; })
+		}),
 	"assumption" : new Rule({
 		name : "Assumption",
 		type : "simple",
@@ -666,7 +671,12 @@ var Verifier = (function() {
 
 	// proof = { 1 : Statement(), 2 : Statement() ... };
 	obj.verify = function(proof) {
-		var result = { message : "Proof is valid.", valid : true };
+	  var result = {
+      message : "Proof is valid.",
+      valid : true,
+      premiseAllowed : true,
+      remainingSorries : 0
+    };
 		for (var i=0; i<proof.steps.length; i++) {
 			obj.validateStatement(result, proof, i);
 			if (! result.valid) {
@@ -689,6 +699,9 @@ var Verifier = (function() {
 		var newv = null;
 		if (why[0].split('.').length == 2)
 			newv = why[0].split('.')[1];
+    if(why[0] == "sorry"){
+      result.remainingSorries += 1;
+    }
 		var validator = obj.lookupValidator(why);
 		if (typeof validator === 'function') {
 			var part = why[2], lines = why[3];

@@ -8,6 +8,11 @@ var rules = {
 		type : "simple",
 		verifier : new Justifier(null, function(proof, step) { return true; })
 		}),
+	"sorry" : new Rule({
+		name : "Sorry",
+		type : "simple",
+		verifier : new Justifier(null, function(proof, step) { return true; })
+		}),
 	"assumption" : new Rule({
 		name : "Assumption",
 		type : "simple",
