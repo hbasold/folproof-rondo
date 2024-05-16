@@ -8,7 +8,7 @@ justify				":".*
 %%
 [\n\r]?"#".*			/* comments are ignored */
 "and"|"∧"|"&"				return 'AND';
-"or"|"∨"|"v"				return 'OR';
+"or"|"∨"|"v"|"+"				return 'OR';
 "implies"|"->"|"→"		return 'IMPLIES';
 "iff"|"<->"		return 'IFF';
 "not"|"~"|"¬"			return 'NOT';

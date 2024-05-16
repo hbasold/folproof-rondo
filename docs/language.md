@@ -9,17 +9,20 @@ Every proof consists of a list of proof steps, where each step has the basic for
    1       2     3        4       5
 ```
 
-1. Integer line numbers are optional, but recommended. The verifier ignores user line numbers, instead keeping count, itself.
+1. Integer line numbers are optional, but recommended. The verifier ignores user line numbers, instead keeping count itself.
 2. Assumption boxes begin with a pipe, like:
 
-   `| phi : assumption`.
-   
-   Nested boxes can be created by adding more pipes:
-   
-   `|| phi2 : assumption`
-   
-   They can be ended explicitly, with any number of dashes on a new line, or implicitly, by simply omitting the pipe.
-   See [Example 1](#example-1---assumption-boxes) under [Examples].
+```
+| phi : assumption
+```
+
+Nested boxes can be created by adding more pipes:
+```
+|| phi2 : assumption
+```
+
+They can be ended explicitly, with any number of dashes on a new line, or implicitly, by simply omitting the pipe.
+See [Example 1](#example-1---assumption-boxes) under [Examples].
 3. phi is a formula in first-order logic. Greater detail can be found under [Formulas](#formulas).
 4. Colons separate the formula, phi, from the reason it follows logically. See [Justifications](#justifications).
 5. Every line is terminated by a newline.
@@ -29,19 +32,30 @@ Describing how each proof step should be formed, logically, is beyond the scope 
 
 ## Formulas
 
-FOLProof accepts the following logical operators, in order of precedence:
+FOLProof accepts the following logical operators, in order of precedence.
+The first column gives the ASCII notation, and the second provides alternative textual and Unicode notation.
 
-Operator    | Precedence   | LTR/RTL
-------------|--------------|--------
-term(a,..)  | 1            | N/A
-not         | 1            | N/A
-and         | 2            | RTL
-or          | 3            | RTL
-->          | 4            | RTL
-A x.        | 5            | N/A
-E x.        | 5            | N/A
+| ASCII Operator | Alternatives | Precedence | Assoc |
+|----------------|--------------|------------|-------|
+| t = s          |              | Atomic     | N/A   |
+| `_|_`          | ⊥            | Atomic     | N/A   |
+| ~              | not, ¬       | 1          | N/A   |
+| &              | and, ∧       | 2          | Right |
+| v              | or, ∨, +     | 2          | Right |
+| ->             | implies, →   | 3          | Right |
+| <->            | iff          | 3          | Right |
+| A x.           | ∀x.          | 4          | N/A   |
+| E x.           | ∃x.          | 4          | N/A   |
 
-The fact that 'and' and 'or' bind stronger than the quantifiers A x. and E x. means that, for example, `A x. Q(x) and P(x)` is interpreted as `A x. (Q(x) and P(x))` and *not* `(A.x Q(x)) and P(x)`, while `A x. Q(x) -> P(x)` is interpreted as `A x. (Q(X) -> P(x))`.
+Quantifiers extend as far possible to the right, which means that, for example, `A x. Q(x) and P(x)` is interpreted as `A x. (Q(x) & P(x))` and *not* `(A.x Q(x)) & P(x)`, while `A x. Q(x) -> P(x)` is interpreted as `A x. (Q(X) -> P(x))`.
+The alternative notation allow textual and unicode representations.
+For instance, the following three inputs are interpreted all as the same formula.
+```
+∀x. P(x) ∧ Q(x) → ¬R(x) ∨ T(x, c)
+A x. P(x) & Q(x) -> ~R(x) + T(x, c)
+A x. P(x) and Q(x) implies not R(x) or T(x, c)
+```
+Arguably, the notation with words is somewhat more difficult to read and merits some parentheses
 
 ## Justifications
 
@@ -81,25 +95,26 @@ Notice how the first assumption is terminated, explicitly, out of necessity, sin
 ### Appendix A
 #### A list of justifications accepted by FOLProof
 
-Rule Name     | Type  | Forms       | References | Substitutions
---------------|-------|-------------|------------|--------------
-Premise       | intro | N/A         | N/A        | N/A
-Assumption    | intro | N/A         | N/A        | N/A
-Copy          | intro | N/A         | a          | N/A
-And           | basic | elim        | a          | N/A
-              |       | intro       | a,b        | N/A
-Or            | basic | elim        | a,b-c,d-e  | N/A
-              |       | intro       | a          | N/A
-Not           | basic | elim        | a,b        | N/A
-              |       | intro       | a-b        | N/A
-Implication   | basic | elim        | a,b        | N/A
-              |       | intro       | a-b        | N/A
-Forall (A.?)  | basic | elim        | a          | Y
-              |       | intro       | a-b        | Y
-Exists (E.?)  | basic | elim        | a-b        | Y
-              |       | intro       | a          | Y
-Contradiction | basic | elim        | a          | N/A
-PBC           | deriv.| N/A         | a-b        | N/A
-MT            | deriv.| N/A         | a,b        | N/A
-NOTNOT        | deriv.| intro       | a          | N/A
-LEM           | deriv.| N/A         | N/A        | N/A
+| Rule Name    | Type   | Forms | References | Substitutions |
+|--------------|--------|-------|------------|---------------|
+| Premise      | intro  | N/A   | N/A        | N/A           |
+| Assumption   | intro  | N/A   | N/A        | N/A           |
+| Sorry        | intro  | N/A   | N/A        | N/A           |
+| Copy         | intro  | N/A   | a          | N/A           |
+| And          | basic  | elim  | a          | N/A           |
+|              |        | intro | a,b        | N/A           |
+| Or           | basic  | elim  | a,b-c,d-e  | N/A           |
+|              |        | intro | a          | N/A           |
+| Not          | basic  | elim  | a,b        | N/A           |
+|              |        | intro | a-b        | N/A           |
+| Implication  | basic  | elim  | a,b        | N/A           |
+|              |        | intro | a-b        | N/A           |
+| Forall (A.?) | basic  | elim  | a          |               |
+|              |        | intro | a-b        |               |
+| Exists (E.?) | basic  | elim  | a-b        |               |
+|              |        | intro | a          |               |
+| Bot          | basic  | elim  | a          | N/A           |
+| Contra       | deriv. | N/A   | a-b        | N/A           |
+| MT           | deriv. | N/A   | a,b        | N/A           |
+| NOTNOT       | deriv. | intro | a          | N/A           |
+| LEM          | deriv. | N/A   | N/A        | N/A           |
