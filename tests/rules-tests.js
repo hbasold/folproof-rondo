@@ -233,6 +233,14 @@ exports["Neg elimination succeeds when reference is negation of current step."] 
 	test.done();
 }
 
+exports["Neg elimination can prove arbitrary conclusion."] = function(test) {
+  var src = "a\n~a\nb : neg e 1,2";
+  var ast = p.parse(src);
+  var result = v.verifyFromAST(ast);
+  test.ok(result.valid, result.message);
+  test.done();
+}
+
 exports["Neg elimination fails when reference is not a negation of current step."] = function(test) {
 	var src = "a\n~b\n_|_ : neg e 1,2";
 	var ast = p.parse(src);
@@ -364,6 +372,20 @@ exports["Forall introduction nested."] = function(test) {
 	var result = v.verifyFromAST(ast);
 	test.ok(result.valid, result.message);
 	test.done();
+}
+
+exports["Nested flags: forall introduction followed by implication introduction."] = function(test) {
+  var src =
+      "| with x0\n" +
+      "||P(x0)\n" +
+      "||P(x0)        : copy 1\n" +
+      "|P(x0) → P(x0) : -> i 1-2\n" +
+      "∀y.P(y) → P(y) : A.y/x0 i 1-3"
+  ;
+  var ast = p.parse(src);
+  var result = v.verifyFromAST(ast);
+  test.ok(result.valid, result.message);
+  test.done();
 }
 
 

@@ -146,6 +146,22 @@ exports["Forall on right of implication."] = function(test) {
 	  test.done();
 };
 
+exports["Complex terms under forall."] = function(test) {
+  var src = "1 A x. P(f(c), x) : premise";
+  var result = parser.parse(src);
+  result = result[0][1];
+  test.equal(result[0], 'forall');
+  test.equal(result[1], 'x');
+  p = result[2];
+  test.equal(p[1], 'P');
+  ts = p[2];
+  test.equal(ts[0][1], 'f');
+  test.equal(ts[0][2][0][1], 'c');
+  test.equal(ts[1][1], 'x');
+  test.done();
+};
+
+
 exports["Atomic predicate."] = function(test) {
 	  var src = "P(f)";
 	  var result = parser.parse(src);
