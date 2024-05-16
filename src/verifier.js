@@ -1,6 +1,24 @@
 var rules = require("./rules");
 var u = require("./util");
 
+  class Statement {
+	  constructor (sentenceAST, justificationAST, scope, loc, isFirst, isLast) {
+      this.isFirst = isFirst;
+      this.isLast = isLast;
+      this.sentenceAST = sentenceAST;
+      this.scope = scope;
+      this.justificationAST = justificationAST;
+      this.loc = loc;
+    }
+
+    isFirstStmt() { return this.isFirst; }
+		isLastStmt() { return this.isLast; }
+		getSentence() { return this.sentenceAST;	}
+		getScope() { return this.scope; }
+		getJustification() { return this.justificationAST; }
+		getMeta() { return this.loc; }
+	}
+
 var Verifier = (function() {
 	var debugMode = false;
 	var obj = this;
@@ -110,11 +128,12 @@ var Verifier = (function() {
 	obj.preprocess = function preprocess(ast) {
 		var proof = { steps : [] };
 		obj.preprocessBox(proof, ast, 0, []);
+    u.debug("processed proof", proof);
 		return proof;
 	}
 
   obj.preprocessBox = function preprocessBox(proof, ast, step, scope) {
-      u.debug('ast', ast);
+    u.debug('ast', ast);
 		for(var i=0; i<ast.length; i++) {
 			if (ast[i][0] === 'rule') {
 				proof.steps[step] = new Statement(ast[i][1], ast[i][2], scope, ast[i][3], i == 0, i == ast.length - 1);
@@ -122,8 +141,8 @@ var Verifier = (function() {
 			} else if (ast[i][0] === 'folbox') {
 				var newScope = scope.slice(0)
 				newScope.push(ast[i][2][1]);
-				step = obj.preprocessBox(proof, ast[i][1], step, newScope);
         u.debug('folbox', 'step', step, 'scope', scope, 'newScope', newScope);
+				step = obj.preprocessBox(proof, ast[i][1], step, newScope);
 			} else if (ast[i][0] === 'box') {
 				var newScope = scope.slice(0)
 				newScope.push(null);
@@ -136,16 +155,7 @@ var Verifier = (function() {
 		return step;
 	}
 
-	var Statement = function(sentenceAST, justificationAST, scope, loc, isFirst, isLast) {
-		this.isFirstStmt = function() { return isFirst; };
-		this.isLastStmt = function() { return isLast; };
-		this.getSentence = function getSentence() { return sentenceAST;	};
-		this.getScope = function getScope() { return scope; }
-		this.getJustification = function getJustification() { return justificationAST; };
-		this.getMeta = function() { return loc; }
-	};
-	
-	return obj;
+  return obj;
 })();
 
 if (typeof require !== 'undefined' && typeof exports !== 'undefined') {

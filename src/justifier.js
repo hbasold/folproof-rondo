@@ -8,6 +8,7 @@ var Justifier = function Justifier(format, fn) {
 		u.debug("Justifier", step, part, steps, subst);
 		var checked = self.checkParams(step, part, steps, subst);
 		if (typeof checked === "string") return checked;
+    u.debug("Calling justifier on checked", checked);
 		return fn(proof, step, checked[0], checked[1], checked[2]);
 	};
 
