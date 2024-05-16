@@ -358,7 +358,7 @@ exports["Forall introduction nested."] = function(test) {
       "|| Ay.P(x0, y)    : A.x/x0 e 1 \n" +
       "|| P(x0,y0)       : A.y/y0 e 2 \n" +
       "| ∀y.P(x0,y)      : A.y/y0 i 2-3 \n" +
-      "∀x.Ay.P(x, y)"
+      "∀x.Ay.P(x, y)     : A.x/x0 i 2-4"
     ;
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
@@ -388,7 +388,14 @@ exports["Exists introduction fails when referenced step doesn't match after subs
 }
 
 exports["Exists elimination succeeds when referenced step range is assumption & concl. matches current step."] = function(test) {
-	var src = "E a. P(a)\n| with x0\n| P(x0) : assumption\n| P(x0) or Q(x0)\n : or i1 2\n| E a.(P(a) or Q(a)) : E.a/x0 i 3\nE a.(P(a) or Q(a)) : E.a/x0 elim 1,2-4";
+  var src =
+      "E a. P(a)\n" +
+      "| with x0\n" +
+      "| P(x0)\n" +
+      "| P(x0) or Q(x0)     : or i1 2\n" +
+      "| E a.(P(a) or Q(a)) : E.a/x0 i 3\n" +
+      "E a.(P(a) or Q(a))   : E.a/x0 elim 1,2-4"
+  ;
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(result.valid, result.message);
@@ -412,7 +419,7 @@ exports["Exists elimination fails when referenced step range is not scoping assu
 }
 
 exports["Exists elimination fails when assumption conclusion doesn't match current step."] = function(test) {
-	var src = "E a. P(a)\n| with x0\n| P(x0) : assumption\n| P(x0) or Q(x0)\n : or i1 2\nE a.(P(a) or Q(a)) : E.a/x0 elim 1,2-3";
+	var src = "E a. P(a)\n| with x0\n| P(x0) : assumption\n| P(x0) or Q(x0) : or i1 2\nE a.(P(a) or Q(a)) : E.a/x0 elim 1,2-3";
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);
@@ -421,7 +428,13 @@ exports["Exists elimination fails when assumption conclusion doesn't match curre
 }
 
 exports["Exists elimination fails when assumption start doesn't match first exists ref step."] = function(test) {
-	var src = "E a. Q(a)\n| with x0\n| P(x0) : assumption\n| P(x0) or Q(x0)\n : or i1 2\nE a.(P(a) or Q(a)) : E.a/x0 elim 1,2-3";
+  var src =
+      "E a. Q(a)\n" +
+      "| with x0\n" +
+      "| P(x0) : assumption\n" +
+      "| P(x0) or Q(x0) : or i1 2\n" +
+      "E a.(P(a) or Q(a)) : E.a/x0 elim 1,2-3"
+  ;
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);
