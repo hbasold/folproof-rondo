@@ -137,7 +137,7 @@ var folproofWeb = (function() {
 				if ($.inArray(ast[1], infixTerms) == -1) {
 					term.append(renderSimpleTerm(ast[1], options), "(");
 					for (var i=0; i<ast[2].length; i++) {
-						term.append(renderSimpleTerm(ast[2][i][1], options));
+						term.append(renderTerm(ast[2][i], options));
 						if (i < ast[2].length-1) term.append(", ");
 					}
 					term.append(")");
