@@ -173,7 +173,13 @@ var folproofWeb = (function() {
 	}
 	
 	function renderJustification(ast, options) {
-		var nest = $("<div class='justification'></div>");
+    var cls = null;
+    if(ast[0] == "sorry"){
+      cls = "justification-warn";
+    } else {
+      cls = "justification";
+    }
+		var nest = $("<div class='" + cls + "'></div>");
 		nest.append(ast[0], " ", ast[1]);
 		if (ast[2]) nest.append(ast[2]);
 		if (ast[3])
