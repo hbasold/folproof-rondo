@@ -744,7 +744,10 @@ case 9:
 
         var sub = null;
         if (substParts) {
-				   sub = substParts[0].split('/');
+           sub = Array(0);
+           for (const s of substParts){
+				       sub.push(s.split('/'));
+           }
         }
 				yy_.yytext = [name, rtype, side, lineranges, sub];
 				return 39;
