@@ -24,7 +24,7 @@ var Justifier = function Justifier(format, fn) {
 			return [];
 		}
 
-		var partNum = null, refNums = [], w = null;
+		var partNum = null, refNums = [], parsedSubst = null;
 		if (format.hasPart) {
 			partNum = parseInt(part);
 			if (!(partNum == 1 || partNum == 2))
@@ -63,24 +63,50 @@ var Justifier = function Justifier(format, fn) {
 		if (format.subst) {
 			if (!subst)
 				return "Substitution specification required (e.g., A.x/x0 intro n-m)";
-			w = subst.map(function(e) { return e.match("^[A-Za-z_][A-Za-z_0-9]*$"); });
-			var allValidIds = w.reduce(function(a, e) { return a && e && e.length == 1 && e[0] });
-			if (w.length != 2 || !allValidIds)
-				return "Substitution format must match (e.g., A.x/x0 intro n-m.)";
+      var parsedSubst = parseSubst(subst);
+      if (typeof parsedSubst === "string")
+        return parsedSubst;
+			// w = subst.map(function(e) { return e.match("^[A-Za-z_][A-Za-z_0-9]*$"); });
+			// var allValidIds = w.reduce(function(a, e) { return a && e && e.length == 1 && e[0] });
+			// if (w.length != 2 || !allValidIds)
+			// 	return "Substitution format must match (e.g., A.x/x0 intro n-m.)";
 
-			w = w.map(function(e) { return e[0] });
+			// w = w.map(function(e) { return e[0] });
+      u.debug("subst", subst, "parsedSubst", parsedSubst);
 		} else {
 			if (subst)
 				return "Substitution unexpected.";
 		}
 
-		return [partNum, refNums, w];
+		return [partNum, refNums, parsedSubst];
 	};
+};
+
+var parseSubst = function(subst){
+  if (subst.length != 2)
+		return "Substitution must consist of a variable and a term (e.g., x/f(c))";
+  var idRegex = "^[A-Za-z_][A-Za-z_0-9]*$";
+  var res = subst[0].match(idRegex);
+  if (!res)
+    return "Substitution must substitute for a variable, but got " + subst[0] + ".";
+  var substAst = p.parser.parse(subst[1]);
+  if (typeof substAst === "string"){
+    return substAst;
+  } else {
+    // the AST will be of the form [["rule", term, ...]], as the top-level parser is "proof"
+    var term = substAst[0][1];
+    // The term cannot be a formula, hence it must have an identifier at the root
+    if (term[0] == "id"){
+      return [res[0], term];
+    } else {
+      return "Substitution does not have a valid term, should be of the form x/f(c), but got " + subst[1] + ".";
+    }
+  }
 };
 
 module.exports = Justifier;
 
-},{"./util":4}],2:[function(require,module,exports){
+},{"../folproof-parser":1,"./util":8}],6:[function(require,module,exports){
 var Rule = function Rule(options) {
 	// { name : name,
 	//   type : ["simple", "derived", "normal"], 

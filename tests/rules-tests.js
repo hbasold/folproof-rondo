@@ -309,6 +309,14 @@ exports["Forall elimination fails when referenced step doesn't match."] = functi
 	test.done();
 }
 
+exports["Forall elimination works with complex term in substition."] = function(test) {
+	var src = "A x. P(x)\nP(f(a)) : A.x/f(a) elim 1";
+	var ast = p.parse(src);
+	var result = v.verifyFromAST(ast);
+	test.ok(result.valid, result.message);
+	test.done();
+}
+
 exports["Forall introduction succeeds when ref is assumption and final step matches current step, under subst."] = function(test) {
 	var src = "| with x0\n| P(x0) : assumption\nA x. P(x) : A.x/x0 i 1-1";
 	var ast = p.parse(src);

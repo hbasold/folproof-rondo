@@ -66,17 +66,19 @@ var Verifier = (function() {
     } else {
       result.premiseAllowed = false;
     }
-		var newv = null;
-		if (why[0].split('.').length == 2)
-			newv = why[0].split('.')[1];
+		// var newv = null;
+		// if (why[0].split('.').length == 2)
+		// 	newv = why[0].split('.')[1];
     if(why[0] == "sorry"){
       result.remainingSorries += 1;
     }
 		var validator = obj.lookupValidator(why);
 		if (typeof validator === 'function') {
-			var part = why[2], lines = why[3];
-			var subst = null;
-			if (newv && why[4]) subst = [newv, why[4]];
+			var part = why[2];
+      var lines = why[3];
+      var subst = why[4];
+			// var subst = null;
+			// if (newv && why[4]) subst = [newv, why[4]];
 			var isValid = validator(proof, step, part, lines, subst);
 			if (isValid === true) {
 				result.valid = true;

@@ -699,32 +699,53 @@ case 9:
 				
 				// strip the leading colon and spaces
 				yy_.yytext = yy_.yytext.substr(yy_.yytext.substr(1).search(/\S/));
-				
-				// find the beginning of the first line number
 				yy_.yytext = yy_.yytext.trim();
+
+        // find the beginning of the first line number
 				var pos = yy_.yytext.search(/\s+\d+/);
-				var lineranges = null, name = yy_.yytext;
+				var lineranges = null;
 				if (pos != -1) {
-					name = yy_.yytext.substr(0, pos);
 					lineranges = yy_.yytext.substr(pos+1).split(/\s*,\s*/);
+          yy_.yytext = yy_.yytext.substr(0, pos);
 				}
-				var parts = name.split(' ');
+
+        // If there is a substitution, then it comes after a dot that separates the rule name from
+        // the substitution.
+        var ruleApp = yy_.yytext.split('.', 2);
+        var name = null;
+        var substParts = null;
+        if (ruleApp.length == 2){
+           name = ruleApp[0].trim();
+           var substParts = ruleApp[1].split(',');
+           var rem = substParts[substParts.length - 1].split(' ', 2);
+           substParts[substParts.length - 1] = rem[0];
+           if(rem.length >= 2){
+             yy_.yytext = rem[1];
+           } else {
+             yy_.yytext = "";
+           }
+        } else {
+           var parts = yy_.yytext.split(' ', 2);
+           name = parts[0];
+           if(parts.length >= 2){
+             yy_.yytext = parts[1];
+           } else {
+             yy_.yytext = "";
+           }
+        }
+				var parts = yy_.yytext.match(/([a-zA-Z]+)(\d+)?/);
 				var rtype = null, side = null;
-				if (parts[0]) {
-					name = parts[0];
+				if (parts) {
 					rtype = parts[1];
-					if (rtype && (parts = rtype.match(/([a-zA-Z]+)(\d+)/))) {
-						rtype = parts[1];
+          if (parts.length >= 3){
 						side = parts[2];
 					}
 				}
-				var sub = name.split('/');
-				if (sub.length == 2) {
-					name = sub[0];
-					sub = sub[1];
-				} else {
-					sub = null;
-				}
+
+        var sub = null;
+        if (substParts) {
+				   sub = substParts[0].split('/');
+        }
 				yy_.yytext = [name, rtype, side, lineranges, sub];
 				return 39;
 				

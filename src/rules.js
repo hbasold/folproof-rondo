@@ -287,7 +287,7 @@ var rules = {
 				return "Neg-Elim: Subexpression in not-expr does not match other expr.";
 			})
 	}),
-	"a." : new Rule({
+ 	"a" : new Rule({
 		name : "ForAll",
 		type : "normal",
 		introduction : new Justifier(
@@ -299,9 +299,9 @@ var rules = {
 				var startExpr = startStep.getSentence();
 				var scope = startStep.getScope(); // ex: [['x0','x'], ['y0', 'y'], ...], LIFO
 				var endExpr = proof.steps[steps[0][1]].getSentence();
+        u.debug("all-intro", "startExpr", startExpr, "endExpr", endExpr, "currExpr", currExpr, "scope", scope, "subst", subst);
 				if (currExpr[0] !== 'forall')
 					return "All-x-Intro: Current step is not a 'for-all' expression.";
-          u.debug("step", step, "steps", steps[0][0], "startStep", startStep, "Scope", scope);
 				if (scope.length == 0 || scope[scope.length - 1] == null)
 					return "All-x-Intro: Not valid without a scoping assumption (e.g., an x0 box).";
 			
@@ -311,8 +311,8 @@ var rules = {
 				if (! found)
 					return "All-x-intro: Substitution " + subst[1] + " doesn't match scope: " + scope.filter(function(e) { if (e != null) return e; }).join(", ");
 
-				var endExprSub = substitute(endExpr, subst[1], subst[0]);
-				if (semanticEq(endExprSub, currExpr[2]))
+				var currExprSub = substitute(currExpr[2], subst[0], subst[1]);
+				if (semanticEq(endExpr, currExprSub))
 					return true;
 				return "All-x-Intro: Last step in range doesn't match current step after " + subst[0] + "/" + subst[1] + ".";
 			}),
@@ -322,6 +322,7 @@ var rules = {
 				var currStep = proof.steps[step];
 				var currExpr = currStep.getSentence();
 				var refExpr = proof.steps[steps[0]].getSentence();
+        u.debug("all-elim", "refExpr", refExpr, "currExpr", currExpr, "subst", subst);
 				if (refExpr[0] !== 'forall')
 					return "All-x-Elim: Referenced step is not a for-all expression.";
 		
@@ -332,7 +333,7 @@ var rules = {
 				return "All-x-Elim: Referenced step did not match current step after " + subst[1] + "/" + subst[0] + ".";
 			})
 	}),
-	"e." : new Rule({
+	"e" : new Rule({
 		name : "Exists",
 		type : "normal",
 		introduction : new Justifier(
@@ -341,11 +342,12 @@ var rules = {
 				var currStep = proof.steps[step];
 				var currExpr = currStep.getSentence();
 				var refExpr = proof.steps[steps[0]].getSentence();
+        u.debug("ex-intro", "refExpr", refExpr, "currExpr", currExpr, "subst", subst);
 				if (currExpr[0] !== 'exists')
 					return "Exists-x-Intro: Current step is not an 'exists' expression.";
 		
-				var refExprSub = substitute(refExpr, subst[1], subst[0]);
-				if (semanticEq(refExprSub, currExpr[2]))
+				var currExprSub = substitute(currExpr[2], subst[0], subst[1]);
+				if (semanticEq(refExpr, currExprSub))
 					return true;
 	
 				return "Exists-x-Intro: Referenced step did not match current step after " + subst[1] + "/" + subst[0] + " substitution.";
@@ -408,6 +410,7 @@ var rules = {
 	}),
 };
 
+// Substitutes b for a in the start expression
 function substitute(startExpr, a, b, bound) {
 	u.debug("substitute", startExpr, a, b);
 	bound = bound ? bound : [];
@@ -428,13 +431,12 @@ function substitute(startExpr, a, b, bound) {
 			return [startExpr[0], startExpr[1],
 				substitute(startExpr[2], a, b, bound)];
 		}
-		
 		return [startExpr[0], substitute(startExpr[1], a, b, bound)];
 	} else if (startExpr[0] === 'id') {
 		if (startExpr.length === 2) { // our loverly base case
 			if (! arrayContains(bound, startExpr[1])) {
 				if (startExpr[1] === a)
-					return [startExpr[0], b];
+					return b; // [startExpr[0], b];
 			}
 			return startExpr;
 		}
