@@ -34,12 +34,22 @@ var Justifier = function Justifier(format, fn) {
 				return "Step part (e.g., 2 in 'and e2') not applicable, in this context.";
 		
 		if (format.stepRefs) {
-			if (steps.length != format.stepRefs.length) {
-				var f = format.stepRefs.map(function(e) { return e == "num" ? "n" : "n-m" });
+      var refStepFormat;
+      if (format.stepRefs.length > 0 & format.stepRefs[format.stepRefs.length - 1] == "nums") {
+        refStepFormat = format.stepRefs.slice(0, -1);
+        var extraSteps = steps.length - refStepFormat.length;
+        if (extraSteps > 0) {
+          refStepFormat = refStepFormat.concat(Array(extraSteps).fill("num"));
+        }
+      } else {
+        refStepFormat = format.stepRefs;
+      }
+			if (steps.length != refStepFormat.length) {
+				var f = refStepFormat.map(function(e) { return e == "num" ? "n" : "n-m" });
 				return "Step reference mismatch; required format: " + f.join(", ") + ".";
 			}
 			for (var i=0; i<steps.length; i++) {
-				if (format.stepRefs[i] == "num") {
+				if (refStepFormat[i] == "num") {
 					var n = parseInt(steps[i]) - 1;
 					if (!(n >= 0 && n < curStep))
 						return "Step reference #" + (i + 1) + " must be 1 <= step < current.";
