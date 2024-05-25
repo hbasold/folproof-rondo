@@ -309,6 +309,15 @@ exports["Forall elimination fails when referenced step doesn't match."] = functi
 	test.done();
 }
 
+exports["Forall elimination fails with more than one substituted variables."] = function(test) {
+	var src = "A x. P(x)\nP(a) : A.x/a,y/b elim 1";
+	var ast = p.parse(src);
+	var result = v.verifyFromAST(ast);
+	test.ok(!result.valid, result.message);
+	test.done();
+}
+
+
 exports["Forall elimination works with complex term in substition."] = function(test) {
 	var src = "A x. P(x)\nP(f(a)) : A.x/f(a) elim 1";
 	var ast = p.parse(src);
@@ -349,6 +358,14 @@ exports["Forall introduction fails when reference range ending step doesn't matc
 	var result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);
 	test.ok(result.message.indexOf("Last step in range") >= 0, "Error must be because of last step mismatch");
+	test.done();
+}
+
+exports["Forall introduction fails with more than one substituted variable."] = function(test) {
+	var src = "| with x0\n| P(x0) : assumption\nA x. P(x) : A.x/x0,y/y0 i 1-1";
+	var ast = p.parse(src);
+	var result = v.verifyFromAST(ast);
+	test.ok(!result.valid, result.message);
 	test.done();
 }
 

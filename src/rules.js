@@ -304,14 +304,16 @@ var rules = {
 					return "All-x-Intro: Current step is not a 'for-all' expression.";
 				if (scope.length == 0 || scope[scope.length - 1] == null)
 					return "All-x-Intro: Not valid without a scoping assumption (e.g., an x0 box).";
-			
+        if (subst.length > 1)
+          return "All-x-intro: Introducing more than one quantifier at the same time is currently not supported";
+
 				// check if any substitutions from our scope match refExpr
 				var scopeVar = scope[scope.length-1];
 				var found = scope.slice().reverse().reduce(function(a,e) { return a || (e == null || e == subst[1]); }, true);
 				if (! found)
 					return "All-x-intro: Substitution " + subst[1] + " doesn't match scope: " + scope.filter(function(e) { if (e != null) return e; }).join(", ");
 
-				var currExprSub = substitute(currExpr[2], subst[0], subst[1]);
+				var currExprSub = substitute(currExpr[2], subst);
 				if (semanticEq(endExpr, currExprSub))
 					return true;
 				return "All-x-Intro: Last step in range doesn't match current step after " + subst[0] + "/" + subst[1] + ".";
@@ -325,10 +327,12 @@ var rules = {
         u.debug("all-elim", "refExpr", refExpr, "currExpr", currExpr, "subst", subst);
 				if (refExpr[0] !== 'forall')
 					return "All-x-Elim: Referenced step is not a for-all expression.";
-		
-					var refExprSub = substitute(refExpr[2], subst[0], subst[1]);
-					if (semanticEq(refExprSub, currExpr))
-						return true;
+        if (subst.length > 1)
+          return "All-x-elim: Eliminating more than one quantifier at the same time is currently not supported";
+
+				var refExprSub = substitute(refExpr[2], subst);
+				if (semanticEq(refExprSub, currExpr))
+					return true;
 
 				return "All-x-Elim: Referenced step did not match current step after " + subst[1] + "/" + subst[0] + ".";
 			})
@@ -345,8 +349,10 @@ var rules = {
         u.debug("ex-intro", "refExpr", refExpr, "currExpr", currExpr, "subst", subst);
 				if (currExpr[0] !== 'exists')
 					return "Exists-x-Intro: Current step is not an 'exists' expression.";
-		
-				var currExprSub = substitute(currExpr[2], subst[0], subst[1]);
+        if (subst.length > 1)
+          return "Exists-x-Intro: Introducing more than one quantifier at the same time is currently not supported";
+
+				var currExprSub = substitute(currExpr[2], subst);
 				if (semanticEq(refExpr, currExprSub))
 					return true;
 	
@@ -366,10 +372,12 @@ var rules = {
 					return "Exists-x-Elim: Referenced step is not an 'exists' expression.";
 				if (scope.length == 0 || scope[scope.length - 1] == null)
 					return "Exists-x-Elim: Range must be within an assumption scope (e.g., an x0 box).";
-		
+        if (subst.length > 1)
+          return "Exists-x-Elim: Eliminating more than one quantifier at the same time is currently not supported";
+
 				// check whether substition matches ref line with current line
 				var scopeVars = scope[scope.length-1];
-				var refExprSub = substitute(refExpr[2], subst[0], subst[1]);
+				var refExprSub = substitute(refExpr[2], subst);
 				if (semanticEq(refExprSub, startExpr)) {
 					if (semanticEq(endExpr, currExpr))
 						return true;
@@ -410,9 +418,9 @@ var rules = {
 	}),
 };
 
-// Substitutes b for a in the start expression
-function substitute(expr, a, b, bound) {
-	u.debug("substitute", expr, a, b);
+// Substitutes in parallel in expr by all the variables that are mapped in subst
+function substitute(expr, subst, bound) {
+	u.debug("substitute", expr, subst);
 	bound = bound ? bound : [];
 	var binOps = ["->", "and", "or", "<->", "="];
 	var unOps = ["not", "forall", "exists"];
@@ -421,29 +429,30 @@ function substitute(expr, a, b, bound) {
 	while (expr[0] === 'paren') expr = expr[1];
 
 	if (arrayContains(binOps, expr[0])) {
-		var leftSide = substitute(expr[1], a, b);
-		var rightSide = substitute(expr[2], a, b);
+		var leftSide = substitute(expr[1], subst);
+		var rightSide = substitute(expr[2], subst);
 		return [expr[0], leftSide, rightSide];
 	} else if (arrayContains(unOps, expr[0])) {
 		if (expr[0] === "forall" || expr[0] === "exists") {
 			bound = bound.slice(0);
 			bound.push(expr[1]);
 			return [expr[0], expr[1],
-				substitute(expr[2], a, b, bound)];
+				substitute(expr[2], subst, bound)];
 		}
-		return [expr[0], substitute(expr[1], a, b, bound)];
+		return [expr[0], substitute(expr[1], subst, bound)];
 	} else if (expr[0] === 'id') {
-		if (expr.length === 2) { // our loverly base case
+		if (expr.length === 2) {
 			if (! arrayContains(bound, expr[1])) {
-				if (expr[1] === a)
-					return b; // [expr[0], b];
+        var s = subst.find((s) => s[0] === expr[1]);
+				if (s)
+					return s[1]; // [expr[0], b];
 			}
 			return expr;
 		}
 		if (expr.length === 3) {
 			var newTerms = [];
 			for (var i=0; i<expr[2].length; i++) {
-				newTerms.push(substitute(expr[2][i], a, b, bound));
+				newTerms.push(substitute(expr[2][i], subst, bound));
 			}
 			return [expr[0], expr[1], newTerms];
 		}

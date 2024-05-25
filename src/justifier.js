@@ -63,9 +63,10 @@ var Justifier = function Justifier(format, fn) {
 		if (format.subst) {
 			if (!subst)
 				return "Substitution specification required (e.g., A.x/x0 intro n-m)";
-      var parsedSubst = parseSubst(subst);
-      if (typeof parsedSubst === "string")
-        return parsedSubst;
+      var parsedSubst = subst.map(parseSubst);
+      var error = parsedSubst.find((x) => typeof x == "string");
+      if (error)
+        return error;
 			// w = subst.map(function(e) { return e.match("^[A-Za-z_][A-Za-z_0-9]*$"); });
 			// var allValidIds = w.reduce(function(a, e) { return a && e && e.length == 1 && e[0] });
 			// if (w.length != 2 || !allValidIds)

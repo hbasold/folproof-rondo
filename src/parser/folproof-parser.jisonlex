@@ -67,7 +67,10 @@ justify				":".*
 
         var sub = null;
         if (substParts) {
-				   sub = substParts[0].split('/');
+           sub = Array(0);
+           for (const s of substParts){
+				       sub.push(s.split('/'));
+           }
         }
 				yytext = [name, rtype, side, lineranges, sub];
 				return 'JUSTIFICATION';

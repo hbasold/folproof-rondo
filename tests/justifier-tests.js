@@ -68,7 +68,7 @@ exports["Test justifier accepts proper substitution format when expected"] = fun
 	test.equal(typeof msg, "string", "Should return error, when substitution expected, but not provided.");
 	var msg = j.checkParams(1, null, null, ["2gamma", "0x"]);	
 	test.equal(typeof msg, "string", "Should return error, when substitution ids not valid ids.");
-	msg = j.checkParams(1, null, null, ["gamma2", "x0"]);
-	test.deepEqual(msg, [null, [], ["gamma2", ["id", "x0"]]]);
+	msg = j.checkParams(1, null, null, [["gamma2", "x0"]]);
+	test.deepEqual(msg, [null, [], [["gamma2", ["id", "x0"]]]]);
 	test.done();
 };
