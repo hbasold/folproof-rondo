@@ -95,26 +95,27 @@ Notice how the first assumption is terminated, explicitly, out of necessity, sin
 ### Appendix A
 #### A list of justifications accepted by FOLProof
 
-| Rule Name    | Type   | Forms | References | Substitutions |
-|--------------|--------|-------|------------|---------------|
-| Premise      | intro  | N/A   | N/A        | N/A           |
-| Assumption   | intro  | N/A   | N/A        | N/A           |
-| Sorry        | intro  | N/A   | N/A        | N/A           |
-| Copy         | intro  | N/A   | a          | N/A           |
-| And          | basic  | elim  | a          | N/A           |
-|              |        | intro | a,b        | N/A           |
-| Or           | basic  | elim  | a,b-c,d-e  | N/A           |
-|              |        | intro | a          | N/A           |
-| Not          | basic  | elim  | a,b        | N/A           |
-|              |        | intro | a-b        | N/A           |
-| Implication  | basic  | elim  | a,b        | N/A           |
-|              |        | intro | a-b        | N/A           |
-| Forall (A.?) | basic  | elim  | a          |               |
-|              |        | intro | a-b        |               |
-| Exists (E.?) | basic  | elim  | a-b        |               |
-|              |        | intro | a          |               |
-| Bot          | basic  | elim  | a          | N/A           |
-| Contra       | deriv. | N/A   | a-b        | N/A           |
-| MT           | deriv. | N/A   | a,b        | N/A           |
-| NOTNOT       | deriv. | intro | a          | N/A           |
-| LEM          | deriv. | N/A   | N/A        | N/A           |
+| Rule Name          | Type   | Forms | References    | Substitutions |
+|--------------------|--------|-------|---------------|---------------|
+| Premise            | intro  | N/A   | N/A           | N/A           |
+| Assumption         | intro  | N/A   | N/A           | N/A           |
+| Sorry              | intro  | N/A   | N/A           | N/A           |
+| Copy               | intro  | N/A   | a             | N/A           |
+| And                | basic  | elim  | a             | N/A           |
+|                    |        | intro | a,b           | N/A           |
+| Or                 | basic  | elim  | a,b-c,d-e     | N/A           |
+|                    |        | intro | a             | N/A           |
+| Not                | basic  | elim  | a,b           | N/A           |
+|                    |        | intro | a-b           | N/A           |
+| Implication        | basic  | elim  | a,b           | N/A           |
+|                    |        | intro | a-b           | N/A           |
+| Forall (A.?)       | basic  | elim  | a             |               |
+|                    |        | intro | a-b           |               |
+| Exists (E.?)       | basic  | elim  | a-b           |               |
+|                    |        | intro | a             |               |
+| Bot                | basic  | elim  | a             | N/A           |
+| Contra             | deriv. | N/A   | a-b           | N/A           |
+| MT                 | deriv. | N/A   | a,b           | N/A           |
+| NOTNOT             | deriv. | intro | a             | N/A           |
+| LEM                | deriv. | N/A   | N/A           | N/A           |
+| Backchaining (B.?) | deriv. | N/A   | a,b1, ..., bn |               |
