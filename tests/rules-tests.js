@@ -504,3 +504,43 @@ exports["Copy fails when reference line is not exact match."] = function(test) {
 	test.ok(!result.valid, result.message);
 	test.done();
 }
+
+exports["Backchaining succeeds with parallel substitution."] = function(test) {
+  var src =
+      "An.Am. L(n,m) -> L(n, s(m))\n" +
+      "L(z,z)\n" +
+      "L(z,s(z))                     : B.n/z,m/z 1,2\n"
+  ;
+	var ast = p.parse(src);
+	var result = v.verifyFromAST(ast);
+	test.ok(result.valid, result.message);
+	test.done();
+}
+
+exports["Backchaining succeeds with larger head."] = function(test) {
+  var src =
+      "An. L(n,n)\n" +
+      "An.Am. L(n,m) & L(n,m) -> L(n, s(m))\n" +
+      "L(z,z)                        : B.n/z elim 1\n" +
+      "L(z,s(z))                     : B.n/z,m/z 2,3,3\n" +
+      "Em. L(z, m)                   : E.m/s(z) intro 4"
+  ;
+	var ast = p.parse(src);
+	var result = v.verifyFromAST(ast);
+	test.ok(result.valid, result.message);
+	test.done();
+}
+
+exports["Backchaining fails with insufficient substitution."] = function(test) {
+  var src =
+      "An. L(n,n)\n" +
+      "An.Am. L(n,m) & L(n,m) -> L(n, s(m))\n" +
+      "L(z,z)                        : B.n/z elim 1\n" +
+      "L(z,s(z))                     : B.n/z 2,3,3\n" +
+      "Em. L(z, m)                   : E.m/s(z) intro 4"
+  ;
+	var ast = p.parse(src);
+	var result = v.verifyFromAST(ast);
+	test.ok(!result.valid, result.message);
+	test.done();
+}

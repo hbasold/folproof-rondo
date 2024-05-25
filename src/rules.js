@@ -386,6 +386,36 @@ var rules = {
 				return "Exists-x-Elim: assumption beginning step doesn't match ref step for " + scopeVars[0] + ".";
 			})
 	}),	
+  "b" : new Rule({
+    name : "Backchaining",
+    type : "derived",
+    verifier : new Justifier(
+      { stepRefs : ["num", "nums"], subst: true },
+      function(proof, step, part, steps, subst) {
+        var currStep = proof.steps[step];
+        var currExpr = currStep.getSentence();
+        var refExpr = steps.map((k) => proof.steps[k].getSentence());
+        u.debug("backchaining", "steps", steps, "refExpr", refExpr, "currExpr", currExpr, "subst", subst);
+        var clause = openHornClause(refExpr[0]);
+        if (typeof clause === "string")
+          return "Backchaining: " + clause;
+
+        var vars = clause[0];
+        var headSub = clause[1].map((c) => substitute(c, subst));
+        var tailSub = substitute(clause[2], subst);
+        u.debug("backchaining", "headSub", headSub, "tailSub", tailSub);
+        if (semanticEq(tailSub, currExpr)){
+          for(let i = 0; i < headSub.length; i++){
+            if(!semanticEq(headSub[i], refExpr[i + 1])){
+              return "Backchaining: Head formula " + (i + 1) + " of Horn clause in step " + (steps[0] + 1) + " does not match step " + (steps[i + 1] + 1) + ".";
+            }
+          }
+          return true;
+        } else {
+          return "Backchaining: Tail of Horn clause in step " + (steps[0] + 1) + " does not match current step."
+        }
+      })
+  }),
 	"=" : new Rule({
 		name : "Equality",
 		type : "normal",
@@ -533,6 +563,45 @@ function semanticEq(A, B, suba, subb) {
 function isContradiction(s) {
 	  // return (s[0] === 'id' && (s[1] === '_|_' || s[1] === 'contradiction'));
     return s[0] == 'bot';
+}
+
+function splitHead(form) {
+  if (form[0] == "id") {
+    return [form];
+  }
+  else if (form[0] == "and") {
+    var l = splitHead(form[1]);
+    var r = splitHead(form[2]);
+    if (l && r) {
+      return l.concat(r);
+    } else {
+      return null;
+    }
+  }
+  else {
+    return null;
+  }
+}
+
+function openHornClause(form, vars = Array(0)){
+  u.debug("openHornClause", form, vars);
+  if (form[0] == "forall"){
+    return openHornClause(form[2], vars.concat([form[1]]));
+  }
+  else if (form[0] == "->"){
+    var h = splitHead(form[1]);
+    if (h){
+      return [vars, h, form[2]];
+    } else {
+      return "Not a valid head in Horn clause";
+    }
+  }
+  else if (form[0] == "id"){
+    return [vars, [], form];
+  }
+  else {
+    return "Not a valid Horn clause with top-level connective " + form[0];
+  }
 }
 
 function arrayContains(arr, el) {
