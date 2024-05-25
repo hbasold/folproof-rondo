@@ -411,41 +411,41 @@ var rules = {
 };
 
 // Substitutes b for a in the start expression
-function substitute(startExpr, a, b, bound) {
-	u.debug("substitute", startExpr, a, b);
+function substitute(expr, a, b, bound) {
+	u.debug("substitute", expr, a, b);
 	bound = bound ? bound : [];
 	var binOps = ["->", "and", "or", "<->", "="];
 	var unOps = ["not", "forall", "exists"];
 
 	// remove parens, which are basically stylistic no-ops
-	while (startExpr[0] === 'paren') startExpr = startExpr[1];
+	while (expr[0] === 'paren') expr = expr[1];
 
-	if (arrayContains(binOps, startExpr[0])) {
-		var leftSide = substitute(startExpr[1], a, b);
-		var rightSide = substitute(startExpr[2], a, b);
-		return [startExpr[0], leftSide, rightSide];
-	} else if (arrayContains(unOps, startExpr[0])) {
-		if (startExpr[0] === "forall" || startExpr[0] === "exists") {
+	if (arrayContains(binOps, expr[0])) {
+		var leftSide = substitute(expr[1], a, b);
+		var rightSide = substitute(expr[2], a, b);
+		return [expr[0], leftSide, rightSide];
+	} else if (arrayContains(unOps, expr[0])) {
+		if (expr[0] === "forall" || expr[0] === "exists") {
 			bound = bound.slice(0);
-			bound.push(startExpr[1]);
-			return [startExpr[0], startExpr[1],
-				substitute(startExpr[2], a, b, bound)];
+			bound.push(expr[1]);
+			return [expr[0], expr[1],
+				substitute(expr[2], a, b, bound)];
 		}
-		return [startExpr[0], substitute(startExpr[1], a, b, bound)];
-	} else if (startExpr[0] === 'id') {
-		if (startExpr.length === 2) { // our loverly base case
-			if (! arrayContains(bound, startExpr[1])) {
-				if (startExpr[1] === a)
-					return b; // [startExpr[0], b];
+		return [expr[0], substitute(expr[1], a, b, bound)];
+	} else if (expr[0] === 'id') {
+		if (expr.length === 2) { // our loverly base case
+			if (! arrayContains(bound, expr[1])) {
+				if (expr[1] === a)
+					return b; // [expr[0], b];
 			}
-			return startExpr;
+			return expr;
 		}
-		if (startExpr.length === 3) {
+		if (expr.length === 3) {
 			var newTerms = [];
-			for (var i=0; i<startExpr[2].length; i++) {
-				newTerms.push(substitute(startExpr[2][i], a, b, bound));
+			for (var i=0; i<expr[2].length; i++) {
+				newTerms.push(substitute(expr[2][i], a, b, bound));
 			}
-			return [startExpr[0], startExpr[1], newTerms];
+			return [expr[0], expr[1], newTerms];
 		}
 		throw Error("Unexpected AST format.");
 	}
