@@ -312,12 +312,13 @@ var rules = {
 				var scopeVar = scope[scope.length-1];
 				var found = scope.slice().reverse().reduce(function(a,e) { return a || (e == null || e == subst[1]); }, true);
 				if (! found)
-					return "All-x-intro: Substitution " + subst[1] + " doesn't match scope: " + scope.filter(function(e) { if (e != null) return e; }).join(", ");
+					return "All-x-intro: Substitution " + Expr.prettySubst(subst) + " doesn't match scope: " + scope.filter(function(e) { if (e != null) return e; }).join(", ");
 
 				var currExprSub = Expr.substitute(currExpr[2], subst);
 				if (Expr.equal(endExpr, currExprSub))
 					return true;
-				return "All-x-Intro: Last step in range doesn't match current step after " + subst[0] + "/" + subst[1] + ".";
+				return "All-x-Intro: Last step in range doesn't match current step after " +
+          Expr.prettySubst(subst) + ".";
 			}),
 		elimination : new Justifier(
 			{ stepRefs : ["num"], subst: true },
@@ -335,7 +336,9 @@ var rules = {
 				if (Expr.equal(refExprSub, currExpr))
 					return true;
 
-				return "All-x-Elim: Referenced step did not match current step after " + subst[1] + "/" + subst[0] + ".";
+				return "All-x-Elim: Referenced step " + (steps[0] + 1) +
+          " did not match current step after " + Expr.prettySubst(subst) + ": " +
+          Expr.pretty(refExprSub) + " != " + Expr.pretty(currExpr) + ".";
 			})
 	}),
 	"e" : new Rule({
@@ -357,7 +360,9 @@ var rules = {
 				if (Expr.equal(refExpr, currExprSub))
 					return true;
 	
-				return "Exists-x-Intro: Referenced step did not match current step after " + subst[1] + "/" + subst[0] + " substitution.";
+				return "Exists-x-Intro: Referenced step "  + (steps[0] + 1) +
+          " did not match current step after " + Expr.prettySubst(subst) + " substitution: " +
+          Expr.pretty(refExpr) + " != " + Expr.pretty(currExprSub) + ".";
 			}),
 		elimination : new Justifier(
 			{ stepRefs: ["num", "range"], subst: true },
@@ -382,7 +387,9 @@ var rules = {
 				if (Expr.equal(refExprSub, startExpr)) {
 					if (Expr.equal(endExpr, currExpr))
 						return true;
-					return "Exists-x-Elim: assumption ending step does not match current step.";
+					return "Exists-x-Elim: assumption ending step " + (steps[1][1] + 1) +
+            " does not match current step: " +
+            Expr.pretty(endExpr) + " != " + Expr.pretty(currExpr) + ".";
 				}
 				return "Exists-x-Elim: assumption beginning step doesn't match ref step for " + scopeVars[0] + ".";
 			})
@@ -402,18 +409,31 @@ var rules = {
           return "Backchaining: " + clause;
 
         var vars = clause[0];
-        var headSub = clause[1].map((c) => Expr.substitute(c, subst));
+        var head = clause[1];
+        if(head.length != steps.length - 1){
+          return "Backchaining: " + (steps.length - 1) +
+            " proof steps provided, but " + head.length +
+            " required to match the head of the Horn clause " +
+            Expr.pretty(refExpr[0]);
+        }
+        var headSub = head.map((c) => Expr.substitute(c, subst));
         var tailSub = Expr.substitute(clause[2], subst);
         u.debug("backchaining", "headSub", headSub, "tailSub", tailSub);
         if (Expr.equal(tailSub, currExpr)){
           for(let i = 0; i < headSub.length; i++){
             if(!Expr.equal(headSub[i], refExpr[i + 1])){
-              return "Backchaining: Head formula " + (i + 1) + " of Horn clause in step " + (steps[0] + 1) + " does not match step " + (steps[i + 1] + 1) + ".";
+              return "Backchaining: Head formula " + (i + 1) +
+                " of Horn clause in step " + (steps[0] + 1) +
+                " does not match step " + (steps[i + 1] + 1) + ": " +
+                Expr.pretty(headSub[i]) + " != " + Expr.pretty(refExpr[i + 1]) +
+                ".";
             }
           }
           return true;
         } else {
-          return "Backchaining: Tail of Horn clause in step " + (steps[0] + 1) + " does not match current step."
+          return "Backchaining: Tail of Horn clause in step " + (steps[0] + 1) +
+            " does not match current step: " +
+            Expr.pretty(tailSub) + " != " + Expr.pretty(currExpr);
         }
       })
   }),
@@ -442,7 +462,7 @@ var rules = {
 					return "Equality-Elim: First referenced step is not an equality.";
 					
 				if (!Expr.equal(elimExpr, proposedResult, equalityExpr[1], equalityExpr[2]))
-					return "Equality-Elim: Does not result in current step.";
+					return "Equality-Elim: Substituting in step " + (steps[1] + 1) + " does not result in current step.";
 
 				return true;
 			})
