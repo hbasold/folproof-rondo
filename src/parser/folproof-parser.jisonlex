@@ -39,7 +39,7 @@ justify				":".*
         var substParts = null;
         if (ruleApp.length == 2){
            name = ruleApp[0].trim();
-           var substParts = ruleApp[1].split(',');
+           var substParts = ruleApp[1].split(';').map((s) => s.trim());
            var rem = substParts[substParts.length - 1].split(' ', 2);
            substParts[substParts.length - 1] = rem[0];
            if(rem.length >= 2){
