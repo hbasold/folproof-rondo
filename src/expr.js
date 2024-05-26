@@ -132,6 +132,116 @@ function isContradiction(s) {
     return s[0] == 'bot';
 }
 
+var quantifiers = ["forall", "exists"];
+var unaryConnectives = ["not"];
+var binaryConnectives = ["<->", "->", "and", "or", "="];
+var opOrder = { "not": 4, "=": 4, "forall": 1, "exists": 1, "and" : 3, "or" : 3, "->" : 2, "<->" : 2 };
+var opPrint = {
+  "not": "~", "=": "=", "forall": "A", "exists": "E", "and" : "&", "or" : "v", "->": "->" , "<->" : "<->"
+};
+
+
+function isQuantifier(expr) {
+  console.assert(Array.isArray(expr) && expr.length > 0, "Expected expression but got %o", expr);
+  return quantifiers.indexOf(expr[0]) >= 0;
+}
+
+function isUnaryConnective(expr) {
+  console.assert(Array.isArray(expr) && expr.length > 0, "Expected expression but got %o", expr);
+  return unaryConnectives.indexOf(expr[0]) >= 0;
+}
+
+function isBinaryConnective(expr) {
+  console.assert(Array.isArray(expr) && expr.length > 0, "Expected expression but got %o", expr);
+  return binaryConnectives.indexOf(expr[0]) >= 0;
+}
+
+function isId(expr) {
+  console.assert(Array.isArray(expr) && expr.length > 0, "Expected expression but got %o", expr);
+  return expr[0] === "id";
+}
+
+function printPrec(i, j, doc) {
+  if (j < i) {
+    return "(" + doc + ")";
+  } else {
+    return doc;
+  }
+}
+
+function prettyArgs(args) {
+  var first = true;
+  var prt = "";
+  for (a of args) {
+    if(!first){
+      prt += ", ";
+    }
+    first = false;
+    prt += prettyTerm(a);
+  }
+  return prt;
+}
+
+function prettyTerm(expr) {
+  // u.debug("prettyTerm", expr);
+  var h = expr[1];
+  var a = "";
+  if(expr.length == 3){
+    a = "(" + prettyArgs(expr[2]) + ")";
+  }
+  return h + a;
+}
+
+function prettyPrec(i, expr) {
+  u.debug("prettyPrec", i, expr);
+  if(isQuantifier(expr)) {
+    var q = expr[0];
+    var x = expr[1];
+    var prec = opOrder[q];
+    var r = prettyPrec(prec, expr[2]);
+    var doc = opPrint[expr[0]] + x +  "." + r;
+    return printPrec(i, prec, doc);
+  }
+  else if(isBinaryConnective(expr)) {
+    var prec = opOrder[expr[0]];
+    var l = prettyPrec(prec + 1, expr[1]);
+    var r = prettyPrec(prec, expr[2]);
+    var doc = l + " " + opPrint[expr[0]] + " " + r;
+    return printPrec(i, prec, doc);
+  }
+  else if(isUnaryConnective(expr)) {
+    var prec = opOrder[expr[0]];
+    var r = prettyPrec(prec, expr[1]);
+    var doc = opPrint[expr[0]] + r;
+    return printPrec(i, prec, doc);
+  }
+  else if(isId(expr)) {
+    return prettyTerm(expr);
+  }
+  else {
+    console.assert(false, "Expr.pretty: Case not covered for %o", expr);
+  }
+}
+
+function pretty(expr) {
+  return prettyPrec(0, expr);
+}
+
+function prettySubst(subst) {
+  var doc = "";
+  var first = true;
+  for(s of subst) {
+    if(!first) {
+      doc += ";"
+    }
+    first = false;
+    doc += s[0] + "/" + pretty(s[1]);
+  }
+  return doc;
+}
+
 module.exports.substitute = substitute;
 module.exports.equal = equal;
 module.exports.isContradiction = isContradiction;
+module.exports.pretty = pretty;
+module.exports.prettySubst = prettySubst;
