@@ -1,6 +1,7 @@
 var u = require("./util");
 var Rule = require("./rule.js");
 var Justifier = require("./justifier.js");
+var Expr = require("./expr.js");
 
 var rules = {
 	"premise" : new Rule({
@@ -30,7 +31,7 @@ var rules = {
 			if (s[0] !== "or")
 				return "LEM: must be phi or not phi.";
 			var left = s[1], right = s[2];
-			if (right[0] !== "not" || !semanticEq(left, right[1]))
+			if (right[0] !== "not" || !Expr.equal(left, right[1]))
 				return "LEM: right side must be negation of left.";
 			
 			return true;
@@ -43,7 +44,7 @@ var rules = {
 			function(proof, step, part, steps) {
 				var curStep = proof.steps[step].getSentence();
 				var refStep = proof.steps[steps[0]].getSentence();
-				if (!semanticEq(curStep, refStep))
+				if (!Expr.equal(curStep, refStep))
 					return "Copy: Current step is not semantically equal to the referenced step.";
 				return true;
 			}
@@ -59,11 +60,11 @@ var rules = {
 				return "MT: 1st referenced step must be implication.";
 			var left = impStep[1], right = impStep[2];
 			var negStep = proof.steps[steps[1]].getSentence();
-			if (negStep[0] !== "not" || !semanticEq(negStep[1], right))
+			if (negStep[0] !== "not" || !Expr.equal(negStep[1], right))
 				return "MT: 2nd ref step must be negation of right side of 1st ref step.";
 			
 			var s = proof.steps[step].getSentence();
-			if (s[0] !== 'not' || !semanticEq(left, s[1]))
+			if (s[0] !== 'not' || !Expr.equal(left, s[1]))
 				return "MT: current step must be negation of left side of ref step.";
 			
 			return true;
@@ -77,14 +78,14 @@ var rules = {
 		function(proof, step, part, steps) {	
 			var assumptionExpr = proof.steps[steps[0][0]].getSentence();
 			var contraExpr = proof.steps[steps[0][1]].getSentence();
-			if (! isContradiction(contraExpr)) {
+			if (! Expr.isContradiction(contraExpr)) {
 			return "Contra: Final step in range must be a contradiction.";
 			}
 	
 			if (assumptionExpr[0] !== 'not')
 			return "Contra: Assumption is not a negation. Might you be thinking of not-introduction?";
 		
-			var semEq = semanticEq(assumptionExpr[1], proof.steps[step].getSentence());
+			var semEq = Expr.equal(assumptionExpr[1], proof.steps[step].getSentence());
 			if (semEq)
 			return true;
 
@@ -98,7 +99,7 @@ var rules = {
 				{ hasPart : false, stepRefs : ["num"], subst : false },
 				function(proof, step, part, steps) {
 				var refStep = proof.steps[steps[0]].getSentence();
-        if (!isContradiction(refStep))
+        if (!Expr.isContradiction(refStep))
 					// if (refStep[0] != 'id' || (refStep[1] != 'contradiction' && refStep[1] != '_|_'))
 						return "Bot-elim: Referenced step is not absurdity.";
 					return true;
@@ -115,7 +116,7 @@ var rules = {
 					if (refStep[0] !== 'not' || refStep[1][0] !== 'not')
 						return "Notnot-elim: Referenced step is not a double-negation.";
 					
-					if (!semanticEq(refStep[1][1], curStep))
+					if (!Expr.equal(refStep[1][1], curStep))
 						return "Notnot-elim: Does not result in current step.";
 
 					return true;
@@ -133,11 +134,11 @@ var rules = {
 			if (implies[0] != '->')
 			return "Implies-Intro: Current step is not an implication";
 
-			var truthSemEq = semanticEq(implies[1], truth);
+			var truthSemEq = Expr.equal(implies[1], truth);
 			if (! truthSemEq)
 			return "Implies-Intro: The left side does not match the assumption.";
 
-			var resultSemEq = semanticEq(implies[2], result);
+			var resultSemEq = Expr.equal(implies[2], result);
 			if (! resultSemEq)
 			return "Implies-Intro: The result does not match the right side.";
 	
@@ -155,8 +156,8 @@ var rules = {
 			var implies = proof.steps[impliesStep].getSentence();
 			if (implies[0] != '->')
 			return "Implies-Elim: Step " + steps[0] + " is not an implication";
-			var truthSemEq = semanticEq(implies[1], truth);
-			var resultSemEq = semanticEq(implies[2], proof.steps[step].getSentence());
+			var truthSemEq = Expr.equal(implies[1], truth);
+			var resultSemEq = Expr.equal(implies[2], proof.steps[step].getSentence());
 			if (truthSemEq) {
 			if (resultSemEq) {
 				return true;
@@ -179,8 +180,8 @@ var rules = {
 				if (s[0] !== 'and')
 					return "And-Intro: Current step is not an 'and'-expression." + proof.steps[step].getSentence();
 
-				if (semanticEq(s[1], proof.steps[steps[0]].getSentence())) {
-					if (semanticEq(s[2], proof.steps[steps[1]].getSentence())) {
+				if (Expr.equal(s[1], proof.steps[steps[0]].getSentence())) {
+					if (Expr.equal(s[2], proof.steps[steps[1]].getSentence())) {
 						return true;
 					} else {
 						return "And-Intro: Right side doesn't match referenced step.";
@@ -196,7 +197,7 @@ var rules = {
 				if (andExp[0] != 'and')
 					return "And-Elim: Referenced step is not an 'and' expression.";
 
-				var semEq = semanticEq(andExp[part], proof.steps[step].getSentence());
+				var semEq = Expr.equal(andExp[part], proof.steps[step].getSentence());
 
 				if (semEq)
 					return true;
@@ -214,7 +215,7 @@ var rules = {
 				if (s[0] !== 'or')
 					return "Or-Intro: Current step is not an 'or'-expression.";
 
-				if (semanticEq(s[part], proof.steps[steps[0]].getSentence()))
+				if (Expr.equal(s[part], proof.steps[steps[0]].getSentence()))
 				return true;
 
 				return "Or-Intro: Side " + part + " doesn't match referenced step.";
@@ -232,13 +233,13 @@ var rules = {
 				// and through the gauntlet...
 				if (orStepExpr[0] !== 'or')
 					return "Or-Elim: First referenced step is not an 'or'-expression.";
-				if (!semanticEq(orStepExpr[1], a1p1Expr))
+				if (!Expr.equal(orStepExpr[1], a1p1Expr))
 					return "Or-Elim: First range intro doesn't match left side of 'or'.";
-				if (!semanticEq(orStepExpr[2], a2p1Expr))
+				if (!Expr.equal(orStepExpr[2], a2p1Expr))
 					return "Or-Elim: Second range range intro doesn't match right side of 'or'.";
-				if (!semanticEq(a1p2Expr, a2p2Expr))
+				if (!Expr.equal(a1p2Expr, a2p2Expr))
 					return "Or-Elim: Step range conclusions don't match.";
-				if (!semanticEq(a1p2Expr, currStepExpr))
+				if (!Expr.equal(a1p2Expr, currStepExpr))
 					return "Or-Elim: Current step doesn't match step range conclusions.";
 
 				return true;
@@ -252,14 +253,14 @@ var rules = {
 			function(proof, step, part, steps) {
 				var assumptionExpr = proof.steps[steps[0][0]].getSentence();
 				var contraExpr = proof.steps[steps[0][1]].getSentence();
-				if (! isContradiction(contraExpr)) {
+				if (! Expr.isContradiction(contraExpr)) {
 					return "Neg-Intro: Final step in range must be absurdity.";
 				}
 				var curStep = proof.steps[step].getSentence();
 				if (curStep[0] !== 'not') {
 					return "Neg-Intro: Current step is not a negation. Might you be thinking of Contra?";
 				} else {
-					var semEq = semanticEq(assumptionExpr, curStep[1]);
+					var semEq = Expr.equal(assumptionExpr, curStep[1]);
 					if (semEq)
 						return true;
 
@@ -275,9 +276,9 @@ var rules = {
 				var step2expr = proof.steps[steps[1]].getSentence();
 				var semEq;
 				if (step1expr[0] === 'not') {
-					semEq = semanticEq(step1expr[1], step2expr);
+					semEq = Expr.equal(step1expr[1], step2expr);
 				} else if (step2expr[0] === 'not') {
-					semEq = semanticEq(step2expr[1], step1expr);
+					semEq = Expr.equal(step2expr[1], step1expr);
 				} else {
 					return "Neg-Elim: Neither referenced proof step is a 'not' expression.";
 				}
@@ -313,8 +314,8 @@ var rules = {
 				if (! found)
 					return "All-x-intro: Substitution " + subst[1] + " doesn't match scope: " + scope.filter(function(e) { if (e != null) return e; }).join(", ");
 
-				var currExprSub = substitute(currExpr[2], subst);
-				if (semanticEq(endExpr, currExprSub))
+				var currExprSub = Expr.substitute(currExpr[2], subst);
+				if (Expr.equal(endExpr, currExprSub))
 					return true;
 				return "All-x-Intro: Last step in range doesn't match current step after " + subst[0] + "/" + subst[1] + ".";
 			}),
@@ -330,8 +331,8 @@ var rules = {
         if (subst.length > 1)
           return "All-x-elim: Eliminating more than one quantifier at the same time is currently not supported";
 
-				var refExprSub = substitute(refExpr[2], subst);
-				if (semanticEq(refExprSub, currExpr))
+				var refExprSub = Expr.substitute(refExpr[2], subst);
+				if (Expr.equal(refExprSub, currExpr))
 					return true;
 
 				return "All-x-Elim: Referenced step did not match current step after " + subst[1] + "/" + subst[0] + ".";
@@ -352,8 +353,8 @@ var rules = {
         if (subst.length > 1)
           return "Exists-x-Intro: Introducing more than one quantifier at the same time is currently not supported";
 
-				var currExprSub = substitute(currExpr[2], subst);
-				if (semanticEq(refExpr, currExprSub))
+				var currExprSub = Expr.substitute(currExpr[2], subst);
+				if (Expr.equal(refExpr, currExprSub))
 					return true;
 	
 				return "Exists-x-Intro: Referenced step did not match current step after " + subst[1] + "/" + subst[0] + " substitution.";
@@ -377,9 +378,9 @@ var rules = {
 
 				// check whether substition matches ref line with current line
 				var scopeVars = scope[scope.length-1];
-				var refExprSub = substitute(refExpr[2], subst);
-				if (semanticEq(refExprSub, startExpr)) {
-					if (semanticEq(endExpr, currExpr))
+				var refExprSub = Expr.substitute(refExpr[2], subst);
+				if (Expr.equal(refExprSub, startExpr)) {
+					if (Expr.equal(endExpr, currExpr))
 						return true;
 					return "Exists-x-Elim: assumption ending step does not match current step.";
 				}
@@ -401,12 +402,12 @@ var rules = {
           return "Backchaining: " + clause;
 
         var vars = clause[0];
-        var headSub = clause[1].map((c) => substitute(c, subst));
-        var tailSub = substitute(clause[2], subst);
+        var headSub = clause[1].map((c) => Expr.substitute(c, subst));
+        var tailSub = Expr.substitute(clause[2], subst);
         u.debug("backchaining", "headSub", headSub, "tailSub", tailSub);
-        if (semanticEq(tailSub, currExpr)){
+        if (Expr.equal(tailSub, currExpr)){
           for(let i = 0; i < headSub.length; i++){
-            if(!semanticEq(headSub[i], refExpr[i + 1])){
+            if(!Expr.equal(headSub[i], refExpr[i + 1])){
               return "Backchaining: Head formula " + (i + 1) + " of Horn clause in step " + (steps[0] + 1) + " does not match step " + (steps[i + 1] + 1) + ".";
             }
           }
@@ -426,7 +427,7 @@ var rules = {
 				if (s[0] !== '=')
 					return "Equality-Intro: Current step is not an equality." + proof.steps[step].getSentence();
 
-				if (semanticEq(s[1], s[2]))
+				if (Expr.equal(s[1], s[2]))
 					return true;
 		
 				return "Equality-Intro: Left and right sides do not match.";
@@ -440,130 +441,13 @@ var rules = {
 				if (equalityExpr[0] !== '=')
 					return "Equality-Elim: First referenced step is not an equality.";
 					
-				if (!semanticEq(elimExpr, proposedResult, equalityExpr[1], equalityExpr[2]))
+				if (!Expr.equal(elimExpr, proposedResult, equalityExpr[1], equalityExpr[2]))
 					return "Equality-Elim: Does not result in current step.";
 
 				return true;
 			})
 	}),
 };
-
-// Substitutes in parallel in expr by all the variables that are mapped in subst
-function substitute(expr, subst, bound) {
-	u.debug("substitute", expr, subst);
-	bound = bound ? bound : [];
-	var binOps = ["->", "and", "or", "<->", "="];
-	var unOps = ["not", "forall", "exists"];
-
-	// remove parens, which are basically stylistic no-ops
-	while (expr[0] === 'paren') expr = expr[1];
-
-	if (arrayContains(binOps, expr[0])) {
-		var leftSide = substitute(expr[1], subst);
-		var rightSide = substitute(expr[2], subst);
-		return [expr[0], leftSide, rightSide];
-	} else if (arrayContains(unOps, expr[0])) {
-		if (expr[0] === "forall" || expr[0] === "exists") {
-			bound = bound.slice(0);
-			bound.push(expr[1]);
-			return [expr[0], expr[1],
-				substitute(expr[2], subst, bound)];
-		}
-		return [expr[0], substitute(expr[1], subst, bound)];
-	} else if (expr[0] === 'id') {
-		if (expr.length === 2) {
-			if (! arrayContains(bound, expr[1])) {
-        var s = subst.find((s) => s[0] === expr[1]);
-				if (s)
-					return s[1]; // [expr[0], b];
-			}
-			return expr;
-		}
-		if (expr.length === 3) {
-			var newTerms = [];
-			for (var i=0; i<expr[2].length; i++) {
-				newTerms.push(substitute(expr[2][i], subst, bound));
-			}
-			return [expr[0], expr[1], newTerms];
-		}
-		throw Error("Unexpected AST format.");
-	}
-}
-
-/**
- * Determines whether two expressions are semantically equivalent
- * under the given (and optional) substitution.
- * a, b - abstract syntax trees of the expressions to be compared.
- * suba, subb (optional) - does comparison after substituting suba in a with subb.
- */
-function semanticEq(A, B, suba, subb) {
-	u.debug("semanticEq", A, B);
-	var bound = {}, sub;
-	if (suba) {
-		sub = true;
-		return _rec(A, B, {});
-	} else {
-		sub = false;
-		return _rec(A, B);
-	}
-
-	function _rec(a, b, bound) {
-		var binOps = ["->", "and", "or", "<->", "="];
-		var unOps = ["not"];
-
-		// if eq w/substitution, return true, otherwise continue
-		if (sub && semanticEq(a, suba)) {
-				if ((a[0] !== 'id' || !bound[a[1]]) && _rec(subb, b, bound)) return true;
-		}
-
-		if (arrayContains(binOps, a[0]) && a[0] === b[0]) {
-			if (_rec(a[1], b[1], bound) && _rec(a[2], b[2], bound)) {
-				return true;
-			}
-			return false;
-		} else if (arrayContains(unOps, a[0]) && a[0] === b[0]) {
-			if (_rec(a[1], b[1], bound)) {
-				return true;
-			}
-			return false;
-		} else if (a[0] === 'exists' || a[0] === 'forall' && a[0] === b[0]) {
-			var newb;
-			if (sub) {
-				newb = clone(bound);
-				newb[a[1]] = true;
-			}
-			if (_rec(a[2], b[2], newb)) {
-				return true;
-			}
-			return false;
-    } else if (a[0] === "bot"){
-        return b[0] === "bot";
-		} else if (a[0] === "id") {
-			if (b && a[1] !== b[1]) return false;
-			if (a.length == 2 && b.length == 2) {
-				return true;
-			}
-
-			if (a.length == 3 && b.length == 3) {
-				if (a[2].length != b[2].length) {
-					return false;
-				}
-				for (var i=0; i<a[2].length; i++) {
-					if (!_rec(a[2][i], b[2][i], bound)) {
-						return false;
-					}
-				}
-				return true;
-			}
-		}
-		return false;
-	}
-}
-
-function isContradiction(s) {
-	  // return (s[0] === 'id' && (s[1] === '_|_' || s[1] === 'contradiction'));
-    return s[0] == 'bot';
-}
 
 function splitHead(form) {
   if (form[0] == "id") {
@@ -602,21 +486,6 @@ function openHornClause(form, vars = Array(0)){
   else {
     return "Not a valid Horn clause with top-level connective " + form[0];
   }
-}
-
-function arrayContains(arr, el) {
-	for (var i=0; i<arr.length; i++) {
-		if (arr[i] === el) return true;
-	}
-	return false;
-}
-
-function clone(obj) {
-	var newo = {};
-	for(var k in Object.keys(obj)) {
-		newo[k] = obj[k];
-	}
-	return newo;
 }
 
 if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
