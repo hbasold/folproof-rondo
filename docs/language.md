@@ -69,7 +69,9 @@ Justifications are the reasons why your current proof step follows logically fro
 
 1. Justifications are indicated by a leading colon. If omitted, either "premise" or "assumption" will be assumed, depending on the context.
 2. Rule names are single words, like "premise" or "and". See [Appendix A](#appendix-a), for a complete list.
-3. Rules that indicate a variable substitution specify it like `A.x/x0`.
+3. Rules that indicate a substitution specify it like `A.x/x0`. Complex terms, as in `A.x/f(x0)` are allowed.
+   The backchaining rule also allows parallel substitutions, where the variable assignments are
+   separated by semicolons: `B.x/f(c); y/g(k)`.
 4. Non-derived rules often have elimination or introduction versions, like `phi : or elim a,b-c,d-e`. Single letters, like "e" and "i", are valid shorthand.
 5. In some cases, rules need to refer to a side, 1 or 2 (left or right), like `phi1 or phi2 : or i1 n`.
 6. Rules that need to reference prior proof steps can do so with a comma-separated list of step numbers and ranges, like `a,b-c,d-e`.
@@ -95,27 +97,29 @@ Notice how the first assumption is terminated, explicitly, out of necessity, sin
 ### Appendix A
 #### A list of justifications accepted by FOLProof
 
-| Rule Name          | Type   | Forms | References    | Substitutions |
-|--------------------|--------|-------|---------------|---------------|
-| Premise            | intro  | N/A   | N/A           | N/A           |
-| Assumption         | intro  | N/A   | N/A           | N/A           |
-| Sorry              | intro  | N/A   | N/A           | N/A           |
-| Copy               | intro  | N/A   | a             | N/A           |
-| And                | basic  | elim  | a             | N/A           |
-|                    |        | intro | a,b           | N/A           |
-| Or                 | basic  | elim  | a,b-c,d-e     | N/A           |
-|                    |        | intro | a             | N/A           |
-| Not                | basic  | elim  | a,b           | N/A           |
-|                    |        | intro | a-b           | N/A           |
-| Implication        | basic  | elim  | a,b           | N/A           |
-|                    |        | intro | a-b           | N/A           |
-| Forall (A.?)       | basic  | elim  | a             |               |
-|                    |        | intro | a-b           |               |
-| Exists (E.?)       | basic  | elim  | a-b           |               |
-|                    |        | intro | a             |               |
-| Bot                | basic  | elim  | a             | N/A           |
-| Contra             | deriv. | N/A   | a-b           | N/A           |
-| MT                 | deriv. | N/A   | a,b           | N/A           |
-| NOTNOT             | deriv. | intro | a             | N/A           |
-| LEM                | deriv. | N/A   | N/A           | N/A           |
-| Backchaining (B.?) | deriv. | N/A   | a,b1, ..., bn |               |
+| Rule Name  | Connective | Type   | Forms | References    | Substitutions |
+|------------|------------|--------|-------|---------------|---------------|
+| premise    | N/A        | intro  | N/A   | N/A           | N/A           |
+| assumption | N/A        | intro  | N/A   | N/A           | N/A           |
+| sorry      | N/A        | intro  | N/A   | N/A           | N/A           |
+| copy       | N/A        | intro  | N/A   | a             | N/A           |
+| and        | &          | basic  | elim  | a             | N/A           |
+|            |            |        | intro | a,b           | N/A           |
+| or         | v          | basic  | elim  | a,b-c,d-e     | N/A           |
+|            |            |        | intro | a             | N/A           |
+| not        | ~          | basic  | elim  | a,b           | N/A           |
+|            |            |        | intro | a-b           | N/A           |
+| ->         | ->         | basic  | elim  | a,b           | N/A           |
+|            |            |        | intro | a-b           | N/A           |
+| A          | Ax.        | basic  | elim  | a             |               |
+|            |            |        | intro | a-b           |               |
+| E          | Ex.        | basic  | elim  | a-b           |               |
+|            |            |        | intro | a             |               |
+| bot        | ⊥          | basic  | elim  | a             | N/A           |
+| =          | =          |        | intro | N/A           | N/A           |
+|            |            |        | elim  | a,b           | N/A           |
+| contra     | N/A        | basic  | N/A   | a-b           | N/A           |
+| MT         | N/A        | deriv. | N/A   | a,b           | N/A           |
+| NOTNOT     | N/A        | deriv. | intro | a             | N/A           |
+| LEM        | N/A        | deriv. | N/A   | N/A           | N/A           |
+| B          | N/A        | deriv. | N/A   | a,b1, ..., bn |               |
