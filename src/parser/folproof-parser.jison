@@ -73,15 +73,8 @@ e_or
 	;
 
 e_and
-	: e_eq AND e_and
-	{ $$ = ['and', $e_eq, $e_and]; }
-	| e_eq
-	{ $$ = $1; }
-	;
-
-e_eq
-	: e_eq EQUALS e_not
-	{ $$ = ['=', $e_eq, $e_not]; }
+	: e_not AND e_and
+	{ $$ = ['and', $e_not, $e_and]; }
 	| e_not
 	{ $$ = $1; }
 	;
@@ -90,11 +83,23 @@ e_not
 	: NOT e_not
 	{ $$ = ['not', $e_not]; }
 	| atom
-	{ $$ = $atom; }
+	{ $$ = $1; }
 	;
 
+/*
+e_eq
+	: term1 EQUALS term2
+	{ $$ = ['=', $term1, $term2]; }
+	| atom
+	{ $$ = $1; }
+	;
+
+*/
+
 atom
-	: term
+	: term EQUALS term
+	{ $$ = ['=', $1, $3]; }
+	| term
 	{ $$ = $term; }
 	| BOTTOM
 	{ $$ = ['bot']; }

@@ -180,6 +180,17 @@ exports["Atomic Absurdity."] = function(test) {
 	  test.done();
 };
 
+exports["Atomic equality."] = function(test) {
+  var src = "a = b";
+  var result = parser.parse(src);
+  result = result[0][1];
+  test.equal(result[0], '=');
+  test.equal(result[1][1], 'a');
+  test.equal(result[2][1], 'b');
+  test.done();
+};
+
+
 exports["Predicate in formula."] = function(test) {
 	  var src = "A x. P(x) -> Q() & R(x, y)";
 	  var result = parser.parse(src);
