@@ -70,7 +70,7 @@ var folproofWeb = (function() {
 			return wrapper;
 		}
 		switch(ast[0]) {
-			case "iff": op = "&harr;"; break;
+			case "<->": op = "&harr;"; break;
 			case "->": op = "&rarr;"; break;
 			case "and": op = "&and;"; break;
 			case "or": op = "&or;"; break;
@@ -102,7 +102,7 @@ var folproofWeb = (function() {
 		return renderTerm(ast);
 	}
 
-	var opOrder = { "not": 1, "=": 1, "forall": 2, "exists": 2, "and":3, "or":4, "->":5, "iff":6 };
+	var opOrder = { "not": 1, "=": 1, "forall": 2, "exists": 2, "and":3, "or":4, "->":5, "<->":6 };
 	function requireParens(parentOp, ast, leftTerm, options) {
 		if (ast[0] === 'id') return false;
 
@@ -122,7 +122,7 @@ var folproofWeb = (function() {
 	}
 
 	function binaryOp(op) {
-		return op === "iff" || op === "->" || op === "and" || op === "or" || op === "=";
+		return op === "<->" || op === "->" || op === "and" || op === "or" || op === "=";
 	}
 
 	var infixTerms = ['='];
