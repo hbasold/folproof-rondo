@@ -22,6 +22,7 @@ justify				":".*
 				
 				// strip the leading colon and spaces
 				yytext = yytext.substr(yytext.substr(1).search(/\S/));
+				yytext = yytext.match(/^[^\#]*/)[0];
 				yytext = yytext.trim();
 
         // find the beginning of the first line number
