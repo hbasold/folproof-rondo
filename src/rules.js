@@ -302,9 +302,10 @@ var rules = {
 				var endExpr = proof.steps[steps[0][1]].getSentence();
         u.debug("all-intro", "startExpr", startExpr, "endExpr", endExpr, "currExpr", currExpr, "scope", scope, "subst", subst);
 				if (currExpr[0] !== 'forall')
-					return "All-x-Intro: Current step is not a 'for-all' expression.";
+					return "All-x-Intro: Current step is notf a 'for-all' expression.";
 				if (scope.length == 0 || scope[scope.length - 1] == null)
-					return "All-x-Intro: Not valid without a scoping assumption (e.g., an x0 box).";
+					return "All-x-Intro: The provided range does not have a scoping assumption (e.g., an x0 box started by 'with') in step " +
+          (steps[0][0] + 1) + ".";
         if (subst.length > 1)
           return "All-x-intro: Introducing more than one quantifier at the same time is currently not supported";
 
@@ -318,7 +319,8 @@ var rules = {
 				if (Expr.equal(endExpr, currExprSub))
 					return true;
 				return "All-x-Intro: Last step in range doesn't match current step after " +
-          Expr.prettySubst(subst) + ".";
+          Expr.prettySubst(subst) + ": " +
+          Expr.pretty(endExpr) + " != " + Expr.pretty(currExprSub) + ".";
 			}),
 		elimination : new Justifier(
 			{ stepRefs : ["num"], subst: true },

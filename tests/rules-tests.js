@@ -339,7 +339,7 @@ exports["Forall introduction fails when reference range is not an assumption."] 
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);
-	test.ok(result.message.indexOf("without a scoping assumption") >= 0, "Error must be because of missing assumption");
+	test.ok(result.message.indexOf("does not have a scoping assumption") >= 0, "Error must be because of missing assumption");
 	test.done();
 }
 
@@ -348,7 +348,7 @@ exports["Forall introduction fails when reference range is not a scoping assumpt
 	var ast = p.parse(src);
 	var result = v.verifyFromAST(ast);
 	test.ok(!result.valid, result.message);
-	test.ok(result.message.indexOf("without a scoping assumption") >= 0, "Error must be because of missing assumption");
+	test.ok(result.message.indexOf("does not have a scoping assumption") >= 0, "Error must be because of missing assumption");
 	test.done();
 }
 
