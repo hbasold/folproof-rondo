@@ -253,3 +253,13 @@ exports["Printing forall left of implication."] = function(test) {
 	test.deepEqual(prt, expected, null);
 	test.done();
 }
+
+exports["Substitute bottom."] = function(test) {
+	var src = "_|_";
+  var t = P.parse("f(x)")[0][1];
+	var e = P.parse(src)[0][1];
+  var r = E.substitute(e, ["y", t]);
+	var expected = e;
+	test.deepEqual(r, expected, null);
+	test.done();
+}

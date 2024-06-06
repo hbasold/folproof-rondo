@@ -54,6 +54,8 @@ function substitute(expr, subst, bound) {
       return [expr[0], expr[1], newTerms];
     }
     throw Error("Unexpected AST format.");
+  } else {
+    return expr;
   }
 }
 
