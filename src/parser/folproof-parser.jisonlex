@@ -83,7 +83,7 @@ justify				":".*
 /* "()"				return 'DOUBLEPAREN'; */
 "("				return 'LPAREN';
 ")"				return 'RPAREN';
-"_|_"|"⊥"     return 'BOTTOM';
+"_|_"|"⊥"|"bot"     return 'BOTTOM';
 /* {objid}				return 'OBJID';
 {predid}				return 'PREDID'; */
 {id}				return 'ID';

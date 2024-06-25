@@ -544,3 +544,16 @@ exports["Backchaining fails with insufficient substitution."] = function(test) {
 	test.ok(!result.valid, result.message);
 	test.done();
 }
+
+exports["Backchaining succeeds with equality."] = function(test) {
+  var src =
+      "Ax. Ay. Az. x = y & y = z -> x = z \n" + 
+      "a = b\n" +
+      "b = c\n" +
+      "a = c : B.x/a;y/b;z/c 1,2,3"
+  ;
+	var ast = p.parse(src);
+	var result = v.verifyFromAST(ast);
+	test.ok(result.valid, result.message);
+	test.done();
+}

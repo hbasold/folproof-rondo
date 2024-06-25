@@ -130,8 +130,9 @@ function equal(A, B, suba, subb) {
 }
 
 function isContradiction(s) {
-    // return (s[0] === 'id' && (s[1] === '_|_' || s[1] === 'contradiction'));
-    return s[0] == 'bot';
+  u.debug("isContradiction", s);
+  // return (s[0] === 'id' && (s[1] === '_|_' || s[1] === 'contradiction'));
+  return s[0] === "bot";
 }
 
 var quantifiers = ["forall", "exists"];
@@ -161,6 +162,11 @@ function isBinaryConnective(expr) {
 function isId(expr) {
   console.assert(Array.isArray(expr) && expr.length > 0, "Expected expression but got %o", expr);
   return expr[0] === "id";
+}
+
+function isAtom(expr) {
+  console.assert(Array.isArray(expr) && expr.length > 0, "Expected expression but got %o", expr);
+  return expr[0] === "id" || expr[0] === "=";
 }
 
 function printPrec(i, j, doc) {
@@ -245,5 +251,6 @@ function prettySubst(subst) {
 module.exports.substitute = substitute;
 module.exports.equal = equal;
 module.exports.isContradiction = isContradiction;
+module.exports.isAtom = isAtom;
 module.exports.pretty = pretty;
 module.exports.prettySubst = prettySubst;

@@ -98,10 +98,11 @@ var rules = {
 			elimination : new Justifier(
 				{ hasPart : false, stepRefs : ["num"], subst : false },
 				function(proof, step, part, steps) {
-				var refStep = proof.steps[steps[0]].getSentence();
-        if (!Expr.isContradiction(refStep))
+				  var refStep = proof.steps[steps[0]].getSentence();
+          if (!Expr.isContradiction(refStep)){
 					// if (refStep[0] != 'id' || (refStep[1] != 'contradiction' && refStep[1] != '_|_'))
-						return "Bot-elim: Referenced step is not absurdity.";
+					  return "Bot-elim: Referenced step is not absurdity, but got " + Expr.pretty(refStep) + " instead.";
+          }
 					return true;
 				})
 		}),
@@ -114,8 +115,8 @@ var rules = {
 					var curStep = proof.steps[step].getSentence();
 					var refStep = proof.steps[steps[0]].getSentence();
 					if (refStep[0] !== 'not' || refStep[1][0] !== 'not')
-						return "Notnot-elim: Referenced step is not a double-negation.";
-					
+						return "Notnot-elim: Referenced step is not a double-negation, but got " + Expr.pretty(refStep) + " instead.";
+
 					if (!Expr.equal(refStep[1][1], curStep))
 						return "Notnot-elim: Does not result in current step.";
 
@@ -132,7 +133,7 @@ var rules = {
 			var result = proof.steps[steps[0][1]].getSentence();
 			var implies = proof.steps[step].getSentence();
 			if (implies[0] != '->')
-			return "Implies-Intro: Current step is not an implication";
+			return "Implies-Intro: Current step is not an implication, but got " + Expr.pretty(implies) + " instead.";
 
 			var truthSemEq = Expr.equal(implies[1], truth);
 			if (! truthSemEq)
@@ -472,7 +473,7 @@ var rules = {
 };
 
 function splitHead(form) {
-  if (form[0] == "id") {
+  if (Expr.isAtom(form)) {
     return [form];
   }
   else if (form[0] == "and") {
@@ -502,7 +503,7 @@ function openHornClause(form, vars = Array(0)){
       return "Not a valid head in Horn clause";
     }
   }
-  else if (form[0] == "id"){
+  else if (Expr.isAtom(form)){
     return [vars, [], form];
   }
   else {

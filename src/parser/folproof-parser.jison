@@ -99,10 +99,10 @@ e_eq
 atom
 	: term EQUALS term
 	{ $$ = ['=', $1, $3]; }
-	| term
-	{ $$ = $term; }
 	| BOTTOM
 	{ $$ = ['bot']; }
+	| term
+	{ $$ = $term; }
 	| LPAREN sentence RPAREN
 	{ $$ = $sentence; $$.userParens = true; }
 	;
