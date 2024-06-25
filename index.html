@@ -97,6 +97,7 @@ $(document).ready(function() {
 					<button class='examples' value='5'>Example 9.13</button>
 					<button class='examples' value='6'>Exam Example Solution</button>
 					<button class='examples' value='7'>Exam Uniform Proof Example Solution</button>
+					<button class='examples' value='8'>Admissible Rules</button>
 				</div>
 			</div>
 		</div>
@@ -270,6 +271,18 @@ T(g(g(c))) ∧ O(d(c,c,c), i(i(i(d(c,c,c), c), g(c)), g(g(c))), g(g(g(c))))  : a
 ∃q. T(g(g(c))) ∧ O(d(c,c,c), q, g(g(g(c))))                                : E.q/i(i(i(d(c,c,c),c),g(c)),g(g(c))) i 11
 ∃x. ∃q. T(x) ∧ O(d(c,c,c), q, g(x))                                        : E.x/g(g(c)) i 12
 ∃p. ∃x. ∃q. T(x) ∧ O(p, q, g(x))                                           : E.p/d(c,c,c) i 13
+</div>
+<div id='example8'>
+# You may use the admissible rules for symmetry and transitivity as follows.
+# First turn these rules into Horn clauses like so:
+Ax. Ay. x = y -> y = x             : premise # (Sym) proven in theorem 9.10
+Ax. Ay. Az. x = y & y = z -> x = z : premise # (Trans) proven in theorem 9.10
+
+# Then you can use thes Horn clauses easily with the backchaining rule in proofs:
+
+a = b
+b = c
+a = c : B.x/a;y/b;z/c 2,3,4
 </div>
 </div>
 </body>
