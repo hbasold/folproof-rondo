@@ -76,9 +76,9 @@
 var parser = (function(){
 var parser = {trace: function trace () { },
 yy: {},
-symbols_: {"error":2,"proof":3,"clause_list":4,"proof_option0":5,"ENDOFFILE":6,"box":7,"EOL":8,"BOX":9,"with":10,"box_option0":11,"DEBOX":12,"box_option1":13,"sentence":14,"box_option2":15,"WITH":16,"ID":17,"e_top":18,"EXISTS":19,"DOT":20,"FORALL":21,"e_or":22,"IFF":23,"IMPLIES":24,"e_and":25,"OR":26,"e_eq":27,"AND":28,"EQUALS":29,"e_not":30,"NOT":31,"atom":32,"term":33,"BOTTOM":34,"LPAREN":35,"RPAREN":36,"term_list":37,"COMMA":38,"JUSTIFICATION":39,"$accept":0,"$end":1},
-terminals_: {2:"error",6:"ENDOFFILE",8:"EOL",9:"BOX",12:"DEBOX",16:"WITH",17:"ID",19:"EXISTS",20:"DOT",21:"FORALL",23:"IFF",24:"IMPLIES",26:"OR",28:"AND",29:"EQUALS",31:"NOT",34:"BOTTOM",35:"LPAREN",36:"RPAREN",38:"COMMA",39:"JUSTIFICATION"},
-productions_: [0,[3,3],[4,1],[4,3],[4,0],[7,6],[7,4],[7,2],[10,2],[14,1],[14,1],[18,4],[18,4],[18,3],[18,3],[18,1],[22,3],[22,1],[25,3],[25,1],[27,3],[27,1],[30,2],[30,1],[32,1],[32,1],[32,3],[37,1],[37,3],[37,0],[33,4],[33,1],[5,0],[5,1],[11,0],[11,1],[13,0],[13,1],[15,0],[15,1]],
+symbols_: {"error":2,"proof":3,"clause_list":4,"proof_option0":5,"ENDOFFILE":6,"box":7,"EOL":8,"BOX":9,"with":10,"box_option0":11,"DEBOX":12,"box_option1":13,"sentence":14,"box_option2":15,"WITH":16,"ID":17,"e_top":18,"EXISTS":19,"DOT":20,"FORALL":21,"e_or":22,"IFF":23,"IMPLIES":24,"e_and":25,"OR":26,"e_not":27,"AND":28,"NOT":29,"atom":30,"term":31,"EQUALS":32,"BOTTOM":33,"LPAREN":34,"RPAREN":35,"term_list":36,"COMMA":37,"JUSTIFICATION":38,"$accept":0,"$end":1},
+terminals_: {2:"error",6:"ENDOFFILE",8:"EOL",9:"BOX",12:"DEBOX",16:"WITH",17:"ID",19:"EXISTS",20:"DOT",21:"FORALL",23:"IFF",24:"IMPLIES",26:"OR",28:"AND",29:"NOT",32:"EQUALS",33:"BOTTOM",34:"LPAREN",35:"RPAREN",37:"COMMA",38:"JUSTIFICATION"},
+productions_: [0,[3,3],[4,1],[4,3],[4,0],[7,6],[7,4],[7,2],[10,2],[14,1],[14,1],[18,4],[18,4],[18,3],[18,3],[18,1],[22,3],[22,1],[25,3],[25,1],[27,2],[27,1],[30,3],[30,1],[30,1],[30,3],[36,1],[36,3],[36,0],[31,4],[31,1],[5,0],[5,1],[11,0],[11,1],[13,0],[13,1],[15,0],[15,1]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -133,34 +133,32 @@ case 18: this.$ = ['and', $$[$0-2], $$[$0]];
 break;
 case 19: this.$ = $$[$0]; 
 break;
-case 20: this.$ = ['=', $$[$0-2], $$[$0]]; 
+case 20: this.$ = ['not', $$[$0]]; 
 break;
 case 21: this.$ = $$[$0]; 
 break;
-case 22: this.$ = ['not', $$[$0]]; 
+case 22: this.$ = ['=', $$[$0-2], $$[$0]]; 
 break;
-case 23: this.$ = $$[$0]; 
+case 23: this.$ = ['bot']; 
 break;
 case 24: this.$ = $$[$0]; 
 break;
-case 25: this.$ = ['bot']; 
+case 25: this.$ = $$[$0-1]; this.$.userParens = true; 
 break;
-case 26: this.$ = $$[$0-1]; this.$.userParens = true; 
+case 26: this.$ = [$$[$0]]; 
 break;
-case 27: this.$ = [$$[$0]]; 
+case 27: this.$ = $$[$0]; this.$.unshift($$[$0-2]); 
 break;
-case 28: this.$ = $$[$0]; this.$.unshift($$[$0-2]); 
+case 28: this.$ = []; 
 break;
-case 29: this.$ = []; 
+case 29: this.$ = ['id', $$[$0-3], $$[$0-1]]; 
 break;
-case 30: this.$ = ['id', $$[$0-3], $$[$0-1]]; 
-break;
-case 31: this.$ = ['id', $$[$0]]; 
+case 30: this.$ = ['id', $$[$0]]; 
 break;
 }
 },
-table: [{2:[1,7],3:1,4:2,6:[2,4],7:3,8:[2,4],9:[1,4],14:5,17:[1,19],18:6,19:[1,8],21:[1,9],22:10,25:11,27:12,30:13,31:[1,14],32:15,33:16,34:[1,17],35:[1,18]},{1:[3]},{5:20,6:[2,32],8:[1,21]},{6:[2,2],8:[2,2],12:[2,2]},{2:[1,7],4:23,7:3,8:[2,4],9:[1,4],10:22,12:[2,4],14:5,16:[1,24],17:[1,19],18:6,19:[1,8],21:[1,9],22:10,25:11,27:12,30:13,31:[1,14],32:15,33:16,34:[1,17],35:[1,18]},{6:[2,38],8:[2,38],12:[2,38],15:25,39:[1,26]},{6:[2,9],8:[2,9],12:[2,9],36:[2,9],39:[2,9]},{6:[2,10],8:[2,10],12:[2,10],36:[2,10],39:[2,10]},{17:[1,27]},{17:[1,28]},{6:[2,15],8:[2,15],12:[2,15],23:[1,29],24:[1,30],36:[2,15],39:[2,15]},{6:[2,17],8:[2,17],12:[2,17],23:[2,17],24:[2,17],26:[1,31],36:[2,17],39:[2,17]},{6:[2,19],8:[2,19],12:[2,19],23:[2,19],24:[2,19],26:[2,19],28:[1,32],29:[1,33],36:[2,19],39:[2,19]},{6:[2,21],8:[2,21],12:[2,21],23:[2,21],24:[2,21],26:[2,21],28:[2,21],29:[2,21],36:[2,21],39:[2,21]},{17:[1,19],30:34,31:[1,14],32:15,33:16,34:[1,17],35:[1,18]},{6:[2,23],8:[2,23],12:[2,23],23:[2,23],24:[2,23],26:[2,23],28:[2,23],29:[2,23],36:[2,23],39:[2,23]},{6:[2,24],8:[2,24],12:[2,24],23:[2,24],24:[2,24],26:[2,24],28:[2,24],29:[2,24],36:[2,24],39:[2,24]},{6:[2,25],8:[2,25],12:[2,25],23:[2,25],24:[2,25],26:[2,25],28:[2,25],29:[2,25],36:[2,25],39:[2,25]},{2:[1,7],14:35,17:[1,19],18:6,19:[1,8],21:[1,9],22:10,25:11,27:12,30:13,31:[1,14],32:15,33:16,34:[1,17],35:[1,18]},{6:[2,31],8:[2,31],12:[2,31],23:[2,31],24:[2,31],26:[2,31],28:[2,31],29:[2,31],35:[1,36],36:[2,31],38:[2,31],39:[2,31]},{6:[1,37]},{2:[1,7],6:[2,33],7:38,9:[1,4],14:5,17:[1,19],18:6,19:[1,8],21:[1,9],22:10,25:11,27:12,30:13,31:[1,14],32:15,33:16,34:[1,17],35:[1,18]},{8:[1,39]},{8:[1,41],12:[2,36],13:40},{17:[1,42]},{6:[2,7],8:[2,7],12:[2,7]},{6:[2,39],8:[2,39],12:[2,39]},{20:[1,43]},{20:[1,44]},{17:[1,19],18:45,19:[1,8],21:[1,9],22:10,25:11,27:12,30:13,31:[1,14],32:15,33:16,34:[1,17],35:[1,18]},{17:[1,19],18:46,19:[1,8],21:[1,9],22:10,25:11,27:12,30:13,31:[1,14],32:15,33:16,34:[1,17],35:[1,18]},{17:[1,19],22:47,25:11,27:12,30:13,31:[1,14],32:15,33:16,34:[1,17],35:[1,18]},{17:[1,19],25:48,27:12,30:13,31:[1,14],32:15,33:16,34:[1,17],35:[1,18]},{17:[1,19],30:49,31:[1,14],32:15,33:16,34:[1,17],35:[1,18]},{6:[2,22],8:[2,22],12:[2,22],23:[2,22],24:[2,22],26:[2,22],28:[2,22],29:[2,22],36:[2,22],39:[2,22]},{36:[1,50]},{17:[1,19],33:52,36:[2,29],37:51},{1:[2,1]},{6:[2,3],8:[2,3],12:[2,3]},{2:[1,7],4:53,7:3,8:[2,4],9:[1,4],12:[2,4],14:5,17:[1,19],18:6,19:[1,8],21:[1,9],22:10,25:11,27:12,30:13,31:[1,14],32:15,33:16,34:[1,17],35:[1,18]},{12:[1,54]},{2:[1,7],7:38,9:[1,4],12:[2,37],14:5,17:[1,19],18:6,19:[1,8],21:[1,9],22:10,25:11,27:12,30:13,31:[1,14],32:15,33:16,34:[1,17],35:[1,18]},{8:[2,8]},{17:[1,19],18:55,19:[1,8],21:[1,9],22:10,25:11,27:12,30:13,31:[1,14],32:15,33:16,34:[1,17],35:[1,18]},{17:[1,19],18:56,19:[1,8],21:[1,9],22:10,25:11,27:12,30:13,31:[1,14],32:15,33:16,34:[1,17],35:[1,18]},{6:[2,13],8:[2,13],12:[2,13],36:[2,13],39:[2,13]},{6:[2,14],8:[2,14],12:[2,14],36:[2,14],39:[2,14]},{6:[2,16],8:[2,16],12:[2,16],23:[2,16],24:[2,16],36:[2,16],39:[2,16]},{6:[2,18],8:[2,18],12:[2,18],23:[2,18],24:[2,18],26:[2,18],36:[2,18],39:[2,18]},{6:[2,20],8:[2,20],12:[2,20],23:[2,20],24:[2,20],26:[2,20],28:[2,20],29:[2,20],36:[2,20],39:[2,20]},{6:[2,26],8:[2,26],12:[2,26],23:[2,26],24:[2,26],26:[2,26],28:[2,26],29:[2,26],36:[2,26],39:[2,26]},{36:[1,57]},{36:[2,27],38:[1,58]},{8:[1,60],11:59,12:[2,34]},{6:[2,6],8:[2,6],12:[2,6]},{6:[2,11],8:[2,11],12:[2,11],36:[2,11],39:[2,11]},{6:[2,12],8:[2,12],12:[2,12],36:[2,12],39:[2,12]},{6:[2,30],8:[2,30],12:[2,30],23:[2,30],24:[2,30],26:[2,30],28:[2,30],29:[2,30],36:[2,30],38:[2,30],39:[2,30]},{17:[1,19],33:52,36:[2,29],37:61},{12:[1,62]},{2:[1,7],7:38,9:[1,4],12:[2,35],14:5,17:[1,19],18:6,19:[1,8],21:[1,9],22:10,25:11,27:12,30:13,31:[1,14],32:15,33:16,34:[1,17],35:[1,18]},{36:[2,28]},{6:[2,5],8:[2,5],12:[2,5]}],
-defaultActions: {37:[2,1],42:[2,8],61:[2,28]},
+table: [{2:[1,7],3:1,4:2,6:[2,4],7:3,8:[2,4],9:[1,4],14:5,17:[1,18],18:6,19:[1,8],21:[1,9],22:10,25:11,27:12,29:[1,13],30:14,31:15,33:[1,16],34:[1,17]},{1:[3]},{5:19,6:[2,31],8:[1,20]},{6:[2,2],8:[2,2],12:[2,2]},{2:[1,7],4:22,7:3,8:[2,4],9:[1,4],10:21,12:[2,4],14:5,16:[1,23],17:[1,18],18:6,19:[1,8],21:[1,9],22:10,25:11,27:12,29:[1,13],30:14,31:15,33:[1,16],34:[1,17]},{6:[2,37],8:[2,37],12:[2,37],15:24,38:[1,25]},{6:[2,9],8:[2,9],12:[2,9],35:[2,9],38:[2,9]},{6:[2,10],8:[2,10],12:[2,10],35:[2,10],38:[2,10]},{17:[1,26]},{17:[1,27]},{6:[2,15],8:[2,15],12:[2,15],23:[1,28],24:[1,29],35:[2,15],38:[2,15]},{6:[2,17],8:[2,17],12:[2,17],23:[2,17],24:[2,17],26:[1,30],35:[2,17],38:[2,17]},{6:[2,19],8:[2,19],12:[2,19],23:[2,19],24:[2,19],26:[2,19],28:[1,31],35:[2,19],38:[2,19]},{17:[1,18],27:32,29:[1,13],30:14,31:15,33:[1,16],34:[1,17]},{6:[2,21],8:[2,21],12:[2,21],23:[2,21],24:[2,21],26:[2,21],28:[2,21],35:[2,21],38:[2,21]},{6:[2,24],8:[2,24],12:[2,24],23:[2,24],24:[2,24],26:[2,24],28:[2,24],32:[1,33],35:[2,24],38:[2,24]},{6:[2,23],8:[2,23],12:[2,23],23:[2,23],24:[2,23],26:[2,23],28:[2,23],35:[2,23],38:[2,23]},{2:[1,7],14:34,17:[1,18],18:6,19:[1,8],21:[1,9],22:10,25:11,27:12,29:[1,13],30:14,31:15,33:[1,16],34:[1,17]},{6:[2,30],8:[2,30],12:[2,30],23:[2,30],24:[2,30],26:[2,30],28:[2,30],32:[2,30],34:[1,35],35:[2,30],37:[2,30],38:[2,30]},{6:[1,36]},{2:[1,7],6:[2,32],7:37,9:[1,4],14:5,17:[1,18],18:6,19:[1,8],21:[1,9],22:10,25:11,27:12,29:[1,13],30:14,31:15,33:[1,16],34:[1,17]},{8:[1,38]},{8:[1,40],12:[2,35],13:39},{17:[1,41]},{6:[2,7],8:[2,7],12:[2,7]},{6:[2,38],8:[2,38],12:[2,38]},{20:[1,42]},{20:[1,43]},{17:[1,18],18:44,19:[1,8],21:[1,9],22:10,25:11,27:12,29:[1,13],30:14,31:15,33:[1,16],34:[1,17]},{17:[1,18],18:45,19:[1,8],21:[1,9],22:10,25:11,27:12,29:[1,13],30:14,31:15,33:[1,16],34:[1,17]},{17:[1,18],22:46,25:11,27:12,29:[1,13],30:14,31:15,33:[1,16],34:[1,17]},{17:[1,18],25:47,27:12,29:[1,13],30:14,31:15,33:[1,16],34:[1,17]},{6:[2,20],8:[2,20],12:[2,20],23:[2,20],24:[2,20],26:[2,20],28:[2,20],35:[2,20],38:[2,20]},{17:[1,18],31:48},{35:[1,49]},{17:[1,18],31:51,35:[2,28],36:50},{1:[2,1]},{6:[2,3],8:[2,3],12:[2,3]},{2:[1,7],4:52,7:3,8:[2,4],9:[1,4],12:[2,4],14:5,17:[1,18],18:6,19:[1,8],21:[1,9],22:10,25:11,27:12,29:[1,13],30:14,31:15,33:[1,16],34:[1,17]},{12:[1,53]},{2:[1,7],7:37,9:[1,4],12:[2,36],14:5,17:[1,18],18:6,19:[1,8],21:[1,9],22:10,25:11,27:12,29:[1,13],30:14,31:15,33:[1,16],34:[1,17]},{8:[2,8]},{17:[1,18],18:54,19:[1,8],21:[1,9],22:10,25:11,27:12,29:[1,13],30:14,31:15,33:[1,16],34:[1,17]},{17:[1,18],18:55,19:[1,8],21:[1,9],22:10,25:11,27:12,29:[1,13],30:14,31:15,33:[1,16],34:[1,17]},{6:[2,13],8:[2,13],12:[2,13],35:[2,13],38:[2,13]},{6:[2,14],8:[2,14],12:[2,14],35:[2,14],38:[2,14]},{6:[2,16],8:[2,16],12:[2,16],23:[2,16],24:[2,16],35:[2,16],38:[2,16]},{6:[2,18],8:[2,18],12:[2,18],23:[2,18],24:[2,18],26:[2,18],35:[2,18],38:[2,18]},{6:[2,22],8:[2,22],12:[2,22],23:[2,22],24:[2,22],26:[2,22],28:[2,22],35:[2,22],38:[2,22]},{6:[2,25],8:[2,25],12:[2,25],23:[2,25],24:[2,25],26:[2,25],28:[2,25],35:[2,25],38:[2,25]},{35:[1,56]},{35:[2,26],37:[1,57]},{8:[1,59],11:58,12:[2,33]},{6:[2,6],8:[2,6],12:[2,6]},{6:[2,11],8:[2,11],12:[2,11],35:[2,11],38:[2,11]},{6:[2,12],8:[2,12],12:[2,12],35:[2,12],38:[2,12]},{6:[2,29],8:[2,29],12:[2,29],23:[2,29],24:[2,29],26:[2,29],28:[2,29],32:[2,29],35:[2,29],37:[2,29],38:[2,29]},{17:[1,18],31:51,35:[2,28],36:60},{12:[1,61]},{2:[1,7],7:37,9:[1,4],12:[2,34],14:5,17:[1,18],18:6,19:[1,8],21:[1,9],22:10,25:11,27:12,29:[1,13],30:14,31:15,33:[1,16],34:[1,17]},{35:[2,27]},{6:[2,5],8:[2,5],12:[2,5]}],
+defaultActions: {36:[2,1],41:[2,8],60:[2,27]},
 parseError: function parseError (str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -688,9 +686,9 @@ case 3:return 24;
 break;
 case 4:return 23;
 break;
-case 5:return 31;
+case 5:return 29;
 break;
-case 6:return 29;
+case 6:return 32;
 break;
 case 7:return 16;
 break;
@@ -701,6 +699,7 @@ case 9:
 				
 				// strip the leading colon and spaces
 				yy_.yytext = yy_.yytext.substr(yy_.yytext.substr(1).search(/\S/));
+				yy_.yytext = yy_.yytext.match(/^[^\#]*/)[0];
 				yy_.yytext = yy_.yytext.trim();
 
         // find the beginning of the first line number
@@ -718,7 +717,7 @@ case 9:
         var substParts = null;
         if (ruleApp.length == 2){
            name = ruleApp[0].trim();
-           var substParts = ruleApp[1].split(',');
+           var substParts = ruleApp[1].split(';').map((s) => s.trim());
            var rem = substParts[substParts.length - 1].split(' ', 2);
            substParts[substParts.length - 1] = rem[0];
            if(rem.length >= 2){
@@ -752,22 +751,22 @@ case 9:
            }
         }
 				yy_.yytext = [name, rtype, side, lineranges, sub];
-				return 39;
+				return 38;
 				
 break;
 case 10:return 19;
 break;
 case 11:return 21;
 break;
-case 12:return 35;
+case 12:return 34;
 break;
-case 13:return 36;
+case 13:return 35;
 break;
-case 14:return 34;
+case 14:return 33;
 break;
 case 15:return 17;
 break;
-case 16:return 38;
+case 16:return 37;
 break;
 case 17:return 20;
 break;
@@ -823,7 +822,7 @@ case 24:return 2;
 break;
 }
 },
-rules: [/^(?:[\n\r]?#.*)/,/^(?:and|∧|&)/,/^(?:or|∨|v|\+)/,/^(?:implies|->|→)/,/^(?:iff|<->)/,/^(?:not|~|¬)/,/^(?:=)/,/^(?:with\b)/,/^(?:\d+)/,/^(?:(:.*))/,/^(?:E|∃)/,/^(?:A|∀)/,/^(?:\()/,/^(?:\))/,/^(?:_\|_|⊥)/,/^(?:([a-zA-Z_][a-zA-Z_'"0-9\|]*))/,/^(?:,)/,/^(?:\.)/,/^(?:[\n\r]*$)/,/^(?:\n([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*-+)/,/^(?:[\n\r]+([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*(?![^\n\r]))/,/^(?:[\n|^]([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\d*([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)/,/^(?:\n)/,/^(?:([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+)/,/^(?:.*)/],
+rules: [/^(?:[\n\r]?#.*)/,/^(?:and|∧|&)/,/^(?:or|∨|v|\+)/,/^(?:implies|->|→)/,/^(?:iff|<->)/,/^(?:not|~|¬)/,/^(?:=)/,/^(?:with\b)/,/^(?:\d+)/,/^(?:(:.*))/,/^(?:E|∃)/,/^(?:A|∀)/,/^(?:\()/,/^(?:\))/,/^(?:_\|_|⊥|bot\b)/,/^(?:([a-zA-Z_][a-zA-Z_'"0-9\|]*))/,/^(?:,)/,/^(?:\.)/,/^(?:[\n\r]*$)/,/^(?:\n([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*-+)/,/^(?:[\n\r]+([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*(?![^\n\r]))/,/^(?:[\n|^]([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\d*([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)/,/^(?:\n)/,/^(?:([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+)/,/^(?:.*)/],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"inclusive":true}}
 });
 jisonLexerFn = lexer.setInput;
@@ -1586,6 +1585,264 @@ process.umask = function() { return 0; };
 
 },{}],5:[function(require,module,exports){
 var u = require("./util");
+
+function arrayContains(arr, el) {
+  for (var i=0; i<arr.length; i++) {
+    if (arr[i] === el) return true;
+  }
+  return false;
+}
+
+function clone(obj) {
+  var newo = {};
+  for(var k in Object.keys(obj)) {
+    newo[k] = obj[k];
+  }
+  return newo;
+}
+
+// Substitutes in parallel in expr by all the variables that are mapped in subst
+function substitute(expr, subst, bound) {
+  u.debug("substitute", expr, subst);
+  bound = bound ? bound : [];
+  var binOps = ["->", "and", "or", "<->", "="];
+  var unOps = ["not", "forall", "exists"];
+
+  // remove parens, which are basically stylistic no-ops
+  while (expr[0] === 'paren') expr = expr[1];
+
+  if (arrayContains(binOps, expr[0])) {
+    var leftSide = substitute(expr[1], subst);
+    var rightSide = substitute(expr[2], subst);
+    return [expr[0], leftSide, rightSide];
+  } else if (arrayContains(unOps, expr[0])) {
+    if (expr[0] === "forall" || expr[0] === "exists") {
+      bound = bound.slice(0);
+      bound.push(expr[1]);
+      return [expr[0], expr[1],
+        substitute(expr[2], subst, bound)];
+    }
+    return [expr[0], substitute(expr[1], subst, bound)];
+  } else if (expr[0] === 'id') {
+    if (expr.length === 2) {
+      if (! arrayContains(bound, expr[1])) {
+        var s = subst.find((s) => s[0] === expr[1]);
+        if (s)
+          return s[1]; // [expr[0], b];
+      }
+      return expr;
+    }
+    if (expr.length === 3) {
+      var newTerms = [];
+      for (var i=0; i<expr[2].length; i++) {
+        newTerms.push(substitute(expr[2][i], subst, bound));
+      }
+      return [expr[0], expr[1], newTerms];
+    }
+    throw Error("Unexpected AST format.");
+  } else {
+    return expr;
+  }
+}
+
+/**
+ * Determines whether two expressions are semantically equivalent
+ * under the given (and optional) substitution.
+ * a, b - abstract syntax trees of the expressions to be compared.
+ * suba, subb (optional) - does comparison after substituting suba in a with subb.
+ */
+function equal(A, B, suba, subb) {
+  u.debug("Expr.equal", A, B);
+  var bound = {}, sub;
+  if (suba) {
+    sub = true;
+    return _rec(A, B, {});
+  } else {
+    sub = false;
+    return _rec(A, B);
+  }
+
+  function _rec(a, b, bound) {
+    var binOps = ["->", "and", "or", "<->", "="];
+    var unOps = ["not"];
+
+    // if eq w/substitution, return true, otherwise continue
+    if (sub && equal(a, suba)) {
+        if ((a[0] !== 'id' || !bound[a[1]]) && _rec(subb, b, bound)) return true;
+    }
+
+    if (arrayContains(binOps, a[0]) && a[0] === b[0]) {
+      if (_rec(a[1], b[1], bound) && _rec(a[2], b[2], bound)) {
+        return true;
+      }
+      return false;
+    } else if (arrayContains(unOps, a[0]) && a[0] === b[0]) {
+      if (_rec(a[1], b[1], bound)) {
+        return true;
+      }
+      return false;
+    } else if (a[0] === 'exists' || a[0] === 'forall' && a[0] === b[0]) {
+      var newb;
+      if (sub) {
+        newb = clone(bound);
+        newb[a[1]] = true;
+      }
+      if (_rec(a[2], b[2], newb)) {
+        return true;
+      }
+      return false;
+    } else if (a[0] === "bot"){
+      return b[0] === "bot";
+    } else if (a[0] === "id") {
+      if (b && a[1] !== b[1]) return false;
+      if (a.length == 2 && b.length == 2) {
+        return true;
+      }
+
+      if (a.length == 3 && b.length == 3) {
+        if (a[2].length != b[2].length) {
+          return false;
+        }
+        for (var i=0; i<a[2].length; i++) {
+          if (!_rec(a[2][i], b[2][i], bound)) {
+            return false;
+          }
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+function isContradiction(s) {
+  u.debug("isContradiction", s);
+  // return (s[0] === 'id' && (s[1] === '_|_' || s[1] === 'contradiction'));
+  return s[0] === "bot";
+}
+
+var quantifiers = ["forall", "exists"];
+var unaryConnectives = ["not"];
+var binaryConnectives = ["<->", "->", "and", "or", "="];
+var opOrder = { "not": 4, "=": 4, "forall": 1, "exists": 1, "and" : 3, "or" : 3, "->" : 2, "<->" : 2 };
+var opPrint = {
+  "not": "~", "=": "=", "forall": "A", "exists": "E", "and" : "&", "or" : "v", "->": "->" , "<->" : "<->"
+};
+
+
+function isQuantifier(expr) {
+  console.assert(Array.isArray(expr) && expr.length > 0, "Expected expression but got %o", expr);
+  return quantifiers.indexOf(expr[0]) >= 0;
+}
+
+function isUnaryConnective(expr) {
+  console.assert(Array.isArray(expr) && expr.length > 0, "Expected expression but got %o", expr);
+  return unaryConnectives.indexOf(expr[0]) >= 0;
+}
+
+function isBinaryConnective(expr) {
+  console.assert(Array.isArray(expr) && expr.length > 0, "Expected expression but got %o", expr);
+  return binaryConnectives.indexOf(expr[0]) >= 0;
+}
+
+function isId(expr) {
+  console.assert(Array.isArray(expr) && expr.length > 0, "Expected expression but got %o", expr);
+  return expr[0] === "id";
+}
+
+function isAtom(expr) {
+  console.assert(Array.isArray(expr) && expr.length > 0, "Expected expression but got %o", expr);
+  return expr[0] === "id" || expr[0] === "=";
+}
+
+function printPrec(i, j, doc) {
+  if (j < i) {
+    return "(" + doc + ")";
+  } else {
+    return doc;
+  }
+}
+
+function prettyArgs(args) {
+  var first = true;
+  var prt = "";
+  for (a of args) {
+    if(!first){
+      prt += ", ";
+    }
+    first = false;
+    prt += prettyTerm(a);
+  }
+  return prt;
+}
+
+function prettyTerm(expr) {
+  // u.debug("prettyTerm", expr);
+  var h = expr[1];
+  var a = "";
+  if(expr.length == 3){
+    a = "(" + prettyArgs(expr[2]) + ")";
+  }
+  return h + a;
+}
+
+function prettyPrec(i, expr) {
+  u.debug("prettyPrec", i, expr);
+  if(isQuantifier(expr)) {
+    var q = expr[0];
+    var x = expr[1];
+    var prec = opOrder[q];
+    var r = prettyPrec(prec, expr[2]);
+    var doc = opPrint[expr[0]] + x +  "." + r;
+    return printPrec(i, prec, doc);
+  }
+  else if(isBinaryConnective(expr)) {
+    var prec = opOrder[expr[0]];
+    var l = prettyPrec(prec + 1, expr[1]);
+    var r = prettyPrec(prec, expr[2]);
+    var doc = l + " " + opPrint[expr[0]] + " " + r;
+    return printPrec(i, prec, doc);
+  }
+  else if(isUnaryConnective(expr)) {
+    var prec = opOrder[expr[0]];
+    var r = prettyPrec(prec, expr[1]);
+    var doc = opPrint[expr[0]] + r;
+    return printPrec(i, prec, doc);
+  }
+  else if(isId(expr)) {
+    return prettyTerm(expr);
+  }
+  else {
+    console.assert(false, "Expr.pretty: Case not covered for %o", expr);
+  }
+}
+
+function pretty(expr) {
+  return prettyPrec(0, expr);
+}
+
+function prettySubst(subst) {
+  var doc = "";
+  var first = true;
+  for(s of subst) {
+    if(!first) {
+      doc += ";"
+    }
+    first = false;
+    doc += s[0] + "/" + pretty(s[1]);
+  }
+  return doc;
+}
+
+module.exports.substitute = substitute;
+module.exports.equal = equal;
+module.exports.isContradiction = isContradiction;
+module.exports.isAtom = isAtom;
+module.exports.pretty = pretty;
+module.exports.prettySubst = prettySubst;
+
+},{"./util":9}],6:[function(require,module,exports){
+var u = require("./util");
 var p = require("../folproof-parser");
 
 var Justifier = function Justifier(format, fn) {
@@ -1704,7 +1961,7 @@ var parseSubst = function(subst){
 
 module.exports = Justifier;
 
-},{"../folproof-parser":1,"./util":8}],6:[function(require,module,exports){
+},{"../folproof-parser":1,"./util":9}],7:[function(require,module,exports){
 var Rule = function Rule(options) {
 	// { name : name,
 	//   type : ["simple", "derived", "normal"], 
@@ -1721,10 +1978,11 @@ var Rule = function Rule(options) {
 
 module.exports = Rule;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var u = require("./util");
 var Rule = require("./rule.js");
 var Justifier = require("./justifier.js");
+var Expr = require("./expr.js");
 
 var rules = {
 	"premise" : new Rule({
@@ -1754,7 +2012,7 @@ var rules = {
 			if (s[0] !== "or")
 				return "LEM: must be phi or not phi.";
 			var left = s[1], right = s[2];
-			if (right[0] !== "not" || !semanticEq(left, right[1]))
+			if (right[0] !== "not" || !Expr.equal(left, right[1]))
 				return "LEM: right side must be negation of left.";
 			
 			return true;
@@ -1767,7 +2025,7 @@ var rules = {
 			function(proof, step, part, steps) {
 				var curStep = proof.steps[step].getSentence();
 				var refStep = proof.steps[steps[0]].getSentence();
-				if (!semanticEq(curStep, refStep))
+				if (!Expr.equal(curStep, refStep))
 					return "Copy: Current step is not semantically equal to the referenced step.";
 				return true;
 			}
@@ -1783,11 +2041,11 @@ var rules = {
 				return "MT: 1st referenced step must be implication.";
 			var left = impStep[1], right = impStep[2];
 			var negStep = proof.steps[steps[1]].getSentence();
-			if (negStep[0] !== "not" || !semanticEq(negStep[1], right))
+			if (negStep[0] !== "not" || !Expr.equal(negStep[1], right))
 				return "MT: 2nd ref step must be negation of right side of 1st ref step.";
 			
 			var s = proof.steps[step].getSentence();
-			if (s[0] !== 'not' || !semanticEq(left, s[1]))
+			if (s[0] !== 'not' || !Expr.equal(left, s[1]))
 				return "MT: current step must be negation of left side of ref step.";
 			
 			return true;
@@ -1801,14 +2059,14 @@ var rules = {
 		function(proof, step, part, steps) {	
 			var assumptionExpr = proof.steps[steps[0][0]].getSentence();
 			var contraExpr = proof.steps[steps[0][1]].getSentence();
-			if (! isContradiction(contraExpr)) {
+			if (! Expr.isContradiction(contraExpr)) {
 			return "Contra: Final step in range must be a contradiction.";
 			}
 	
 			if (assumptionExpr[0] !== 'not')
 			return "Contra: Assumption is not a negation. Might you be thinking of not-introduction?";
 		
-			var semEq = semanticEq(assumptionExpr[1], proof.steps[step].getSentence());
+			var semEq = Expr.equal(assumptionExpr[1], proof.steps[step].getSentence());
 			if (semEq)
 			return true;
 
@@ -1821,10 +2079,11 @@ var rules = {
 			elimination : new Justifier(
 				{ hasPart : false, stepRefs : ["num"], subst : false },
 				function(proof, step, part, steps) {
-				var refStep = proof.steps[steps[0]].getSentence();
-        if (!isContradiction(refStep))
+				  var refStep = proof.steps[steps[0]].getSentence();
+          if (!Expr.isContradiction(refStep)){
 					// if (refStep[0] != 'id' || (refStep[1] != 'contradiction' && refStep[1] != '_|_'))
-						return "Bot-elim: Referenced step is not absurdity.";
+					  return "Bot-elim: Referenced step is not absurdity, but got " + Expr.pretty(refStep) + " instead.";
+          }
 					return true;
 				})
 		}),
@@ -1837,9 +2096,9 @@ var rules = {
 					var curStep = proof.steps[step].getSentence();
 					var refStep = proof.steps[steps[0]].getSentence();
 					if (refStep[0] !== 'not' || refStep[1][0] !== 'not')
-						return "Notnot-elim: Referenced step is not a double-negation.";
-					
-					if (!semanticEq(refStep[1][1], curStep))
+						return "Notnot-elim: Referenced step is not a double-negation, but got " + Expr.pretty(refStep) + " instead.";
+
+					if (!Expr.equal(refStep[1][1], curStep))
 						return "Notnot-elim: Does not result in current step.";
 
 					return true;
@@ -1855,13 +2114,13 @@ var rules = {
 			var result = proof.steps[steps[0][1]].getSentence();
 			var implies = proof.steps[step].getSentence();
 			if (implies[0] != '->')
-			return "Implies-Intro: Current step is not an implication";
+			return "Implies-Intro: Current step is not an implication, but got " + Expr.pretty(implies) + " instead.";
 
-			var truthSemEq = semanticEq(implies[1], truth);
+			var truthSemEq = Expr.equal(implies[1], truth);
 			if (! truthSemEq)
 			return "Implies-Intro: The left side does not match the assumption.";
 
-			var resultSemEq = semanticEq(implies[2], result);
+			var resultSemEq = Expr.equal(implies[2], result);
 			if (! resultSemEq)
 			return "Implies-Intro: The result does not match the right side.";
 	
@@ -1879,8 +2138,8 @@ var rules = {
 			var implies = proof.steps[impliesStep].getSentence();
 			if (implies[0] != '->')
 			return "Implies-Elim: Step " + steps[0] + " is not an implication";
-			var truthSemEq = semanticEq(implies[1], truth);
-			var resultSemEq = semanticEq(implies[2], proof.steps[step].getSentence());
+			var truthSemEq = Expr.equal(implies[1], truth);
+			var resultSemEq = Expr.equal(implies[2], proof.steps[step].getSentence());
 			if (truthSemEq) {
 			if (resultSemEq) {
 				return true;
@@ -1903,8 +2162,8 @@ var rules = {
 				if (s[0] !== 'and')
 					return "And-Intro: Current step is not an 'and'-expression." + proof.steps[step].getSentence();
 
-				if (semanticEq(s[1], proof.steps[steps[0]].getSentence())) {
-					if (semanticEq(s[2], proof.steps[steps[1]].getSentence())) {
+				if (Expr.equal(s[1], proof.steps[steps[0]].getSentence())) {
+					if (Expr.equal(s[2], proof.steps[steps[1]].getSentence())) {
 						return true;
 					} else {
 						return "And-Intro: Right side doesn't match referenced step.";
@@ -1920,7 +2179,7 @@ var rules = {
 				if (andExp[0] != 'and')
 					return "And-Elim: Referenced step is not an 'and' expression.";
 
-				var semEq = semanticEq(andExp[part], proof.steps[step].getSentence());
+				var semEq = Expr.equal(andExp[part], proof.steps[step].getSentence());
 
 				if (semEq)
 					return true;
@@ -1938,7 +2197,7 @@ var rules = {
 				if (s[0] !== 'or')
 					return "Or-Intro: Current step is not an 'or'-expression.";
 
-				if (semanticEq(s[part], proof.steps[steps[0]].getSentence()))
+				if (Expr.equal(s[part], proof.steps[steps[0]].getSentence()))
 				return true;
 
 				return "Or-Intro: Side " + part + " doesn't match referenced step.";
@@ -1956,13 +2215,13 @@ var rules = {
 				// and through the gauntlet...
 				if (orStepExpr[0] !== 'or')
 					return "Or-Elim: First referenced step is not an 'or'-expression.";
-				if (!semanticEq(orStepExpr[1], a1p1Expr))
+				if (!Expr.equal(orStepExpr[1], a1p1Expr))
 					return "Or-Elim: First range intro doesn't match left side of 'or'.";
-				if (!semanticEq(orStepExpr[2], a2p1Expr))
+				if (!Expr.equal(orStepExpr[2], a2p1Expr))
 					return "Or-Elim: Second range range intro doesn't match right side of 'or'.";
-				if (!semanticEq(a1p2Expr, a2p2Expr))
+				if (!Expr.equal(a1p2Expr, a2p2Expr))
 					return "Or-Elim: Step range conclusions don't match.";
-				if (!semanticEq(a1p2Expr, currStepExpr))
+				if (!Expr.equal(a1p2Expr, currStepExpr))
 					return "Or-Elim: Current step doesn't match step range conclusions.";
 
 				return true;
@@ -1976,14 +2235,14 @@ var rules = {
 			function(proof, step, part, steps) {
 				var assumptionExpr = proof.steps[steps[0][0]].getSentence();
 				var contraExpr = proof.steps[steps[0][1]].getSentence();
-				if (! isContradiction(contraExpr)) {
+				if (! Expr.isContradiction(contraExpr)) {
 					return "Neg-Intro: Final step in range must be absurdity.";
 				}
 				var curStep = proof.steps[step].getSentence();
 				if (curStep[0] !== 'not') {
 					return "Neg-Intro: Current step is not a negation. Might you be thinking of Contra?";
 				} else {
-					var semEq = semanticEq(assumptionExpr, curStep[1]);
+					var semEq = Expr.equal(assumptionExpr, curStep[1]);
 					if (semEq)
 						return true;
 
@@ -1999,9 +2258,9 @@ var rules = {
 				var step2expr = proof.steps[steps[1]].getSentence();
 				var semEq;
 				if (step1expr[0] === 'not') {
-					semEq = semanticEq(step1expr[1], step2expr);
+					semEq = Expr.equal(step1expr[1], step2expr);
 				} else if (step2expr[0] === 'not') {
-					semEq = semanticEq(step2expr[1], step1expr);
+					semEq = Expr.equal(step2expr[1], step1expr);
 				} else {
 					return "Neg-Elim: Neither referenced proof step is a 'not' expression.";
 				}
@@ -2025,9 +2284,10 @@ var rules = {
 				var endExpr = proof.steps[steps[0][1]].getSentence();
         u.debug("all-intro", "startExpr", startExpr, "endExpr", endExpr, "currExpr", currExpr, "scope", scope, "subst", subst);
 				if (currExpr[0] !== 'forall')
-					return "All-x-Intro: Current step is not a 'for-all' expression.";
+					return "All-x-Intro: Current step is notf a 'for-all' expression.";
 				if (scope.length == 0 || scope[scope.length - 1] == null)
-					return "All-x-Intro: Not valid without a scoping assumption (e.g., an x0 box).";
+					return "All-x-Intro: The provided range does not have a scoping assumption (e.g., an x0 box started by 'with') in step " +
+          (steps[0][0] + 1) + ".";
         if (subst.length > 1)
           return "All-x-intro: Introducing more than one quantifier at the same time is currently not supported";
 
@@ -2035,12 +2295,14 @@ var rules = {
 				var scopeVar = scope[scope.length-1];
 				var found = scope.slice().reverse().reduce(function(a,e) { return a || (e == null || e == subst[1]); }, true);
 				if (! found)
-					return "All-x-intro: Substitution " + subst[1] + " doesn't match scope: " + scope.filter(function(e) { if (e != null) return e; }).join(", ");
+					return "All-x-intro: Substitution " + Expr.prettySubst(subst) + " doesn't match scope: " + scope.filter(function(e) { if (e != null) return e; }).join(", ");
 
-				var currExprSub = substitute(currExpr[2], subst);
-				if (semanticEq(endExpr, currExprSub))
+				var currExprSub = Expr.substitute(currExpr[2], subst);
+				if (Expr.equal(endExpr, currExprSub))
 					return true;
-				return "All-x-Intro: Last step in range doesn't match current step after " + subst[0] + "/" + subst[1] + ".";
+				return "All-x-Intro: Last step in range doesn't match current step after " +
+          Expr.prettySubst(subst) + ": " +
+          Expr.pretty(endExpr) + " != " + Expr.pretty(currExprSub) + ".";
 			}),
 		elimination : new Justifier(
 			{ stepRefs : ["num"], subst: true },
@@ -2054,11 +2316,13 @@ var rules = {
         if (subst.length > 1)
           return "All-x-elim: Eliminating more than one quantifier at the same time is currently not supported";
 
-				var refExprSub = substitute(refExpr[2], subst);
-				if (semanticEq(refExprSub, currExpr))
+				var refExprSub = Expr.substitute(refExpr[2], subst);
+				if (Expr.equal(refExprSub, currExpr))
 					return true;
 
-				return "All-x-Elim: Referenced step did not match current step after " + subst[1] + "/" + subst[0] + ".";
+				return "All-x-Elim: Referenced step " + (steps[0] + 1) +
+          " did not match current step after " + Expr.prettySubst(subst) + ": " +
+          Expr.pretty(refExprSub) + " != " + Expr.pretty(currExpr) + ".";
 			})
 	}),
 	"e" : new Rule({
@@ -2076,11 +2340,13 @@ var rules = {
         if (subst.length > 1)
           return "Exists-x-Intro: Introducing more than one quantifier at the same time is currently not supported";
 
-				var currExprSub = substitute(currExpr[2], subst);
-				if (semanticEq(refExpr, currExprSub))
+				var currExprSub = Expr.substitute(currExpr[2], subst);
+				if (Expr.equal(refExpr, currExprSub))
 					return true;
 	
-				return "Exists-x-Intro: Referenced step did not match current step after " + subst[1] + "/" + subst[0] + " substitution.";
+				return "Exists-x-Intro: Referenced step "  + (steps[0] + 1) +
+          " did not match current step after " + Expr.prettySubst(subst) + " substitution: " +
+          Expr.pretty(refExpr) + " != " + Expr.pretty(currExprSub) + ".";
 			}),
 		elimination : new Justifier(
 			{ stepRefs: ["num", "range"], subst: true },
@@ -2101,11 +2367,13 @@ var rules = {
 
 				// check whether substition matches ref line with current line
 				var scopeVars = scope[scope.length-1];
-				var refExprSub = substitute(refExpr[2], subst);
-				if (semanticEq(refExprSub, startExpr)) {
-					if (semanticEq(endExpr, currExpr))
+				var refExprSub = Expr.substitute(refExpr[2], subst);
+				if (Expr.equal(refExprSub, startExpr)) {
+					if (Expr.equal(endExpr, currExpr))
 						return true;
-					return "Exists-x-Elim: assumption ending step does not match current step.";
+					return "Exists-x-Elim: assumption ending step " + (steps[1][1] + 1) +
+            " does not match current step: " +
+            Expr.pretty(endExpr) + " != " + Expr.pretty(currExpr) + ".";
 				}
 				return "Exists-x-Elim: assumption beginning step doesn't match ref step for " + scopeVars[0] + ".";
 			})
@@ -2125,18 +2393,31 @@ var rules = {
           return "Backchaining: " + clause;
 
         var vars = clause[0];
-        var headSub = clause[1].map((c) => substitute(c, subst));
-        var tailSub = substitute(clause[2], subst);
+        var head = clause[1];
+        if(head.length != steps.length - 1){
+          return "Backchaining: " + (steps.length - 1) +
+            " proof steps provided, but " + head.length +
+            " required to match the head of the Horn clause " +
+            Expr.pretty(refExpr[0]);
+        }
+        var headSub = head.map((c) => Expr.substitute(c, subst));
+        var tailSub = Expr.substitute(clause[2], subst);
         u.debug("backchaining", "headSub", headSub, "tailSub", tailSub);
-        if (semanticEq(tailSub, currExpr)){
+        if (Expr.equal(tailSub, currExpr)){
           for(let i = 0; i < headSub.length; i++){
-            if(!semanticEq(headSub[i], refExpr[i + 1])){
-              return "Backchaining: Head formula " + (i + 1) + " of Horn clause in step " + (steps[0] + 1) + " does not match step " + (steps[i + 1] + 1) + ".";
+            if(!Expr.equal(headSub[i], refExpr[i + 1])){
+              return "Backchaining: Head formula " + (i + 1) +
+                " of Horn clause in step " + (steps[0] + 1) +
+                " does not match step " + (steps[i + 1] + 1) + ": " +
+                Expr.pretty(headSub[i]) + " != " + Expr.pretty(refExpr[i + 1]) +
+                ".";
             }
           }
           return true;
         } else {
-          return "Backchaining: Tail of Horn clause in step " + (steps[0] + 1) + " does not match current step."
+          return "Backchaining: Tail of Horn clause in step " + (steps[0] + 1) +
+            " does not match current step: " +
+            Expr.pretty(tailSub) + " != " + Expr.pretty(currExpr);
         }
       })
   }),
@@ -2150,7 +2431,7 @@ var rules = {
 				if (s[0] !== '=')
 					return "Equality-Intro: Current step is not an equality." + proof.steps[step].getSentence();
 
-				if (semanticEq(s[1], s[2]))
+				if (Expr.equal(s[1], s[2]))
 					return true;
 		
 				return "Equality-Intro: Left and right sides do not match.";
@@ -2164,133 +2445,22 @@ var rules = {
 				if (equalityExpr[0] !== '=')
 					return "Equality-Elim: First referenced step is not an equality.";
 					
-				if (!semanticEq(elimExpr, proposedResult, equalityExpr[1], equalityExpr[2]))
-					return "Equality-Elim: Does not result in current step.";
+				if (!Expr.equal(elimExpr, proposedResult, equalityExpr[1], equalityExpr[2])){
+					return "Equality-Elim: Substituting in step " + (steps[1] + 1) +
+          " does not result in current step: " +
+          " formula " + Expr.pretty(elimExpr) +
+          " != " + Expr.pretty(proposedResult) +
+          " when replacing " + Expr.pretty(equalityExpr[1]) +
+            " by " + Expr.pretty(equalityExpr[2]) ;
+        }
 
 				return true;
 			})
 	}),
 };
 
-// Substitutes in parallel in expr by all the variables that are mapped in subst
-function substitute(expr, subst, bound) {
-	u.debug("substitute", expr, subst);
-	bound = bound ? bound : [];
-	var binOps = ["->", "and", "or", "<->", "="];
-	var unOps = ["not", "forall", "exists"];
-
-	// remove parens, which are basically stylistic no-ops
-	while (expr[0] === 'paren') expr = expr[1];
-
-	if (arrayContains(binOps, expr[0])) {
-		var leftSide = substitute(expr[1], subst);
-		var rightSide = substitute(expr[2], subst);
-		return [expr[0], leftSide, rightSide];
-	} else if (arrayContains(unOps, expr[0])) {
-		if (expr[0] === "forall" || expr[0] === "exists") {
-			bound = bound.slice(0);
-			bound.push(expr[1]);
-			return [expr[0], expr[1],
-				substitute(expr[2], subst, bound)];
-		}
-		return [expr[0], substitute(expr[1], subst, bound)];
-	} else if (expr[0] === 'id') {
-		if (expr.length === 2) {
-			if (! arrayContains(bound, expr[1])) {
-        var s = subst.find((s) => s[0] === expr[1]);
-				if (s)
-					return s[1]; // [expr[0], b];
-			}
-			return expr;
-		}
-		if (expr.length === 3) {
-			var newTerms = [];
-			for (var i=0; i<expr[2].length; i++) {
-				newTerms.push(substitute(expr[2][i], subst, bound));
-			}
-			return [expr[0], expr[1], newTerms];
-		}
-		throw Error("Unexpected AST format.");
-	}
-}
-
-/**
- * Determines whether two expressions are semantically equivalent
- * under the given (and optional) substitution.
- * a, b - abstract syntax trees of the expressions to be compared.
- * suba, subb (optional) - does comparison after substituting suba in a with subb.
- */
-function semanticEq(A, B, suba, subb) {
-	u.debug("semanticEq", A, B);
-	var bound = {}, sub;
-	if (suba) {
-		sub = true;
-		return _rec(A, B, {});
-	} else {
-		sub = false;
-		return _rec(A, B);
-	}
-
-	function _rec(a, b, bound) {
-		var binOps = ["->", "and", "or", "<->", "="];
-		var unOps = ["not"];
-
-		// if eq w/substitution, return true, otherwise continue
-		if (sub && semanticEq(a, suba)) {
-				if ((a[0] !== 'id' || !bound[a[1]]) && _rec(subb, b, bound)) return true;
-		}
-
-		if (arrayContains(binOps, a[0]) && a[0] === b[0]) {
-			if (_rec(a[1], b[1], bound) && _rec(a[2], b[2], bound)) {
-				return true;
-			}
-			return false;
-		} else if (arrayContains(unOps, a[0]) && a[0] === b[0]) {
-			if (_rec(a[1], b[1], bound)) {
-				return true;
-			}
-			return false;
-		} else if (a[0] === 'exists' || a[0] === 'forall' && a[0] === b[0]) {
-			var newb;
-			if (sub) {
-				newb = clone(bound);
-				newb[a[1]] = true;
-			}
-			if (_rec(a[2], b[2], newb)) {
-				return true;
-			}
-			return false;
-    } else if (a[0] === "bot"){
-        return b[0] === "bot";
-		} else if (a[0] === "id") {
-			if (b && a[1] !== b[1]) return false;
-			if (a.length == 2 && b.length == 2) {
-				return true;
-			}
-
-			if (a.length == 3 && b.length == 3) {
-				if (a[2].length != b[2].length) {
-					return false;
-				}
-				for (var i=0; i<a[2].length; i++) {
-					if (!_rec(a[2][i], b[2][i], bound)) {
-						return false;
-					}
-				}
-				return true;
-			}
-		}
-		return false;
-	}
-}
-
-function isContradiction(s) {
-	  // return (s[0] === 'id' && (s[1] === '_|_' || s[1] === 'contradiction'));
-    return s[0] == 'bot';
-}
-
 function splitHead(form) {
-  if (form[0] == "id") {
+  if (Expr.isAtom(form)) {
     return [form];
   }
   else if (form[0] == "and") {
@@ -2320,7 +2490,7 @@ function openHornClause(form, vars = Array(0)){
       return "Not a valid head in Horn clause";
     }
   }
-  else if (form[0] == "id"){
+  else if (Expr.isAtom(form)){
     return [vars, [], form];
   }
   else {
@@ -2328,26 +2498,11 @@ function openHornClause(form, vars = Array(0)){
   }
 }
 
-function arrayContains(arr, el) {
-	for (var i=0; i<arr.length; i++) {
-		if (arr[i] === el) return true;
-	}
-	return false;
-}
-
-function clone(obj) {
-	var newo = {};
-	for(var k in Object.keys(obj)) {
-		newo[k] = obj[k];
-	}
-	return newo;
-}
-
 if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
 	module.exports = rules;
 }
 
-},{"./justifier.js":5,"./rule.js":6,"./util":8}],8:[function(require,module,exports){
+},{"./expr.js":5,"./justifier.js":6,"./rule.js":7,"./util":9}],9:[function(require,module,exports){
 var util = {};
 debugMode = false;
 util.debug = function debug() {
@@ -2359,7 +2514,7 @@ if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
 	module.exports = util;
 }
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var rules = require("./rules");
 var u = require("./util");
 
@@ -2526,5 +2681,5 @@ if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
 	exports.Verifier = Verifier;
 }
 
-},{"./rules":7,"./util":8}]},{},[9])(9)
+},{"./rules":8,"./util":9}]},{},[10])(10)
 });
