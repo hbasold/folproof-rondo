@@ -464,8 +464,14 @@ var rules = {
 				if (equalityExpr[0] !== '=')
 					return "Equality-Elim: First referenced step is not an equality.";
 					
-				if (!Expr.equal(elimExpr, proposedResult, equalityExpr[1], equalityExpr[2]))
-					return "Equality-Elim: Substituting in step " + (steps[1] + 1) + " does not result in current step.";
+				if (!Expr.equal(elimExpr, proposedResult, equalityExpr[1], equalityExpr[2])){
+					return "Equality-Elim: Substituting in step " + (steps[1] + 1) +
+          " does not result in current step: " +
+          " formula " + Expr.pretty(elimExpr) +
+          " != " + Expr.pretty(proposedResult) +
+          " when replacing " + Expr.pretty(equalityExpr[1]) +
+            " by " + Expr.pretty(equalityExpr[2]) ;
+        }
 
 				return true;
 			})
