@@ -38,14 +38,14 @@ The first column gives the ASCII notation, and the second provides alternative t
 | ASCII Operator | Alternatives | Precedence | Assoc |
 |----------------|--------------|------------|-------|
 | t = s          |              | Atomic     | N/A   |
-| `_|_`          | ⊥            | Atomic     | N/A   |
+| `_|_`          | bot, ⊥       | Atomic     | N/A   |
 | ~              | not, ¬       | 1          | N/A   |
 | &              | and, ∧       | 2          | Right |
 | v              | or, ∨, +     | 2          | Right |
 | ->             | implies, →   | 3          | Right |
 | <->            | iff          | 3          | Right |
-| A x.           | ∀x.          | 4          | N/A   |
-| E x.           | ∃x.          | 4          | N/A   |
+| A x.           | ∀ x.         | 4          | N/A   |
+| E x.           | ∃ x.         | 4          | N/A   |
 
 Quantifiers extend as far possible to the right, which means that, for example, `A x. Q(x) and P(x)` is interpreted as `A x. (Q(x) & P(x))` and *not* `(A.x Q(x)) & P(x)`, while `A x. Q(x) -> P(x)` is interpreted as `A x. (Q(X) -> P(x))`.
 The alternative notation allow textual and unicode representations.
@@ -62,7 +62,7 @@ Arguably, the notation with words is somewhat more difficult to read and merits 
 Justifications are the reasons why your current proof step follows logically from what is already there. They take the form:
 
 ```
-: ruleName[.v1/v2] [elim/intro[1/2]] [[(num/range), ]*]
+: ruleName[.v1/t] [elim/intro[1/2]] [[(num/range), ]*]
 ^     ^       ^         ^       ^       ^
 1     2       3         4       5       6
 ```
@@ -84,10 +84,10 @@ Justifications are the reasons why your current proof step follows logically fro
 2 ~a      : premise
 3 ~b      : premise
 4| a      : assumption
-5| _|_    : not elim 4,2
+5| _|_    : neg elim 4,2
  -----------------------
 6| b      : assumption
-7| _|_    : not elim 6,3
+7| _|_    : neg elim 6,3
 8 _|_     : or elim 1,4-5,6-7
 ```
 Notice how the first assumption is terminated, explicitly, out of necessity, since it would otherwise be difficult to tell there are two assumption boxes. The second box is terminated, implicitly, simply by omitting the leading pipe on line 8.
@@ -97,29 +97,31 @@ Notice how the first assumption is terminated, explicitly, out of necessity, sin
 ### Appendix A
 #### A list of justifications accepted by FOLProof
 
-| Rule Name  | Connective | Type   | Forms | References    | Substitutions |
-|------------|------------|--------|-------|---------------|---------------|
-| premise    | N/A        | intro  | N/A   | N/A           | N/A           |
-| assumption | N/A        | intro  | N/A   | N/A           | N/A           |
-| sorry      | N/A        | intro  | N/A   | N/A           | N/A           |
-| copy       | N/A        | intro  | N/A   | a             | N/A           |
-| and        | &          | basic  | elim  | a             | N/A           |
-|            |            |        | intro | a,b           | N/A           |
-| or         | v          | basic  | elim  | a,b-c,d-e     | N/A           |
-|            |            |        | intro | a             | N/A           |
-| not        | ~          | basic  | elim  | a,b           | N/A           |
-|            |            |        | intro | a-b           | N/A           |
-| ->         | ->         | basic  | elim  | a,b           | N/A           |
-|            |            |        | intro | a-b           | N/A           |
-| A          | Ax.        | basic  | elim  | a             |               |
-|            |            |        | intro | a-b           |               |
-| E          | Ex.        | basic  | elim  | a-b           |               |
-|            |            |        | intro | a             |               |
-| bot        | ⊥          | basic  | elim  | a             | N/A           |
-| =          | =          |        | intro | N/A           | N/A           |
-|            |            |        | elim  | a,b           | N/A           |
-| contra     | N/A        | basic  | N/A   | a-b           | N/A           |
-| MT         | N/A        | deriv. | N/A   | a,b           | N/A           |
-| NOTNOT     | N/A        | deriv. | intro | a             | N/A           |
-| LEM        | N/A        | deriv. | N/A   | N/A           | N/A           |
-| B          | N/A        | deriv. | N/A   | a,b1, ..., bn |               |
+| Rule Name  | Connective | Type   | Forms  | References    | Substitutions |
+|------------|------------|--------|--------|---------------|---------------|
+| premise    | N/A        | intro  | N/A    | N/A           | N/A           |
+| assumption | N/A        | intro  | N/A    | N/A           | N/A           |
+| sorry      | N/A        | intro  | N/A    | N/A           | N/A           |
+| copy       | N/A        | intro  | N/A    | a             | N/A           |
+| and        | &          | basic  | elim1  | a             | N/A           |
+|            |            |        | elim2  | a             | N/A           |
+|            |            |        | intro  | a,b           | N/A           |
+| or         | v          | basic  | elim   | a,b-c,d-e     | N/A           |
+|            |            |        | intro1 | a             | N/A           |
+|            |            |        | intro2 | a             | N/A           |
+| neg        | ~          | basic  | elim   | a,b           | N/A           |
+|            |            |        | intro  | a-b           | N/A           |
+| ->         | ->         | basic  | elim   | a,b           | N/A           |
+|            |            |        | intro  | a-b           | N/A           |
+| A          | Ax.        | basic  | elim   | a             |               |
+|            |            |        | intro  | a-b           |               |
+| E          | Ex.        | basic  | elim   | a-b           |               |
+|            |            |        | intro  | a             |               |
+| bot        | ⊥          | basic  | elim   | a             | N/A           |
+| =          | =          |        | intro  | N/A           | N/A           |
+|            |            |        | elim   | a,b           | N/A           |
+| contra     | N/A        | basic  | N/A    | a-b           | N/A           |
+| MT         | N/A        | deriv. | N/A    | a,b           | N/A           |
+| NOTNOT     | N/A        | deriv. | intro  | a             | N/A           |
+| LEM        | N/A        | deriv. | N/A    | N/A           | N/A           |
+| B          | N/A        | deriv. | N/A    | a,b1, ..., bn |               |
