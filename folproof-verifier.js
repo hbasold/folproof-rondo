@@ -2137,7 +2137,7 @@ var rules = {
 			var truth = proof.steps[truthStep].getSentence();
 			var implies = proof.steps[impliesStep].getSentence();
 			if (implies[0] != '->')
-			return "Implies-Elim: Step " + steps[0] + " is not an implication";
+			  return "Implies-Elim: Step " + (steps[0] + 1) + " is not an implication";
 			var truthSemEq = Expr.equal(implies[1], truth);
 			var resultSemEq = Expr.equal(implies[2], proof.steps[step].getSentence());
 			if (truthSemEq) {
@@ -2268,6 +2268,58 @@ var rules = {
 				if (semEq) return true;
 		
 				return "Neg-Elim: Subexpression in not-expr does not match other expr.";
+			})
+	}),
+	"<->" : new Rule({
+		name : "Bi-implication",
+		type : "normal",
+		introduction : new Justifier(
+			{ stepRefs : ["num", "num"] },
+			function(proof, step, part, steps) {
+				var s = proof.steps[step].getSentence();
+				if (s[0] !== '<->')
+					return "Bi-Implication-Intro: Current step is not an '<->'-expression." + proof.steps[step].getSentence();
+
+        var l = ["->"].concat(s.slice(1,3));
+        var r = ["->"];
+        r.push(s[2]);
+        r.push(s[1]);
+				if (Expr.equal(l, proof.steps[steps[0]].getSentence())) {
+					if (Expr.equal(r, proof.steps[steps[1]].getSentence())) {
+						return true;
+					} else {
+						return "Bi-Implication-Intro: Right side doesn't match referenced step: " +
+              Expr.pretty(r) + " != " + Expr.pretty(proof.steps[steps[1]].getSentence());
+					}
+				}
+		
+				return "Bi-Implication: Left side doesn't match referenced step: " +
+          Expr.pretty(l) + " != " + Expr.pretty(proof.steps[steps[0]].getSentence());
+			}),
+		elimination : new Justifier(
+			{ hasPart: true, stepRefs: ["num"] },
+			function(proof, step, part, steps) {
+				var s = proof.steps[steps[0]].getSentence();
+				if (s[0] != '<->'){
+					return "Bi-Implication-Elim: Referenced step is not an '<->' expression, got "
+            + Expr.pretty(andExp);
+        }
+
+        var semEq = false;
+        if(part == 1){
+          var l = ["->"].concat(s.slice(1,3));
+				  semEq = Expr.equal(l, proof.steps[step].getSentence());
+        } else {
+          var r = ["->"];
+          r.push(s[2]);
+          r.push(s[1]);
+				  semEq = Expr.equal(r, proof.steps[step].getSentence());
+        }
+
+				if (semEq)
+					return true;
+
+				return "Bi-Implication-Elim: In referenced line, side " + part + " does not match current step.";
 			})
 	}),
  	"a" : new Rule({

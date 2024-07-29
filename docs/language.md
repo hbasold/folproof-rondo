@@ -113,6 +113,9 @@ Notice how the first assumption is terminated, explicitly, out of necessity, sin
 |            |            |        | intro  | a-b           | N/A           |
 | ->         | ->         | basic  | elim   | a,b           | N/A           |
 |            |            |        | intro  | a-b           | N/A           |
+| <->        | <->        | basic  | elim1  | a             | N/A           |
+|            |            |        | elim2  | a             | N/A           |
+|            |            |        | intro  | a,b           | N/A           |
 | A          | Ax.        | basic  | elim   | a             |               |
 |            |            |        | intro  | a-b           |               |
 | E          | Ex.        | basic  | elim   | a-b           |               |
@@ -122,6 +125,6 @@ Notice how the first assumption is terminated, explicitly, out of necessity, sin
 |            |            |        | elim   | a,b           | N/A           |
 | contra     | N/A        | basic  | N/A    | a-b           | N/A           |
 | MT         | N/A        | deriv. | N/A    | a,b           | N/A           |
-| NOTNOT     | N/A        | deriv. | intro  | a             | N/A           |
+| NOTNOT     | N/A        | deriv. | elim   | a             | N/A           |
 | LEM        | N/A        | deriv. | N/A    | N/A           | N/A           |
 | B          | N/A        | deriv. | N/A    | a,b1, ..., bn |               |
