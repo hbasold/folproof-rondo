@@ -11,8 +11,8 @@
 <script type='text/javascript'>
 $(document).ready(function() {
 	var debugMode = false;
-	$("#parentheses").bind("click change", function() { $("#proof-input").keyup(); });
-	$("#proof-input").keyup(function(v) {
+	$("#parentheses").bind("click change", function() { $("#proof-input").trigger("input"); });
+  $("#proof-input").on("input", function(v) {
 		var proof = $(this).val();
 		var paren = $("#parentheses").val();
 		try {
@@ -40,12 +40,12 @@ $(document).ready(function() {
 		var html = folproofWeb.render(ast, { parentheses : paren });
 		$("#render-panel").empty().append(html);
 	});
-	$("#proof-input").keyup(); // force invocation on load
+	$("#proof-input").trigger("input"); // force invocation on load
 	$("button.examples").click(function() {
 		var i = $(this).val();
 		var proof = $("#proof-input");
 		proof.val($("#example" + i).text().substr(1))
-		proof.keyup();
+		proof.trigger("input");
 	});
 });
 </script>
