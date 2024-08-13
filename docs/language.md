@@ -1,6 +1,7 @@
 # FOLProof Language Reference
 
 ## Proof steps
+
 Every proof consists of a list of proof steps, where each step has the basic form:
 
 ```
@@ -17,16 +18,13 @@ Every proof consists of a list of proof steps, where each step has the basic for
 ```
 
 Nested boxes can be created by adding more pipes:
+
 ```
 || phi2 : assumption
 ```
 
 They can be ended explicitly, with any number of dashes on a new line, or implicitly, by simply omitting the pipe.
-See [Example 1](#example-1---assumption-boxes) under [Examples].
-3. phi is a formula in first-order logic. Greater detail can be found under [Formulas](#formulas).
-4. Colons separate the formula, phi, from the reason it follows logically. See [Justifications](#justifications).
-5. Every line is terminated by a newline.
-
+See [Example 1](#example-1---assumption-boxes) under [Examples]. 3. phi is a formula in first-order logic. Greater detail can be found under [Formulas](#formulas). 4. Colons separate the formula, phi, from the reason it follows logically. See [Justifications](#justifications). 5. Every line is terminated by a newline.
 
 Describing how each proof step should be formed, logically, is beyond the scope of this document.
 
@@ -35,26 +33,28 @@ Describing how each proof step should be formed, logically, is beyond the scope 
 FOLProof accepts the following logical operators, in order of precedence.
 The first column gives the ASCII notation, and the second provides alternative textual and Unicode notation.
 
-| ASCII Operator | Alternatives | Precedence | Assoc |
-|----------------|--------------|------------|-------|
-| t = s          |              | Atomic     | N/A   |
-| `_|_`          | bot, ⊥       | Atomic     | N/A   |
-| ~              | not, ¬       | 1          | N/A   |
-| &              | and, ∧       | 2          | Right |
-| v              | or, ∨, +     | 2          | Right |
-| ->             | implies, →   | 3          | Right |
-| <->            | iff          | 3          | Right |
-| A x.           | ∀ x.         | 4          | N/A   |
-| E x.           | ∃ x.         | 4          | N/A   |
+| ASCII Operator | Alternatives | Precedence | Assoc  |
+| -------------- | ------------ | ---------- | ------ | --- |
+| t = s          |              | Atomic     | N/A    |
+| `\_            | \_`          | bot, ⊥     | Atomic | N/A |
+| ~              | not, ¬       | 1          | N/A    |
+| &              | and, ∧       | 2          | Right  |
+| v              | or, ∨, +     | 2          | Right  |
+| ->             | implies, →   | 3          | Right  |
+| <->            | iff          | 3          | Right  |
+| A x.           | ∀ x.         | 4          | N/A    |
+| E x.           | ∃ x.         | 4          | N/A    |
 
-Quantifiers extend as far possible to the right, which means that, for example, `A x. Q(x) and P(x)` is interpreted as `A x. (Q(x) & P(x))` and *not* `(A.x Q(x)) & P(x)`, while `A x. Q(x) -> P(x)` is interpreted as `A x. (Q(X) -> P(x))`.
+Quantifiers extend as far possible to the right, which means that, for example, `A x. Q(x) and P(x)` is interpreted as `A x. (Q(x) & P(x))` and _not_ `(A.x Q(x)) & P(x)`, while `A x. Q(x) -> P(x)` is interpreted as `A x. (Q(X) -> P(x))`.
 The alternative notation allow textual and unicode representations.
 For instance, the following three inputs are interpreted all as the same formula.
+
 ```
 ∀x. P(x) ∧ Q(x) → ¬R(x) ∨ T(x, c)
 A x. P(x) & Q(x) -> ~R(x) + T(x, c)
 A x. P(x) and Q(x) implies not R(x) or T(x, c)
 ```
+
 Arguably, the notation with words is somewhat more difficult to read and merits some parentheses
 
 ## Justifications
@@ -79,6 +79,7 @@ Justifications are the reasons why your current proof step follows logically fro
 ## Examples
 
 ### Example 1 - Assumption Boxes
+
 ```
 1 a or b  : premise
 2 ~a      : premise
@@ -90,15 +91,17 @@ Justifications are the reasons why your current proof step follows logically fro
 7| _|_    : neg elim 6,3
 8 _|_     : or elim 1,4-5,6-7
 ```
+
 Notice how the first assumption is terminated, explicitly, out of necessity, since it would otherwise be difficult to tell there are two assumption boxes. The second box is terminated, implicitly, simply by omitting the leading pipe on line 8.
 
 ## Appendix
 
 ### Appendix A
+
 #### A list of justifications accepted by FOLProof
 
 | Rule Name  | Connective | Type   | Forms  | References    | Substitutions |
-|------------|------------|--------|--------|---------------|---------------|
+| ---------- | ---------- | ------ | ------ | ------------- | ------------- |
 | premise    | N/A        | intro  | N/A    | N/A           | N/A           |
 | assumption | N/A        | intro  | N/A    | N/A           | N/A           |
 | sorry      | N/A        | intro  | N/A    | N/A           | N/A           |
