@@ -124,6 +124,7 @@ var folproofWeb = (function () {
     "->": 5,
     "<->": 6,
   };
+
   function requireParens(parentOp, ast, leftTerm, options) {
     if (ast[0] === "id") return false;
 
@@ -149,6 +150,7 @@ var folproofWeb = (function () {
   }
 
   var infixTerms = ["="];
+
   function renderTerm(ast, options) {
     if (ast instanceof Array) {
       if (ast.length === 1) {
@@ -234,6 +236,7 @@ var folproofWeb = (function () {
     dom.append(nest);
     return line;
   }
+
   return obj;
 
   function debug() {

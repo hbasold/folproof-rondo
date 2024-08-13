@@ -1,8 +1,11 @@
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+
 # Proof Rondo
+
 A JavaScript First-Order Logic (FOL) proof verifier.
 
 ## Demo
+
 Take it for a test drive: [https://liacs.leidenuniv.nl/~basoldh/education/proof-rondo/](https://liacs.leidenuniv.nl/~basoldh/education/proof-rondo/).
 
 ## Building

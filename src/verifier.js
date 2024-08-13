@@ -14,18 +14,23 @@ class Statement {
   isFirstStmt() {
     return this.isFirst;
   }
+
   isLastStmt() {
     return this.isLast;
   }
+
   getSentence() {
     return this.sentenceAST;
   }
+
   getScope() {
     return this.scope;
   }
+
   getJustification() {
     return this.justificationAST;
   }
+
   getMeta() {
     return this.loc;
   }
