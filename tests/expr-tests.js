@@ -1,4 +1,4 @@
-var E = require("../src/expr.js");
+var E = require("../src/expr.mjs");
 var P = require("../folproof-parser.js");
 
 exports["Printing identifiers."] = function (test) {

@@ -134,9 +134,9 @@ justify				":".*
 .*				return 'error';
 
 %%
-jisonLexerFn = lexer.setInput;
+const jisonLexerFn = lexer.setInput;
 lexer.setInput = function(input) {
-        var debug = false;
+        let debug = false;
         this._iemitstack = [0];
         this._log = function() { if (debug) console.log.apply(this, arguments); };
         this.myBegin = function(state, why) { this._log("Begin " + state + " because " + why); this.begin(state); };

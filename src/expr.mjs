@@ -1,4 +1,4 @@
-var u = require("./util");
+import { debugMessage } from "./util.mjs";
 
 function arrayContains(arr, el) {
   for (var i = 0; i < arr.length; i++) {
@@ -17,7 +17,7 @@ function clone(obj) {
 
 // Substitutes in parallel in expr by all the variables that are mapped in subst
 function substitute(expr, subst, bound) {
-  u.debug("substitute", expr, subst);
+  debugMessage("substitute", expr, subst);
   bound = bound ? bound : [];
   var binOps = ["->", "and", "or", "<->", "="];
   var unOps = ["not", "forall", "exists"];
@@ -64,7 +64,7 @@ function substitute(expr, subst, bound) {
  * suba, subb (optional) - does comparison after substituting suba in a with subb.
  */
 function equal(A, B, suba, subb) {
-  u.debug("Expr.equal", A, B);
+  debugMessage("Expr.equal", A, B);
   var bound = {},
     sub;
   if (suba) {
@@ -129,7 +129,7 @@ function equal(A, B, suba, subb) {
 }
 
 function isContradiction(s) {
-  u.debug("isContradiction", s);
+  debugMessage("isContradiction", s);
   // return (s[0] === 'id' && (s[1] === '_|_' || s[1] === 'contradiction'));
   return s[0] === "bot";
 }
@@ -225,7 +225,7 @@ function prettyArgs(args) {
 }
 
 function prettyTerm(expr) {
-  // u.debug("prettyTerm", expr);
+  // debugMessage("prettyTerm", expr);
   var h = expr[1];
   var a = "";
   if (expr.length == 3) {
@@ -235,7 +235,7 @@ function prettyTerm(expr) {
 }
 
 function prettyPrec(i, expr) {
-  u.debug("prettyPrec", i, expr);
+  debugMessage("prettyPrec", i, expr);
   if (isQuantifier(expr)) {
     var q = expr[0];
     var x = expr[1];
@@ -278,9 +278,4 @@ function prettySubst(subst) {
   return doc;
 }
 
-module.exports.substitute = substitute;
-module.exports.equal = equal;
-module.exports.isContradiction = isContradiction;
-module.exports.isAtom = isAtom;
-module.exports.pretty = pretty;
-module.exports.prettySubst = prettySubst;
+export { substitute, equal, isContradiction, isAtom, pretty, prettySubst };

@@ -1,4 +1,4 @@
-var v = require("../src/verifier.js").Verifier;
+var v = require("../src/verifier.mjs").Verifier;
 var p = require("../folproof-parser.js");
 
 exports["Substitution (= elim) works for unbound vars."] = function (test) {

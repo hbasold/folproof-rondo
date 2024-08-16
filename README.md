@@ -33,7 +33,7 @@ There are several ways to run FOLProof:
 1. From the shell
 
 - After installation: type `folproof [your-proof].fol`, from anywhere.
-- Without installation: type `node cli.js [your-proof].fol`, from within the folproof directory.
+- Without installation: type `node folproof-cli.mjs [your-proof].fol`, from within the folproof directory.
 
 2. From the web
 
@@ -43,7 +43,7 @@ There are several ways to run FOLProof:
 ## Architecture Overview
 
 - folproof-parser.js - built automatically from ./src/parser/folproof-parser.jison and folproof-parser.jisonlex
-- folproof-web.js - renders proof ASTs to HTML. Requires JQuery
-- folproof-verifier.js - verifies proofs from ASTs (built from /src/\*.js)
-- cli.js - a short script to run verifier.js, from within a shell.
+- folproof-web.mjs - renders proof ASTs to HTML. Requires JQuery
+- folproof-verifier.mjs - verifies proofs from ASTs (built from /src/\*.js)
+- folproof-cli.mjs - a short script to run verifier.mjs, from within a shell.
 - index.html - provides a test interface

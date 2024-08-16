@@ -34,14 +34,15 @@
     "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
   },
   "main": "./",
-  "bin": "./cli.js",
+  "bin": "./folproof-cli.mjs",
   "dependencies": {
-    "nomnom": "1.5.2",
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
     "path": "0.4.9"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
-    "browserify": "latest",
+    "esbuild": "0.23.0",
     "eslint": "^9.9.0",
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.9.0",
@@ -50,6 +51,8 @@
     "prettier": "3.3.3"
   },
   "scripts": {
-    "test": "make test"
+    "parserUpdate": "npx jison src/parser/folproof-parser.jison src/parser/folproof-parser.jisonlex",
+    "bundleWeb": "esbuild frontend/script.mjs --bundle --minify --outfile=frontend/bundle.js --external:fs",
+    "test": "npx nodeunit tests/*.js"
   }
 }

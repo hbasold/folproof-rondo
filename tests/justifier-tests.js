@@ -1,4 +1,4 @@
-var Justifier = require("../src/justifier.js");
+var Justifier = require("../src/justifier.mjs");
 
 function dummyFn() {}
 

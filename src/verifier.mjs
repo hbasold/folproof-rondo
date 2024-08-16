@@ -1,5 +1,5 @@
-var rules = require("./rules");
-var u = require("./util");
+import { debugMessage } from "./util.mjs";
+import { rules } from "./rules.mjs";
 
 class Statement {
   constructor(sentenceAST, justificationAST, scope, loc, isFirst, isLast) {
@@ -36,43 +36,39 @@ class Statement {
   }
 }
 
-var Verifier = (function () {
-  var debugMode = false;
-  var obj = this;
+class Verifier {
+  static verifyFromAST(ast) {
+    return Verifier.verify(Verifier.preprocess(ast));
+  }
 
-  obj.verifyFromAST = function (ast) {
-    var proof = preprocess(ast);
-    return obj.verify(proof);
-  };
-
-  // proof = { 1 : Statement(), 2 : Statement() ... };
-  obj.verify = function (proof) {
-    var result = {
+  static verify(proof) {
+    let result = {
       message: "Proof is valid.",
       valid: true,
       premiseAllowed: true,
       remainingSorries: 0,
     };
-    for (var i = 0; i < proof.steps.length; i++) {
-      obj.validateStatement(result, proof, i);
+
+    for (let step = 0; step < proof.steps.length; ++step) {
+      Verifier.validateStatement(result, proof, step);
       if (!result.valid) {
         break;
       }
     }
     return result;
-  };
+  }
 
-  obj.validateStatement = function validateStatement(result, proof, step) {
-    var stmt = proof.steps[step];
-    if (stmt[0] === "error") {
+  static validateStatement(result, proof, step) {
+    let statement = proof.steps[step];
+    if (statement[0] === "error") {
       result.valid = false;
       result.message = "Proof invalid due to syntax errors.";
       result.errorStep = step + 1;
       return;
     }
 
-    var why = stmt.getJustification();
-    u.debug("why", why);
+    let why = statement.getJustification();
+    debugMessage("why", why);
     if (why[0] == "premise") {
       if (!result.premiseAllowed) {
         result.valid = false;
@@ -90,7 +86,7 @@ var Verifier = (function () {
     if (why[0] == "sorry") {
       result.remainingSorries += 1;
     }
-    var validator = obj.lookupValidator(why);
+    var validator = Verifier.lookupValidator(why);
     if (typeof validator === "function") {
       var part = why[2];
       var lines = why[3];
@@ -104,19 +100,19 @@ var Verifier = (function () {
         result.valid = false;
         result.message = isValid;
         result.errorStep = step + 1;
-        result.errorSrcLoc = stmt.getMeta();
+        result.errorSrcLoc = statement.getMeta();
       }
       return;
     } else if (typeof validator === "string") {
       result.valid = false;
       result.message = validator;
       result.errorStep = step + 1;
-      result.errorSrcLoc = stmt.getMeta();
+      result.errorSrcLoc = statement.getMeta();
     }
     result.valid = false;
-  };
+  }
 
-  obj.lookupValidator = function lookupValidator(why) {
+  static lookupValidator(why) {
     var name = why[0].toLowerCase();
     if (name.split(".").length == 2) name = name.split(".")[0] + ".";
     var rule = rules[name];
@@ -150,17 +146,17 @@ var Verifier = (function () {
       " " +
       (why[3] ? why[3] : "")
     );
-  };
+  }
 
-  obj.preprocess = function preprocess(ast) {
+  static preprocess(ast) {
     var proof = { steps: [] };
-    obj.preprocessBox(proof, ast, 0, []);
-    u.debug("processed proof", proof);
+    Verifier.preprocessBox(proof, ast, 0, []);
+    debugMessage("processed proof", proof);
     return proof;
-  };
+  }
 
-  obj.preprocessBox = function preprocessBox(proof, ast, step, scope) {
-    u.debug("ast", ast);
+  static preprocessBox(proof, ast, step, scope) {
+    debugMessage("ast", ast);
     for (var i = 0; i < ast.length; i++) {
       if (ast[i][0] === "rule") {
         proof.steps[step] = new Statement(
@@ -175,23 +171,27 @@ var Verifier = (function () {
       } else if (ast[i][0] === "folbox") {
         var newScope = scope.slice(0);
         newScope.push(ast[i][2][1]);
-        u.debug("folbox", "step", step, "scope", scope, "newScope", newScope);
-        step = obj.preprocessBox(proof, ast[i][1], step, newScope);
+        debugMessage(
+          "folbox",
+          "step",
+          step,
+          "scope",
+          scope,
+          "newScope",
+          newScope,
+        );
+        step = Verifier.preprocessBox(proof, ast[i][1], step, newScope);
       } else if (ast[i][0] === "box") {
         var newScope = scope.slice(0);
         // newScope.push(null);
-        u.debug("box", "step", step, "scope", scope, "newScope", newScope);
-        step = obj.preprocessBox(proof, ast[i][1], step, newScope);
+        debugMessage("box", "step", step, "scope", scope, "newScope", newScope);
+        step = Verifier.preprocessBox(proof, ast[i][1], step, newScope);
       } else if (ast[i][0] === "error") {
         proof.steps[step] = ast[i];
       }
     }
     return step;
-  };
-
-  return obj;
-})();
-
-if (typeof require !== "undefined" && typeof exports !== "undefined") {
-  exports.Verifier = Verifier;
+  }
 }
+
+export { Verifier };

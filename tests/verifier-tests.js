@@ -1,4 +1,4 @@
-var v = require("../src/verifier.js").Verifier;
+var v = require("../src/verifier.mjs").Verifier;
 
 exports["Sets first/last statements"] = function (test) {
   var proofAST = [

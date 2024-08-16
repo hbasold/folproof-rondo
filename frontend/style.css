@@ -1,0 +1,25 @@
+#proof-input,
+#render-panel {
+  font-family: monospace;
+}
+
+.justification {
+  float: right;
+}
+
+.FOL-box,
+.simple-box {
+  border: 1px solid black;
+  border-radius: 3px;
+  padding: 2px;
+}
+
+.lineno {
+  display: block;
+  float: left;
+  width: 1.8em;
+}
+
+.rule {
+  clear: both;
+}

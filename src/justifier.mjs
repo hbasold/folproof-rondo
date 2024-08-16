@@ -1,15 +1,15 @@
-var u = require("./util");
-var p = require("../folproof-parser");
+import { debugMessage } from "./util.mjs";
+import p from "../folproof-parser.js";
 
 var Justifier = function Justifier(format, fn) {
   // format = { hasPart : (true/false), stepRefs : ("num" | "range")*, subst : (true/false) };
   var self = this;
 
   this.exec = function (proof, step, part, steps, subst) {
-    u.debug("Justifier", step, part, steps, subst);
+    debugMessage("Justifier", step, part, steps, subst);
     var checked = self.checkParams(step, part, steps, subst);
     if (typeof checked === "string") return checked;
-    u.debug("Calling justifier on checked", checked);
+    debugMessage("Calling justifier on checked", checked);
     return fn(proof, step, checked[0], checked[1], checked[2]);
   };
 
@@ -96,7 +96,7 @@ var Justifier = function Justifier(format, fn) {
       // 	return "Substitution format must match (e.g., A.x/x0 intro n-m.)";
 
       // w = w.map(function(e) { return e[0] });
-      u.debug("subst", subst, "parsedSubst", parsedSubst);
+      debugMessage("subst", subst, "parsedSubst", parsedSubst);
     } else {
       if (subst) return "Substitution unexpected.";
     }
@@ -133,4 +133,4 @@ var parseSubst = function (subst) {
   }
 };
 
-module.exports = Justifier;
+export { Justifier };

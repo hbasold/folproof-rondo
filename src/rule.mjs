@@ -1,4 +1,4 @@
-var Rule = function Rule(options) {
+const Rule = function Rule(options) {
   // { name : name,
   //   type : ["simple", "derived", "normal"],
   //   verifier : new Verifier(parseFormat, function(proof, step) {}),
@@ -22,4 +22,4 @@ var Rule = function Rule(options) {
   };
 };
 
-module.exports = Rule;
+export { Rule };

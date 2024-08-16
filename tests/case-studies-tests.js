@@ -1,5 +1,5 @@
 var parser = require("../folproof-parser.js").parser;
-var Verifier = require("../folproof-verifier.js").Verifier;
+var Verifier = require("../folproof-verifier.js").Verifier; // TODO change to verifier.mjs
 var fs = require("fs");
 var path = require("path");
 

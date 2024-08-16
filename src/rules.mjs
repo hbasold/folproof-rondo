@@ -1,9 +1,9 @@
-var u = require("./util");
-var Rule = require("./rule.js");
-var Justifier = require("./justifier.js");
-var Expr = require("./expr.js");
+import { debugMessage } from "./util.mjs";
+import { Rule } from "./rule.mjs";
+import { Justifier } from "./justifier.mjs";
+import * as Expr from "./expr.mjs";
 
-var rules = {
+const rules = {
   premise: new Rule({
     name: "Premise",
     type: "simple",
@@ -433,7 +433,7 @@ var rules = {
       var startExpr = startStep.getSentence();
       var scope = startStep.getScope(); // ex: [['x0','x'], ['y0', 'y'], ...], LIFO
       var endExpr = proof.steps[steps[0][1]].getSentence();
-      u.debug(
+      debugMessage(
         "all-intro",
         "startExpr",
         startExpr,
@@ -499,7 +499,7 @@ var rules = {
       var currStep = proof.steps[step];
       var currExpr = currStep.getSentence();
       var refExpr = proof.steps[steps[0]].getSentence();
-      u.debug(
+      debugMessage(
         "all-elim",
         "refExpr",
         refExpr,
@@ -542,7 +542,7 @@ var rules = {
       var currStep = proof.steps[step];
       var currExpr = currStep.getSentence();
       var refExpr = proof.steps[steps[0]].getSentence();
-      u.debug(
+      debugMessage(
         "ex-intro",
         "refExpr",
         refExpr,
@@ -620,7 +620,7 @@ var rules = {
         var currStep = proof.steps[step];
         var currExpr = currStep.getSentence();
         var refExpr = steps.map((k) => proof.steps[k].getSentence());
-        u.debug(
+        debugMessage(
           "backchaining",
           "steps",
           steps,
@@ -648,7 +648,7 @@ var rules = {
         }
         var headSub = head.map((c) => Expr.substitute(c, subst));
         var tailSub = Expr.substitute(clause[2], subst);
-        u.debug("backchaining", "headSub", headSub, "tailSub", tailSub);
+        debugMessage("backchaining", "headSub", headSub, "tailSub", tailSub);
         if (Expr.equal(tailSub, currExpr)) {
           for (let i = 0; i < headSub.length; i++) {
             if (!Expr.equal(headSub[i], refExpr[i + 1])) {
@@ -753,7 +753,7 @@ function splitHead(form) {
 }
 
 function openHornClause(form, vars = Array(0)) {
-  u.debug("openHornClause", form, vars);
+  debugMessage("openHornClause", form, vars);
   if (form[0] == "forall") {
     return openHornClause(form[2], vars.concat([form[1]]));
   } else if (form[0] == "->") {
@@ -770,6 +770,4 @@ function openHornClause(form, vars = Array(0)) {
   }
 }
 
-if (typeof require !== "undefined" && typeof exports !== "undefined") {
-  module.exports = rules;
-}
+export { rules };
