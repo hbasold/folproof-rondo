@@ -290,6 +290,9 @@ function renderJustification(AST) {
 function renderBox(DOM, AST, line, options, type) {
   let box = document.createElement("div");
   box.className = type + "-box";
+  if (type === "FOL") {
+    box.append(renderSimpleTerm(AST[2][1]));
+  }
   const lines = renderRules(box, AST[1], line, options);
   DOM.appendChild(box);
   return lines;
