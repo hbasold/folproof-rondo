@@ -1,0 +1,1160 @@
+import { Verifier as v } from "../src/verifier.mjs";
+import p from "../folproof-parser.js";
+import { strict as assert } from "node:assert";
+
+describe("Rules Tests", () => {
+  // exports["Substitution (= elim) works for unbound vars."] = function (test) {
+  //   var src =
+  //     "a -> A a.(a -> c) -> b\n" +
+  //     "a = x\n" +
+  //     "x -> A a.(a -> c) -> b : = e 2,1\n";
+  //
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid);
+  //   test.done();
+  // };
+  //
+  // exports["Substitution (= elim) fails for bound vars."] = function (test) {
+  //   var src =
+  //     "a -> A a.(a -> c) -> b\n" +
+  //     "a = x\n" +
+  //     "x -> A a.(x -> c) -> b : = e 2,1\n";
+  //
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid);
+  //   test.done();
+  // };
+  //
+  // exports["Substitution (= elim) works for any # of unbound vars."] = function (
+  //   test,
+  // ) {
+  //   var src =
+  //     "a -> (A a.a -> c) -> b or a and a \n" +
+  //     "a = x\n" +
+  //     "x -> (A a.a -> c) -> b or a and x : = e 2,1\n";
+  //
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid);
+  //   test.done();
+  // };
+
+  describe("Substitution (= elim) Tests", () => {
+    it("should substitute unbound vars", () => {
+      const src =
+        "a -> A a.(a -> c) -> b\n" +
+        "a = x\n" +
+        "x -> A a.(a -> c) -> b : = e 2,1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should fail to substitute bound vars", () => {
+      const src =
+        "a -> A a.(a -> c) -> b\n" +
+        "a = x\n" +
+        "x -> A a.(x -> c) -> b : = e 2,1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should substitute any number of unbound vars", () => {
+      const src =
+        "a -> (A a.a -> c) -> b or a and a \n" +
+        "a = x\n" +
+        "x -> (A a.a -> c) -> b or a and x : = e 2,1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+  });
+
+  // exports["_|_ elimination fails when reference line not contradiction."] =
+  //   function (test) {
+  //     var src = "c\na -> b : contra e 1\n";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(!result.valid);
+  //     test.done();
+  //   };
+  //
+  // exports["_|_ elimination succeeds when reference line is contradiction."] =
+  //   function (test) {
+  //     var src = "_|_\na -> b : bot e 1\n";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(result.valid);
+  //     test.done();
+  //   };
+
+  describe("_|_ Elimination Tests", () => {
+    it("should fail when reference line is not contradiction", () => {
+      const src = "c\na -> b : contra e 1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should succeed when reference line is contradiction", () => {
+      const src = "_|_\na -> b : bot e 1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+  });
+
+  // exports["notnot elimination fails when reference line not a double-negation."] =
+  //   function (test) {
+  //     var src = "~c\nc : notnot e 1\n";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(!result.valid);
+  //     test.done();
+  //   };
+  //
+  // exports[
+  //   "notnot elimination succeeds when reference line double-negation of current line."
+  // ] = function (test) {
+  //   var src = "~~c\nc : notnot e 1\n";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+
+  describe("Double Negation Elimination Tests", () => {
+    it("should fail when reference line is not a double-negation", () => {
+      const src = "~c\nc : notnot e 1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should succeed when reference line is a double-negation", () => {
+      const src = "~~c\nc : notnot e 1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+  });
+
+  // exports["LEM works."] = function (test) {
+  //   var src = "(a -> b) or not (a -> b) : LEM";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports["LEM fails when not in form: phi or not phi."] = function (test) {
+  //   var src = "(a -> b) or (a -> b) : LEM";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.done();
+  // };
+
+  describe("Law of Excluded Middle (LEM) Tests", () => {
+    it("should succeed", () => {
+      const src = "(a -> b) or not (a -> b) : LEM";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should fail when not in form: phi or not phi", () => {
+      const src = "(a -> b) or (a -> b) : LEM";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+  });
+
+  // exports["MT works."] = function (test) {
+  //   var src = "a -> b\n~b\n~a : MT 1,2";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports["MT fails when ref 1 not implication."] = function (test) {
+  //   var src = "a and b\n~b\n~a : MT 1,2";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports["MT fails when ref 2 not negation of right side of ref 1."] = function (
+  //   test,
+  // ) {
+  //   var src = "a -> b\nb\n~a : MT 1,2";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports["MT fails when current line not negation of left side of ref 1."] =
+  //   function (test) {
+  //     var src = "a -> b\n~b\na : MT 1,2";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(!result.valid, result.message);
+  //     test.done();
+  //   };
+
+  describe("Modus Tollens (MT) Tests", () => {
+    it("should succeed", () => {
+      const src = "a -> b\n~b\n~a : MT 1,2";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should fail when ref 1 is not an implication", () => {
+      const src = "a and b\n~b\n~a : MT 1,2";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should fail when ref 2 is not negation of right side of ref 1", () => {
+      const src = "a -> b\nb\n~a : MT 1,2";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should fail when current line is not negation of left side of ref 1", () => {
+      const src = "a -> b\n~b\na : MT 1,2";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+  });
+
+  // exports["And introduction fails when reference is not a tautology."] =
+  //   function (test) {
+  //     var src = "a\n~b\na and b : and i 1,2";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(!result.valid, result.message);
+  //     src = "~a\nb\na and b : and i 1,2";
+  //     ast = p.parse(src);
+  //     result = v.verifyFromAST(ast);
+  //     test.ok(!result.valid, result.message);
+  //     test.done();
+  //   };
+  //
+  // exports["And introduction succeeds when references are tautologies."] =
+  //   function (test) {
+  //     var src = "a\nb\na and b : and i 1,2";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(result.valid, result.message);
+  //     test.done();
+  //   };
+  //
+  // exports[
+  //   "And elimination fails when reference side doesn't match current step."
+  // ] = function (test) {
+  //   var src = "a and b\nb : and e1 1";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   src = "a and b\na : and e2 1";
+  //   ast = p.parse(src);
+  //   result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports["And elimination succeeds when reference side matches current step."] =
+  //   function (test) {
+  //     var src = "a and b\na : and e1 1";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(result.valid, result.message);
+  //     src = "a and b\nb : and e2 1";
+  //     ast = p.parse(src);
+  //     result = v.verifyFromAST(ast);
+  //     test.ok(result.valid, result.message);
+  //     test.done();
+  //   };
+
+  describe("And Introduction Tests", () => {
+    it("should fail when reference is not a tautology", () => {
+      const src = "a\n~b\na and b : and i 1,2";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should succeed when references are tautologies", () => {
+      const src = "a\nb\na and b : and i 1,2";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+  });
+
+  describe("And Elimination Tests", () => {
+    it("should fail when reference side doesn't match current step", () => {
+      const src = "a and b\nb : and e1 1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should succeed when reference side matches current step", () => {
+      const src = "a and b\na : and e1 1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+  });
+
+  // exports["Or elimination succeeds when assumptions produce same result."] =
+  //   function (test) {
+  //     var src =
+  //       "a or b\n~a\n~b\n| a : assumption\n| _|_ : neg e 2,4\n---\n" +
+  //       "| b : assumption\n| _|_ : neg e 3,6\n_|_ : or e 1,4-5,6-7";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(result.valid, result.message);
+  //     test.done();
+  //   };
+  //
+  // exports["Or elimination fails when assumptions don't begin with or side."] =
+  //   function (test) {
+  //     var src =
+  //       "a or b\n~a\n~b\n| c : assumption\n---\n" +
+  //       "| c : assumption\nc : or e 1,4-4,5-5";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(!result.valid, result.message);
+  //     test.done();
+  //   };
+  //
+  // exports["Or elimination fails when assumptions don't produce same result."] =
+  //   function (test) {
+  //     var src =
+  //       "a or b\n~a\n~b\n| a : assumption\n| _|_ : neg e 2,4\n---\n" +
+  //       "| b : assumption\n| _|_ : neg e 3,6\n| c : contra e 6\n_|_ : or e 1,4-5,6-8";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(!result.valid, result.message);
+  //     test.done();
+  //   };
+
+  describe("Or Elimination Tests", () => {
+    it("should succeed when assumptions produce same result", () => {
+      const src =
+        "a or b\n~a\n~b\n| a : assumption\n| _|_ : neg e 2,4\n---\n" +
+        "| b : assumption\n| _|_ : neg e 3,6\n_|_ : or e 1,4-5,6-7";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should fail when assumptions don't begin with or side", () => {
+      const src =
+        "a or b\n~a\n~b\n| c : assumption\n---\n" +
+        "| c : assumption\nc : or e 1,4-4,5-5";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should fail when assumptions don't produce same result", () => {
+      const src =
+        "a or b\n~a\n~b\n| a : assumption\n| _|_ : neg e 2,4\n---\n" +
+        "| b : assumption\n| _|_ : neg e 3,6\n| c : contra e 6\n_|_ : or e 1,4-5,6-8";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+  });
+
+  // exports["Or introduction succeeds when side matches reference."] = function (
+  //   test,
+  // ) {
+  //   var src = "a\na or b : or i1 1";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   src = "a\nb or a : or i2 1";
+  //   ast = p.parse(src);
+  //   result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports["Or introduction fails when side does not match reference."] =
+  //   function (test) {
+  //     var src = "~a\na or b : or i1 1";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(!result.valid, result.message);
+  //     src = "~a\nb or a : or i2 1";
+  //     ast = p.parse(src);
+  //     result = v.verifyFromAST(ast);
+  //     test.ok(!result.valid, result.message);
+  //     test.done();
+  //   };
+
+  describe("Or Introduction Tests", () => {
+    it("should succeed when side matches reference", () => {
+      const src = "a\na or b : or i1 1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should fail when side does not match reference", () => {
+      const src = "~a\na or b : or i1 1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+  });
+
+  // exports["Neg introduction succeeds when reference is contradiction."] =
+  //   function (test) {
+  //     var src = "a\n| ~a : assumption\n| _|_ : neg e 1,2\n~~a : neg i 2-3";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(result.valid, result.message);
+  //     test.done();
+  //   };
+  //
+  // exports["Neg introduction fails when reference is not contradiction."] =
+  //   function (test) {
+  //     var src = "a\n| ~a : assumption\n~~a : neg i 2-2";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(!result.valid, result.message);
+  //     test.done();
+  //   };
+
+  describe("Negation Introduction Tests", () => {
+    it("should succeed when reference is contradiction", () => {
+      const src = "a\n| ~a : assumption\n| _|_ : neg e 1,2\n~~a : neg i 2-3";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should fail when reference is not contradiction", () => {
+      const src = "a\n| ~a : assumption\n~~a : neg i 2-2";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+  });
+
+  // exports[
+  //   "Neg elimination succeeds when reference is negation of current step."
+  // ] = function (test) {
+  //   var src = "a\n~a\n_|_ : neg e 1,2";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports["Neg elimination can prove arbitrary conclusion."] = function (test) {
+  //   var src = "a\n~a\nb : neg e 1,2";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports[
+  //   "Neg elimination fails when reference is not a negation of current step."
+  // ] = function (test) {
+  //   var src = "a\n~b\n_|_ : neg e 1,2";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.done();
+  // };
+
+  describe("Negation Elimination Tests", () => {
+    it("should succeed when reference is negation of current step", () => {
+      const src = "a\n~a\n_|_ : neg e 1,2";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should succeed when reference is negation of current step", () => {
+      const src = "a\n~a\nb : neg e 1,2";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should fail when reference is not a negation of current step", () => {
+      const src = "a\n~b\n_|_ : neg e 1,2";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+  });
+
+  // exports[
+  //   "Implication introduction succeeds when left and right side match first and last step of assumption."
+  // ] = function (test) {
+  //   var src = "|a : assumption\n|a or b : or i1 1\na -> (a or b) : -> i 1-2";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports[
+  //   "Implication introduction fails when left or right side don't match beginning or end of assumption."
+  // ] = function (test) {
+  //   var src = "|a : assumption\n|a or b : or i1 1\nb -> (a or b) : -> i 1-2";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   src = "|a : assumption\n|a or c : or i1 1\na -> (a or b) : -> i 1-2";
+  //   ast = p.parse(src);
+  //   result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.done();
+  // };
+
+  describe("Implication Introduction Tests", () => {
+    it("should succeed when left and right side match first and last step of assumption", () => {
+      const src =
+        "|a : assumption\n|a or b : or i1 1\na -> (a or b) : -> i 1-2";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should fail when left or right side don't match beginning or end of assumption", () => {
+      const src =
+        "|a : assumption\n|a or b : or i1 1\nb -> (a or b) : -> i 1-2";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should fail when left or right side don't match beginning or end of assumption", () => {
+      const src =
+        "|a : assumption\n|a or c : or i1 1\na -> (a or b) : -> i 1-2";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+  });
+
+  // exports[
+  //   "Implication elimination succeeds when left side matches 2nd ref step, and right side matches current step."
+  // ] = function (test) {
+  //   var src = "a -> b\na\nb : -> e 1,2";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports[
+  //   "Implication elimination fails when left side doesn't match 2nd ref step."
+  // ] = function (test) {
+  //   var src = "a -> b\nc\nb : -> e 1,2";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports[
+  //   "Implication elimination fails when right side doesn't match current step."
+  // ] = function (test) {
+  //   var src = "a -> b\na\nc : -> e 1,2";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.done();
+  // };
+
+  describe("Implication Elimination Tests", () => {
+    it("should succeed when left side matches 2nd ref step, and right side matches current step", () => {
+      const src = "a -> b\na\nb : -> e 1,2";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should fail when left side doesn't match 2nd ref step", () => {
+      const src = "a -> b\nc\nb : -> e 1,2";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should fail when right side doesn't match current step", () => {
+      const src = "a -> b\na\nc : -> e 1,2";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+  });
+
+  // exports[
+  //   "Forall elimination succeeds when referenced step matches after substition."
+  // ] = function (test) {
+  //   var src = "A x. P(x)\nP(a) : A.x/a elim 1";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports["Forall elimination fails when referenced step doesn't match."] =
+  //   function (test) {
+  //     var src = "A x. P(x)\nQ(a) : A.x/a elim 1";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(!result.valid, result.message);
+  //     test.done();
+  //   };
+  //
+  // exports["Forall elimination fails with more than one substituted variables."] =
+  //   function (test) {
+  //     var src = "A x. P(x)\nP(a) : A.x/a,y/b elim 1";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(!result.valid, result.message);
+  //     test.done();
+  //   };
+  //
+  // exports["Forall elimination works with complex term in substition."] =
+  //   function (test) {
+  //     var src = "A x. P(x)\nP(f(a)) : A.x/f(a) elim 1";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(result.valid, result.message);
+  //     test.done();
+  //   };
+
+  describe("Forall Elimination Tests", () => {
+    it("should succeed when referenced step matches after substition", () => {
+      const src = "A x. P(x)\nP(a) : A.x/a elim 1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should fail when referenced step doesn't match", () => {
+      const src = "A x. P(x)\nQ(a) : A.x/a elim 1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should fail with more than one substituted variables", () => {
+      const src = "A x. P(x)\nP(a) : A.x/a,y/b elim 1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should work with complex term in substition", () => {
+      const src = "A x. P(x)\nP(f(a)) : A.x/f(a) elim 1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+  });
+
+  // exports[
+  //   "Forall introduction succeeds when ref is assumption and final step matches current step, under subst."
+  // ] = function (test) {
+  //   var src = "| with x0\n| P(x0) : assumption\nA x. P(x) : A.x/x0 i 1-1";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports[
+  //   "Forall introduction fails when reference range is not an assumption."
+  // ] = function (test) {
+  //   var src = "P(x) : premise\nA x. P(x) : A.x/x i 1-1";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.ok(
+  //     result.message.indexOf("does not have a scoping assumption") >= 0,
+  //     "Error must be because of missing assumption",
+  //   );
+  //   test.done();
+  // };
+  //
+  // exports[
+  //   "Forall introduction fails when reference range is not a scoping assumption."
+  // ] = function (test) {
+  //   var src = "| P(x) : assumption\nA x. P(x) : A.x/x i 1-1";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.ok(
+  //     result.message.indexOf("does not have a scoping assumption") >= 0,
+  //     "Error must be because of missing assumption",
+  //   );
+  //   test.done();
+  // };
+  //
+  // exports[
+  //   "Forall introduction fails when reference range ending step doesn't match current step under subst."
+  // ] = function (test) {
+  //   var src = "| with x0\n| P(x0) : assumption\nA x. Q(x) : A.x/x0 i 1-1";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.ok(
+  //     result.message.indexOf("Last step in range") >= 0,
+  //     "Error must be because of last step mismatch",
+  //   );
+  //   test.done();
+  // };
+  //
+  // exports["Forall introduction fails with more than one substituted variable."] =
+  //   function (test) {
+  //     var src = "| with x0\n| P(x0) : assumption\nA x. P(x) : A.x/x0,y/y0 i 1-1";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(!result.valid, result.message);
+  //     test.done();
+  //   };
+  //
+  // exports["Forall introduction nested inside implication introduction."] =
+  //   function (test) {
+  //     var src =
+  //       "∀x.P(c, x)      : premise \n" +
+  //       "| r \n" +
+  //       "|| with x0 \n" +
+  //       "|| P(c,x0)      : A.x/x0 e 1 \n" +
+  //       "| ∀x.P(c,x)     : A.x/x0 i 3-3 \n" +
+  //       "r -> ∀x.P(c,x)  : -> i 2-4";
+  //     var ast = p.parse(src);
+  //     var result = v.verifyFromAST(ast);
+  //     test.ok(result.valid, result.message);
+  //     test.done();
+  //   };
+  //
+  // exports["Forall introduction nested."] = function (test) {
+  //   var src =
+  //     "∀x.Ay.P(x, y)     : premise \n" +
+  //     "| with x0 \n" +
+  //     "|| with y0 \n" +
+  //     "|| Ay.P(x0, y)    : A.x/x0 e 1 \n" +
+  //     "|| P(x0,y0)       : A.y/y0 e 2 \n" +
+  //     "| ∀y.P(x0,y)      : A.y/y0 i 2-3 \n" +
+  //     "∀x.Ay.P(x, y)     : A.x/x0 i 2-4";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports[
+  //   "Nested flags: forall introduction followed by implication introduction."
+  // ] = function (test) {
+  //   var src =
+  //     "| with x0\n" +
+  //     "||P(x0)\n" +
+  //     "||P(x0)        : copy 1\n" +
+  //     "|P(x0) → P(x0) : -> i 1-2\n" +
+  //     "∀y.P(y) → P(y) : A.y/x0 i 1-3";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+
+  describe("Forall Introduction Tests", () => {
+    it("should succeed when ref is assumption and final step matches current step, under subst", () => {
+      const src = "| with x0\n| P(x0) : assumption\nA x. P(x) : A.x/x0 i 1-1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should fail when reference range is not an assumption", () => {
+      const src = "P(x) : premise\nA x. P(x) : A.x/x i 1-1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should fail when reference range is not a scoping assumption", () => {
+      const src = "| P(x) : assumption\nA x. P(x) : A.x/x i 1-1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should fail when reference range ending step doesn't match current step under subst", () => {
+      const src = "| with x0\n| P(x0) : assumption\nA x. Q(x) : A.x/x0 i 1-1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should fail with more than one substituted variable", () => {
+      const src =
+        "| with x0\n| P(x0) : assumption\nA x. P(x) : A.x/x0,y/y0 i 1-1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should succeed when nested inside implication introduction", () => {
+      const src =
+        "∀x.P(c, x)      : premise \n" +
+        "| r \n" +
+        "|| with x0 \n" +
+        "|| P(c,x0)      : A.x/x0 e 1 \n" +
+        "| ∀x.P(c,x)     : A.x/x0 i 3-3 \n" +
+        "r -> ∀x.P(c,x)  : -> i 2-4";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should succeed when nested", () => {
+      const src =
+        "∀x.Ay.P(x, y)     : premise \n" +
+        "| with x0 \n" +
+        "|| with y0 \n" +
+        "|| Ay.P(x0, y)    : A.x/x0 e 1 \n" +
+        "|| P(x0,y0)       : A.y/y0 e 2 \n" +
+        "| ∀y.P(x0,y)      : A.y/y0 i 2-3 \n" +
+        "∀x.Ay.P(x, y)     : A.x/x0 i 2-4";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should succeed with nested flags: forall introduction followed by implication introduction", () => {
+      const src =
+        "| with x0\n" +
+        "||P(x0)\n" +
+        "||P(x0)        : copy 1\n" +
+        "|P(x0) → P(x0) : -> i 1-2\n" +
+        "∀y.P(y) → P(y) : A.y/x0 i 1-3";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+  });
+
+  // exports[
+  //   "Exists introduction succeeds when referenced step matches after substitution."
+  // ] = function (test) {
+  //   var src = "P(a)\nE x. P(x) : E.x/a intro 1";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports[
+  //   "Exists introduction fails when referenced step doesn't match after substitution."
+  // ] = function (test) {
+  //   var src = "P(a)\nE x. Q(x) : E.x/a intro 1";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   src = "P(a)\nE y. P(y) : E.x/a intro 1";
+  //   ast = p.parse(src);
+  //   result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.done();
+  // };
+
+  describe("Exists Introduction Tests", () => {
+    it("should succeed when referenced step matches after substitution", () => {
+      const src = "P(a)\nE x. P(x) : E.x/a intro 1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should fail when referenced step doesn't match after substitution", () => {
+      const src = "P(a)\nE x. Q(x) : E.x/a intro 1";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+  });
+
+  // exports[
+  //   "Exists elimination succeeds when referenced step range is assumption & concl. matches current step."
+  // ] = function (test) {
+  //   var src =
+  //     "E a. P(a)\n" +
+  //     "| with x0\n" +
+  //     "| P(x0)\n" +
+  //     "| P(x0) or Q(x0)     : or i1 2\n" +
+  //     "| E a.(P(a) or Q(a)) : E.a/x0 i 3\n" +
+  //     "E a.(P(a) or Q(a))   : E.a/x0 elim 1,2-4";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports[
+  //   "Exists elimination fails when referenced step range is not assumption."
+  // ] = function (test) {
+  //   var src =
+  //     "E a. P(a)\nE a. P(a) or Q(a)\n : or i1 2\nE a. P(a) or Q(a) : E.x/a elim 1,2-2";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports[
+  //   "Exists elimination fails when referenced step range is not scoping assumption."
+  // ] = function (test) {
+  //   var src =
+  //     "E a. P(a)\n| P(x0) : assumption\n| P(x0) or Q(x0)\n : or i1 2\n| E a.(P(a) or Q(a)) : E.a/x0 i 3\nE a.(P(a) or Q(a)) : E.a/x0 elim 1,2-4";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports[
+  //   "Exists elimination fails when assumption conclusion doesn't match current step."
+  // ] = function (test) {
+  //   var src =
+  //     "E a. P(a)\n| with x0\n| P(x0) : assumption\n| P(x0) or Q(x0) : or i1 2\nE a.(P(a) or Q(a)) : E.a/x0 elim 1,2-3";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.ok(
+  //     result.message.indexOf("ending step") >= 0,
+  //     "Must fail because ending step.",
+  //   );
+  //   test.done();
+  // };
+  //
+  // exports[
+  //   "Exists elimination fails when assumption start doesn't match first exists ref step."
+  // ] = function (test) {
+  //   var src =
+  //     "E a. Q(a)\n" +
+  //     "| with x0\n" +
+  //     "| P(x0) : assumption\n" +
+  //     "| P(x0) or Q(x0) : or i1 2\n" +
+  //     "E a.(P(a) or Q(a)) : E.a/x0 elim 1,2-3";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.ok(
+  //     result.message.indexOf("beginning step") >= 0,
+  //     "Must fail because beginning step doesn't match exists step.",
+  //   );
+  //   test.done();
+  // };
+
+  describe("Exists Elimination Tests", () => {
+    it("should succeed when referenced step range is assumption & concl. matches current step", () => {
+      const src =
+        "E a. P(a)\n" +
+        "| with x0\n" +
+        "| P(x0)\n" +
+        "| P(x0) or Q(x0)     : or i1 2\n" +
+        "| E a.(P(a) or Q(a)) : E.a/x0 i 3\n" +
+        "E a.(P(a) or Q(a))   : E.a/x0 elim 1,2-4";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should fail when referenced step range is not assumption", () => {
+      const src =
+        "E a. P(a)\nE a. P(a) or Q(a)\n : or i1 2\nE a. P(a) or Q(a) : E.x/a elim 1,2-2";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should fail when referenced step range is not scoping assumption", () => {
+      const src =
+        "E a. P(a)\n| P(x0) : assumption\n| P(x0) or Q(x0)\n : or i1 2\n| E a.(P(a) or Q(a)) : E.a/x0 i 3\nE a.(P(a) or Q(a)) : E.a/x0 elim 1,2-4";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should fail when assumption conclusion doesn't match current step", () => {
+      const src =
+        "E a. P(a)\n| with x0\n| P(x0) : assumption\n| P(x0) or Q(x0) : or i1 2\nE a.(P(a) or Q(a)) : E.a/x0 elim 1,2-3";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should fail when assumption start doesn't match first exists ref step", () => {
+      const src =
+        "E a. Q(a)\n" +
+        "| with x0\n" +
+        "| P(x0) : assumption\n" +
+        "| P(x0) or Q(x0) : or i1 2\n" +
+        "E a.(P(a) or Q(a)) : E.a/x0 elim 1,2-3";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+  });
+
+  // exports["Copy succeeds when reference line is exact match."] = function (test) {
+  //   var src = "a\n|~b : assumption\n|a : copy 1\n~b -> a : -> i 2-3";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports["Copy fails when reference line is not exact match."] = function (
+  //   test,
+  // ) {
+  //   var src = "a\n|~a : assumption\n|b : copy 1\n~a -> a : -> i 2-3";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.done();
+  // };
+
+  describe("Copy Tests", () => {
+    it("should succeed when reference line is exact match", () => {
+      const src = "a\n|~b : assumption\n|a : copy 1\n~b -> a : -> i 2-3";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should fail when reference line is not exact match", () => {
+      const src = "a\n|~a : assumption\n|b : copy 1\n~a -> a : -> i 2-3";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+  });
+
+  // exports["Backchaining succeeds with parallel substitution."] = function (test) {
+  //   var src =
+  //     "An.Am. L(n,m) -> L(n, s(m))\n" +
+  //     "L(z,z)\n" +
+  //     "L(z,s(z))                     : B.n/z;m/z 1,2\n";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports["Backchaining succeeds with larger head."] = function (test) {
+  //   var src =
+  //     "An. L(n,n)\n" +
+  //     "An.Am. L(n,m) & L(n,m) -> L(n, s(m))\n" +
+  //     "L(z,z)                        : B.n/z elim 1\n" +
+  //     "L(z,s(z))                     : B.n/z;m/z 2,3,3\n" +
+  //     "Em. L(z, m)                   : E.m/s(z) intro 4";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports["Backchaining fails with insufficient substitution."] = function (
+  //   test,
+  // ) {
+  //   var src =
+  //     "An. L(n,n)\n" +
+  //     "An.Am. L(n,m) & L(n,m) -> L(n, s(m))\n" +
+  //     "L(z,z)                        : B.n/z elim 1\n" +
+  //     "L(z,s(z))                     : B.n/z 2,3,3\n" +
+  //     "Em. L(z, m)                   : E.m/s(z) intro 4";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(!result.valid, result.message);
+  //   test.done();
+  // };
+  //
+  // exports["Backchaining succeeds with equality."] = function (test) {
+  //   var src =
+  //     "Ax. Ay. Az. x = y & y = z -> x = z \n" +
+  //     "a = b\n" +
+  //     "b = c\n" +
+  //     "a = c : B.x/a;y/b;z/c 1,2,3";
+  //   var ast = p.parse(src);
+  //   var result = v.verifyFromAST(ast);
+  //   test.ok(result.valid, result.message);
+  //   test.done();
+  // };
+
+  describe("Backchaining Tests", () => {
+    it("should succeed with parallel substitution", () => {
+      const src =
+        "An.Am. L(n,m) -> L(n, s(m))\n" +
+        "L(z,z)\n" +
+        "L(z,s(z))                     : B.n/z;m/z 1,2\n";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should succeed with larger head", () => {
+      const src =
+        "An. L(n,n)\n" +
+        "An.Am. L(n,m) & L(n,m) -> L(n, s(m))\n" +
+        "L(z,z)                        : B.n/z elim 1\n" +
+        "L(z,s(z))                     : B.n/z;m/z 2,3,3\n" +
+        "Em. L(z, m)                   : E.m/s(z) intro 4";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+
+    it("should fail with insufficient substitution", () => {
+      const src =
+        "An. L(n,n)\n" +
+        "An.Am. L(n,m) & L(n,m) -> L(n, s(m))\n" +
+        "L(z,z)                        : B.n/z elim 1\n" +
+        "L(z,s(z))                     : B.n/z 2,3,3\n" +
+        "Em. L(z, m)                   : E.m/s(z) intro 4";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+    });
+
+    it("should succeed with equality", () => {
+      const src =
+        "Ax. Ay. Az. x = y & y = z -> x = z \n" +
+        "a = b\n" +
+        "b = c\n" +
+        "a = c : B.x/a;y/b;z/c 1,2,3";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(result.valid, result.message);
+    });
+  });
+});

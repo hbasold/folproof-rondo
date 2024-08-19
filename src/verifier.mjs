@@ -86,14 +86,14 @@ class Verifier {
     if (why[0] == "sorry") {
       result.remainingSorries += 1;
     }
-    var validator = Verifier.lookupValidator(why);
+    const validator = Verifier.lookupValidator(why);
     if (typeof validator === "function") {
-      var part = why[2];
-      var lines = why[3];
-      var subst = why[4];
+      const part = why[2];
+      const lines = why[3];
+      const subst = why[4];
       // var subst = null;
       // if (newv && why[4]) subst = [newv, why[4]];
-      var isValid = validator(proof, step, part, lines, subst);
+      const isValid = validator(proof, step, part, lines, subst);
       if (isValid === true) {
         result.valid = true;
       } else {
@@ -113,24 +113,28 @@ class Verifier {
   }
 
   static lookupValidator(why) {
-    var name = why[0].toLowerCase();
-    if (name.split(".").length == 2) name = name.split(".")[0] + ".";
-    var rule = rules[name];
-    if (!rule) return "Cannot find rule: " + name;
+    let name = why[0].toLowerCase();
+    if (name.split(".").length === 2) {
+      name = name.split(".")[0] + ".";
+    }
+    const rule = rules[name];
+    if (!rule) {
+      return "Cannot find rule: " + name;
+    }
     if (rule.getType() === "simple" || rule.getType() === "derived") {
-      var fn = rule.getSimpleVerifier();
+      const fn = rule.getSimpleVerifier();
       if (!fn) throw new Error("Not implemented for " + name);
       return fn.exec;
     }
 
     if (why[1]) {
-      var elimOrIntro = why[1].toLowerCase();
+      const elimOrIntro = why[1].toLowerCase();
       if ("introduction".indexOf(elimOrIntro) === 0) {
-        var fn = rule.getIntroVerifier();
+        const fn = rule.getIntroVerifier();
         if (!fn) throw new Error("Not implemented for " + name);
         return fn.exec;
       } else if ("elimination".indexOf(elimOrIntro) === 0) {
-        var fn = rule.getElimVerifier();
+        const fn = rule.getElimVerifier();
         if (!fn) throw new Error("Not implemented for " + name);
         return fn.exec;
       }
@@ -149,7 +153,7 @@ class Verifier {
   }
 
   static preprocess(ast) {
-    var proof = { steps: [] };
+    let proof = { steps: [] };
     Verifier.preprocessBox(proof, ast, 0, []);
     debugMessage("processed proof", proof);
     return proof;
@@ -157,7 +161,7 @@ class Verifier {
 
   static preprocessBox(proof, ast, step, scope) {
     debugMessage("ast", ast);
-    for (var i = 0; i < ast.length; i++) {
+    for (let i = 0; i < ast.length; i++) {
       if (ast[i][0] === "rule") {
         proof.steps[step] = new Statement(
           ast[i][1],
@@ -165,11 +169,11 @@ class Verifier {
           scope,
           ast[i][3],
           i == 0,
-          i == ast.length - 1,
+          i === ast.length - 1,
         );
         step = step + 1;
       } else if (ast[i][0] === "folbox") {
-        var newScope = scope.slice(0);
+        let newScope = scope.slice(0);
         newScope.push(ast[i][2][1]);
         debugMessage(
           "folbox",
@@ -182,8 +186,7 @@ class Verifier {
         );
         step = Verifier.preprocessBox(proof, ast[i][1], step, newScope);
       } else if (ast[i][0] === "box") {
-        var newScope = scope.slice(0);
-        // newScope.push(null);
+        let newScope = scope.slice(0);
         debugMessage("box", "step", step, "scope", scope, "newScope", newScope);
         step = Verifier.preprocessBox(proof, ast[i][1], step, newScope);
       } else if (ast[i][0] === "error") {

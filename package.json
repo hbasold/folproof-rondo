@@ -1,6 +1,6 @@
 {
   "name": "folproof",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "A first-order logic proof verifier",
   "keywords": [
     "fol",
@@ -47,12 +47,12 @@
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.9.0",
     "jison": "latest",
-    "nodeunit": "latest",
+    "mocha": "^10.7.3",
     "prettier": "3.3.3"
   },
   "scripts": {
-    "parserUpdate": "npx jison src/parser/folproof-parser.jison src/parser/folproof-parser.jisonlex",
+    "parserUpdate": "jison src/parser/folproof-parser.jison src/parser/folproof-parser.jisonlex",
     "bundleWeb": "esbuild frontend/script.mjs --bundle --minify --outfile=frontend/bundle.js --external:fs",
-    "test": "npx nodeunit tests/*.js"
+    "test": "mocha"
   }
 }
