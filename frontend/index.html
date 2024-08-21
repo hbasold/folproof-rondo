@@ -14,169 +14,298 @@
     <script type="module" src="bundle.js"></script>
   </head>
   <body>
-    <div class="container">
-      <div class="row">
-        <noscript>
-          <div class="col-md-12 pt-2">
-            <div class="alert alert-warning" role="alert">
-              <h4>Javascript is disabled</h4>
-              <p>
-                Proof Rondo requires Javascript to be enabled in order to work
-                properly. Please enable Javascript in your browser and reload
-                the page.
-              </p>
-            </div>
+    <div class="container my-3">
+      <noscript>
+        <div class="col">
+          <div class="alert alert-warning" role="alert">
+            <p class="fs-4">JavaScript is disabled</p>
+            <p>
+              Proof Rondo requires JavaScript to be enabled in order to work
+              properly. Please enable JavaScript in your browser and reload the
+              page.
+            </p>
           </div>
-        </noscript>
-        <header class="col-md-12">
-          <h1>Proof Rondo</h1>
-          <p class="fs-3">Javascript First-Order Logic Proof Checker</p>
+        </div>
+      </noscript>
+      <header class="row justify-content-between">
+        <div class="col-auto">
+          <h1>
+            Proof Rondo
+            <small class="text-body-secondary">
+              First-Order Logic Proof Checker
+            </small>
+          </h1>
           <p>
-            <i
-              >Source:
+            <small>
+              Source:
               <a
                 href="https://github.com/hbasold/folproof-rondo"
                 title="folproof-rondo on GitHub"
+                referrerpolicy="no-referrer"
+                target="_blank"
               >
-                https://github.com/hbasold/folproof-rondo
+                github.com/hbasold/folproof-rondo
               </a>
-            </i>
+            </small>
           </p>
-        </header>
-        <div>
-          <div class="bs-callout bs-callout-info">
-            <h2>Instructions</h2>
-            <p>
-              Enter your proof in the input box, below. As you type, the
-              formatted proof will appear on the right, along with a validation
-              status, beneath that. To learn the syntax, try playing with the
-              examples, below, or see the
-              <a href="{% link education/proof-rondo/language.md %}"
-                >language reference</a
-              >.
-            </p>
-            <p>
-              <b>Note:</b>
-            </p>
-            <ul>
-              <li>
-                Please be sure you use a modern browser, and that Javascript is
-                enabled.
-              </li>
-              <li>
-                There is currently a limitation in the parser, where the last
-                substitution quantifier rules cannot contain spaces. Thus, you
-                have to write x/g(c,d) instead of x/g(c, d)!
-              </li>
-              <li>
-                The rules for equality are used as "= i" instead of (Refl) and
-                "= e" instead of (Repl).
-              </li>
-            </ul>
-          </div>
+        </div>
+
+        <div class="col-auto">
+          <ul class="nav">
+            <li class="dropdown">
+              <button
+                class="btn btn-link nav-link px-0 dropdown-toggle"
+                id="bd-theme"
+                type="button"
+                aria-expanded="false"
+                data-bs-toggle="dropdown"
+                data-bs-display="static"
+                aria-label="Change theme (dark)"
+              >
+                <span id="bd-theme-text">Change theme</span>
+              </button>
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="bd-theme-text"
+              >
+                <li>
+                  <button
+                    type="button"
+                    class="dropdown-item"
+                    data-bs-theme-value="light"
+                    aria-pressed="false"
+                  >
+                    Light
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    class="dropdown-item active"
+                    data-bs-theme-value="dark"
+                    aria-pressed="true"
+                  >
+                    Dark
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    class="dropdown-item"
+                    data-bs-theme-value="auto"
+                    aria-pressed="false"
+                  >
+                    Auto
+                  </button>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </header>
+
+      <div class="row">
+        <div class="col">
+          <h2>Instructions</h2>
+          <p>
+            Enter your proof in the input box, below. As you type, the formatted
+            proof will appear on the right, along with a validation status,
+            beneath that. To learn the syntax, try playing with the examples,
+            below, or see the
+            <a
+              href="https://github.com/hbasold/folproof-rondo/blob/master/docs/language.md"
+              referrerpolicy="no-referrer"
+              target="_blank"
+              >language reference</a
+            >.
+          </p>
+          <strong>Note:</strong>
+          <ul>
+            <li>
+              There is currently a limitation in the parser, where the last
+              substitution quantifier rules cannot contain spaces. Thus, you
+              have to write <code>x/g(c,d)</code> instead of
+              <code>x/g(c, d)</code>!
+            </li>
+            <li>
+              The rules for equality are used as <code>= i</code> instead of
+              (Refl) and <code>= e</code> instead of (Repl).
+            </li>
+          </ul>
         </div>
       </div>
 
       <main class="row">
-        <h2>Proof Checker</h2>
-        <p><b>Examples:</b></p>
-        <fieldset
-          id="buttons"
-          class="btn-group"
-          aria-label="Button group with nested dropdown"
-        >
-          <button id="9" type="button" class="btn btn-primary example active">
-            Proof Rondo Default
-          </button>
-          <button id="1" type="button" class="btn btn-primary example">
-            Example 3.1
-          </button>
-          <button id="0" type="button" class="btn btn-primary example">
-            Example 5.8
-          </button>
-          <button id="2" type="button" class="btn btn-primary example">
-            Example 5.12
-          </button>
-          <button id="3" type="button" class="btn btn-primary example">
-            Drinkers Paradox
-          </button>
-          <button id="4" type="button" class="btn btn-primary example">
-            Example 7.13
-          </button>
-          <button id="5" type="button" class="btn btn-primary example">
-            Example 9.13
-          </button>
-
-          <fieldset class="btn-group">
+        <div class="col-12">
+          <h2>Proof Checker</h2>
+          <p class="d-inline d-xl-none pe-2"><b>Load an example:</b></p>
+          <p class="d-none d-xl-block"><b>Examples:</b></p>
+          <fieldset class="btn-group d-xl-none" aria-label="Button group">
             <button
               type="button"
               class="btn btn-primary dropdown-toggle"
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Exam Examples
+              Select an Example
             </button>
             <ul class="dropdown-menu">
               <li>
-                <a
-                  class="dropdown-item example"
-                  id="6"
-                  href="javascript:void(0)"
-                >
-                  Example Solution
-                </a>
+                <button value="9" type="button" class="dropdown-item example">
+                  Proof Rondo Default
+                </button>
               </li>
               <li>
-                <a
-                  class="dropdown-item example"
-                  id="7"
-                  href="javascript:void(0)"
-                >
+                <button value="1" type="button" class="dropdown-item example">
+                  Example 3.1
+                </button>
+              </li>
+              <li>
+                <button value="0" type="button" class="dropdown-item example">
+                  Example 5.8
+                </button>
+              </li>
+              <li>
+                <button value="2" type="button" class="dropdown-item example">
+                  Example 5.12
+                </button>
+              </li>
+              <li>
+                <button value="3" type="button" class="dropdown-item example">
+                  Drinkers Paradox
+                </button>
+              </li>
+              <li>
+                <button value="4" type="button" class="dropdown-item example">
+                  Example 7.13
+                </button>
+              </li>
+              <li>
+                <button value="5" type="button" class="dropdown-item example">
+                  Example 9.13
+                </button>
+              </li>
+              <li>
+                <button value="6" type="button" class="dropdown-item example">
+                  Example Solution
+                </button>
+              </li>
+              <li>
+                <button value="7" type="button" class="dropdown-item example">
                   Uniform Proof Example Solution
-                </a>
+                </button>
+              </li>
+              <li>
+                <button value="6" type="button" class="dropdown-item example">
+                  Example Solution
+                </button>
+              </li>
+              <li>
+                <button value="7" type="button" class="dropdown-item example">
+                  Uniform Proof Example Solution
+                </button>
+              </li>
+              <li>
+                <button value="8" type="button" class="dropdown-item example">
+                  Admissible Rules
+                </button>
               </li>
             </ul>
           </fieldset>
+          <fieldset
+            class="btn-group d-none d-xl-inline-flex"
+            aria-label="Button group with nested dropdown"
+          >
+            <button value="9" type="button" class="btn btn-primary example">
+              Proof Rondo Default
+            </button>
+            <button value="1" type="button" class="btn btn-primary example">
+              Example 3.1
+            </button>
+            <button value="0" type="button" class="btn btn-primary example">
+              Example 5.8
+            </button>
+            <button value="2" type="button" class="btn btn-primary example">
+              Example 5.12
+            </button>
+            <button value="3" type="button" class="btn btn-primary example">
+              Drinkers Paradox
+            </button>
+            <button value="4" type="button" class="btn btn-primary example">
+              Example 7.13
+            </button>
+            <button value="5" type="button" class="btn btn-primary example">
+              Example 9.13
+            </button>
 
-          <button id="8" type="button" class="btn btn-primary example">
-            Admissible Rules
-          </button>
-        </fieldset>
+            <fieldset class="btn-group">
+              <button
+                type="button"
+                class="btn btn-primary dropdown-toggle"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Exam Examples
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <button value="6" type="button" class="dropdown-item example">
+                    Example Solution
+                  </button>
+                </li>
+                <li>
+                  <button value="7" type="button" class="dropdown-item example">
+                    Uniform Proof Example Solution
+                  </button>
+                </li>
+              </ul>
+            </fieldset>
 
-        <div class="col-md-6">
-          <label for="proof-input"><span class="fs-4">Proof input</span></label>
-          <textarea
-            class="form-control alert alert-light"
-            id="proof-input"
-          ></textarea>
+            <button value="8" type="button" class="btn btn-primary example">
+              Admissible Rules
+            </button>
+          </fieldset>
+        </div>
+
+        <div class="col-12 col-lg-7">
+          <p class="fs-4 m-1">Proof Input</p>
+          <div id="proof-input" class="form-control"></div>
+          <p class="pt-2">
+            <strong>Note:</strong> Press <kbd>Esc</kbd> + <kbd>Tab</kbd> to
+            escape the proof input.
+          </p>
           <button id="clear-input" type="button" class="btn btn-warning">
             Clear Proof Input
           </button>
         </div>
 
-        <div class="col-md-6">
-          <span class="fs-4">Result</span>
+        <div class="col">
+          <p class="fs-4 m-1">Output</p>
 
           <div class="alert alert-light" id="render-panel"></div>
 
           <div id="result-box" class="alert alert-light">
-            <h4>Result</h4>
+            <p class="fs-4">Result</p>
             <div id="result"></div>
           </div>
 
-          <div id="options">
+          <div id="settings">
             <p class="fs-4">Settings</p>
-            <div class="pb-3 form-row">
-              <label for="parentheses">
-                <b>Parentheses:</b>
-              </label>
-              <select id="parentheses" class="form-control">
-                <option value="minimal">
-                  Minimal (order-of-ops overrides)
-                </option>
-                <option value="user" selected>User-defined</option>
-                <option value="explicit">Explicit order-of-ops</option>
-              </select>
+            <div class="row g-3 align-items-center">
+              <div class="col-auto">
+                <label for="parentheses" class="col-form-label">
+                  <b>Parentheses:</b>
+                </label>
+              </div>
+              <div class="col-auto">
+                <select id="parentheses" class="form-control">
+                  <option value="minimal">
+                    Minimal (order-of-ops overrides)
+                  </option>
+                  <option value="user" selected>User-defined</option>
+                  <option value="explicit">Explicit order-of-ops</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
