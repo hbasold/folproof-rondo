@@ -1,5 +1,5 @@
 import { Verifier as v } from "../src/verifier.mjs";
-import { strict as assert } from 'node:assert';
+import { strict as assert } from "node:assert";
 
 describe("Verifier Tests", function () {
   it("Sets first/last statements", function () {

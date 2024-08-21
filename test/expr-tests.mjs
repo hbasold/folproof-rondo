@@ -1,9 +1,8 @@
 import * as E from "../src/expr.mjs";
 import * as P from "../folproof-parser.js";
-import { strict as assert } from 'node:assert';
+import { strict as assert } from "node:assert";
 
 describe("Expression Printer Tests", function () {
-
   it("Printing identifiers", function () {
     const src = "a";
     const e = P.parse(src)[0][1];
@@ -233,8 +232,7 @@ describe("Expression Printer Tests", function () {
     const t = P.parse("f(x)")[0][1];
     const e = P.parse(src)[0][1];
     const r = E.substitute(e, ["y", t]);
-    const expected = e;  // Since _|_ should remain unchanged
+    const expected = e; // Since _|_ should remain unchanged
     assert.deepEqual(r, expected);
   });
-
 });
