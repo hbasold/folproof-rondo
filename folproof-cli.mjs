@@ -33,9 +33,9 @@ debugMessage("Debug mode is enabled!");
 try {
   const content = fs.readFileSync(path.normalize(file_path), "utf8");
   debugMessage("File has been read.");
-  let ast = parser.parse(content);
+  const AST = parser.parse(content);
   debugMessage("File content has been parsed.");
-  let result = Verifier.verifyFromAST(ast);
+  const result = Verifier.verifyFromAST(AST);
   debugMessage("AST has been verified, with as result:");
   console.log(successColour(JSON.stringify(result, null, 2)));
 } catch (ex) {
