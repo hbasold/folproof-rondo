@@ -2,5 +2,3 @@
 folproof-parser.js
 # Bundled by ESBuild
 frontend/bundle.js
-# Conflicting styling conventions
-README.md
