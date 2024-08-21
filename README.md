@@ -1,49 +1,49 @@
-[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
-
 # Proof Rondo
-
-A JavaScript First-Order Logic (FOL) proof verifier.
+A First-Order Logic (FOL) proof verifier written in JavaScript.
 
 ## Demo
+While there are multiple ways to use Proof Rondo, a frontend has been built
+(see the `frontend/` directory) to conveniently interact with its parser and verifier through the web.
+Take it for a test
+drive
+at: [https://liacs.leidenuniv.nl/~basoldh/education/proof-rondo/](https://liacs.leidenuniv.nl/~basoldh/education/proof-rondo/).
 
-Take it for a test drive: [https://liacs.leidenuniv.nl/~basoldh/education/proof-rondo/](https://liacs.leidenuniv.nl/~basoldh/education/proof-rondo/).
-
-## Building
-
-1. If you don't have node and npm installed, please install it.
-
-- Visit [here](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager), for more details.
-
-2. Run `npm install` to install the libraries FOLProof needs.
-3. Run `make`.
-
-## Installing (Optional)
-
-If you'd like to run FOLProof in a shell, then proceed, here:
-
-1. Install the build dependencies (node, npm, etc).
-2. Within the folproof root directory, run `sudo npm -g install`.
-
-- This should install shell dependencies, like nomnom and path.
+## Building and Installing
+1. If you don't have Node.js and npm installed, please install both.
+   - _See [https://docs.npmjs.com/downloading-and-installing-node-js-and-npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+   for more information._
+2. Open a terminal and navigate to the Proof Rondo directory (the one containing the
+   `package.json` file).
+3. Run `npm install` to install the libraries Proof Rondo needs. If you would
+   like to run Proof Rondo in a terminal from anywhere on your computer, 
+   additionally provide the `-g` option, so: `npm install -g`.
+4. _(Optional) look at the `package.json` for the scripts used for
+   bundling the frontend code and generating the parser file._
 
 ## Running
+There are several ways to run Proof Rondo:
 
-There are several ways to run FOLProof:
+1. **From the terminal**:
+    - **After installation**: type `folproof [your-proof].fol`, from anywhere.
+    - **Without installation**: type `npx folproof [your-proof].fol`, from within the
+      Proof Rondo directory (where you performed `npm install`).
 
-1. From the shell
+_For help with using Logic Rondo from the terminal, provide the `--help` flag._
 
-- After installation: type `folproof [your-proof].fol`, from anywhere.
-- Without installation: type `node folproof-cli.mjs [your-proof].fol`, from within the folproof directory.
-
-2. From the web
-
-- Please look in the included index.html for an example of how to use FOLProof in a website.
-- You can test the included index.html [at the demo site](https://cdibbs.github.io/folproof).
+2. **From the web**:
+    - **Use**: open the `frontend/index.html` file using a local web server, or
+      use the aforementioned demo website.
+    - **Create yourself**: Take a look at the `frontend/` directory to get an idea
+      of how to get started using Proof Rondo on your website.
 
 ## Architecture Overview
-
-- folproof-parser.js - built automatically from ./src/parser/folproof-parser.jison and folproof-parser.jisonlex
-- folproof-web.mjs - renders proof ASTs to HTML. Requires JQuery
-- folproof-verifier.mjs - verifies proofs from ASTs (built from /src/\*.js)
-- folproof-cli.mjs - a short script to run verifier.mjs, from within a shell.
-- index.html - provides a test interface
+| File/Directory       | Description                                                                                   |
+|----------------------|-----------------------------------------------------------------------------------------------|
+| `docs/`              | Describes the language accepted by Proof Rondo.                                               |
+| `frontend/`          | Code specific to the frontend we built for Proof Rondo.                                       |
+| `frontend/bundle.js` | Is created using ESBuild (see the `package.json`).                                            |
+| `src/`               | Source code for the parser and verifier.                                                      |
+| `test/`              | Mocha unit tests.                                                                             |
+| `folproof-cli.mjs`   | Source code for using Proof Rondo as CLI tool.                                                |
+| `folproof-parser.js` | Built automatically from `./src/parser/folproof-parser.jison` and `folproof-parser.jisonlex`. |
+| `folproof-web.mjs`   | Renders proof ASTs to HTML. It is not frontend specific.                                      |
