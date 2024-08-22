@@ -260,14 +260,6 @@ function renderSimpleTerm(t) {
   return output;
 }
 
-/**
- * Render justification.
- *
- * AST[0] = rule, AST[1] = elim/intro, AST[2] = index (if required), AST[3] = line numbers
- *
- * @param AST
- * @returns {HTMLDivElement}
- */
 function renderJustification(AST) {
   let justification = document.createElement("div");
   justification.className = "justification";
