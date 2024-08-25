@@ -1,7 +1,42 @@
 import { debugMessage } from "./util.mjs";
-import { Rule } from "./rule.mjs";
 import { Justifier } from "./justifier.mjs";
 import * as Expr from "./expr.mjs";
+
+class Rule {
+  // { name : name,
+  //   type : ["simple", "derived", "normal"],
+  //   verifier : new Verifier(parseFormat, function(proof, step) {}),
+  //   introduction : new Verifier(parseFormat, function(proof, step, part, steps, subst) {}),
+  //   elimination : new Verifier(parseFormat, function(proof, step, part, steps, subst) {})
+  // }
+  constructor(options) {
+    this.name = options.name;
+    this.type = options.type;
+    this.verifier = options.verifier || null;
+    this.introduction = options.introduction || null;
+    this.elimination = options.elimination || null;
+  }
+
+  getName() {
+    return this.name;
+  }
+
+  getType() {
+    return this.type;
+  }
+
+  getSimpleVerifier() {
+    return this.verifier;
+  }
+
+  getIntroVerifier() {
+    return this.introduction;
+  }
+
+  getElimVerifier() {
+    return this.elimination;
+  }
+}
 
 const rules = {
   premise: new Rule({
