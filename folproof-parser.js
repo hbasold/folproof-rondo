@@ -795,36 +795,35 @@ case 18:
 				
 break;
 case 19: /* manually close an assumption box */
-				this._log("MANUAL DEBOX");
-				this._iemitstack.shift();
-				return ['DEBOX', 'EOL'];
-				
+				        this._log("MANUAL DEBOX");
+				        this._iemitstack.shift();
+				        return ['DEBOX', 'EOL'];
+                    
 break;
 case 20:/* eat blank lines */
 break;
-case 21:
-				/* Similar to the idea of semantic whitespace, we keep track of virtual
-				 * BOX/DEBOX characters based on a stack of | occurrences
-				 */
-				    var indentation = (yy_.yytext.match(/\|/g)||[]).length;
-				    if (indentation > this._iemitstack[0]) {
-					this._iemitstack.unshift(indentation);
-					this._log(this.topState(), "BOX", this.stateStackSize());
-					this.myBegin(this.topState(), 'deepening, due to indent'); // deepen our current state
-					return ['BOX', 'EOL'];
-				    }
+case 21: /* Similar to the idea of semantic whitespace, we keep track of virtual
+                                    * BOX/DEBOX characters based on a stack of | occurrences
+                                    */
+                                    var indentation = (yy_.yytext.match(/\|/g)||[]).length;
+                                    if (indentation > this._iemitstack[0]) {
+                                        this._iemitstack.unshift(indentation);
+                                        this._log(this.topState(), "BOX", this.stateStackSize());
+                                        this.myBegin(this.topState(), 'deepening, due to indent'); // deepen our current state
+                                        return ['BOX', 'EOL'];
+                                    }
 
-				    var tokens = ["EOL"];
-				    while (indentation < this._iemitstack[0]) {
-					this.myPopState();
-					this._log(this.topState(), "DEBOX", this.stateStackSize());
-					tokens.push("DEBOX");
-					this._iemitstack.shift();
-				    }
-				    if (tokens[tokens.length-1] === "DEBOX")
-					    tokens.push("EOL");
-				    return tokens;
-				
+                                    var tokens = ["EOL"];
+                                    while (indentation < this._iemitstack[0]) {
+                                        this.myPopState();
+                                        this._log(this.topState(), "DEBOX", this.stateStackSize());
+                                        tokens.push("DEBOX");
+                                        this._iemitstack.shift();
+                                    }
+                                    if (tokens[tokens.length-1] === "DEBOX")
+                                        tokens.push("EOL");
+                                    return tokens;
+				                
 break;
 case 22:return 8; 
 break;
@@ -834,7 +833,7 @@ case 24:return 2;
 break;
 }
 },
-rules: [/^(?:[\n\r]?#.*)/,/^(?:and|∧|&)/,/^(?:or|∨|v|\+)/,/^(?:implies|->|→)/,/^(?:iff|<->)/,/^(?:not|~|¬)/,/^(?:=)/,/^(?:with\b)/,/^(?:\d+)/,/^(?:(:.*))/,/^(?:E|∃)/,/^(?:A|∀)/,/^(?:\()/,/^(?:\))/,/^(?:_\|_|⊥|bot\b)/,/^(?:([a-zA-Z_][a-zA-Z_'"0-9\|]*))/,/^(?:,)/,/^(?:\.)/,/^(?:[\n\r]*$)/,/^(?:\n([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*-+)/,/^(?:[\n\r]+([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*(?![^\n\r]))/,/^(?:[\n|^]([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\d*([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)/,/^(?:\n)/,/^(?:([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+)/,/^(?:.*)/],
+rules: [/^(?:[\n\r]?#.*)/,/^(?:and|∧|&)/,/^(?:or|∨|v|\+)/,/^(?:implies|->|→)/,/^(?:iff|<->)/,/^(?:not|~|¬)/,/^(?:=)/,/^(?:with\b)/,/^(?:\d+)/,/^(?:(:.*))/,/^(?:E|∃)/,/^(?:A|∀)/,/^(?:\()/,/^(?:\))/,/^(?:_\|_|⊥|bot\b)/,/^(?:([a-zA-Z_][a-zA-Z_'"0-9\|]*))/,/^(?:,)/,/^(?:\.)/,/^(?:[\n\r]*$)/,/^(?:\n(([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)*-+)/,/^(?:[\n\r]+([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*(?![^\n\r]))/,/^(?:[\n|^]([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\d*(([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)*)/,/^(?:\n)/,/^(?:([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+)/,/^(?:.*)/],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"inclusive":true}}
 });
 const jisonLexerFn = lexer.setInput;
