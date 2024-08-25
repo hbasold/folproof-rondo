@@ -60,7 +60,10 @@ class Verifier {
 
   static validateStatement(result, proof, step) {
     let statement = proof.steps[step];
-    if (statement[0] === "error") {
+    if (
+      statement[0] === "error" ||
+      JSON.stringify(statement.sentenceAST).includes("error")
+    ) {
       result.valid = false;
       result.message = "Proof invalid due to syntax errors.";
       result.errorStep = step + 1;
@@ -69,7 +72,7 @@ class Verifier {
 
     let why = statement.getJustification();
     debugMessage("why", why);
-    if (why[0] == "premise") {
+    if (why[0] === "premise") {
       if (!result.premiseAllowed) {
         result.valid = false;
         result.message =
@@ -80,10 +83,7 @@ class Verifier {
     } else {
       result.premiseAllowed = false;
     }
-    // var newv = null;
-    // if (why[0].split('.').length == 2)
-    // 	newv = why[0].split('.')[1];
-    if (why[0] == "sorry") {
+    if (why[0] === "sorry") {
       result.remainingSorries += 1;
     }
     const validator = Verifier.lookupValidator(why);
@@ -91,8 +91,6 @@ class Verifier {
       const part = why[2];
       const lines = why[3];
       const subst = why[4];
-      // var subst = null;
-      // if (newv && why[4]) subst = [newv, why[4]];
       const isValid = validator(proof, step, part, lines, subst);
       if (isValid === true) {
         result.valid = true;
@@ -168,7 +166,7 @@ class Verifier {
           ast[i][2],
           scope,
           ast[i][3],
-          i == 0,
+          i === 0,
           i === ast.length - 1,
         );
         step = step + 1;

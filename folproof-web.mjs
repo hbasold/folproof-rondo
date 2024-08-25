@@ -13,16 +13,21 @@ function render(AST, options) {
 }
 
 function renderRules(DOM, AST, line, options) {
-  for (let i = 0; i < AST.length; i++) {
-    debugMessage(AST[i]);
-    if (AST[i][0] === "rule") {
-      line = renderRule(DOM, AST[i], line, options);
-    } else if (AST[i][0] === "box") {
-      line = renderBox(DOM, AST[i], line, options, "simple");
-    } else if (AST[i][0] === "folbox") {
-      line = renderBox(DOM, AST[i], line, options, "FOL");
-    } else if (AST[i][0] === "error") {
-      line = renderSyntaxError(DOM, AST[i], line);
+  for (const item of AST) {
+    debugMessage(`renderRules: ${item}`);
+    switch (item[0]) {
+      case "rule":
+      case "error":
+        line = renderRule(DOM, item, line, options);
+        break;
+      case "box":
+        line = renderBox(DOM, item, line, options, "simple");
+        break;
+      case "folbox":
+        line = renderBox(DOM, item, line, options, "FOL");
+        break;
+      default:
+        throw Error("Unexpected AST format.");
     }
   }
   return line;
@@ -37,6 +42,11 @@ function renderRule(DOM, AST, line, options) {
   line_number_span.textContent = line;
   nest.appendChild(line_number_span);
 
+  if (AST[0] === "error") {
+    nest.appendChild(renderSyntaxError(AST));
+    DOM.appendChild(nest);
+    return line + 1;
+  }
   nest.appendChild(renderClause(AST[1], options));
   nest.appendChild(renderJustification(AST[2]));
 
@@ -44,18 +54,11 @@ function renderRule(DOM, AST, line, options) {
   return line + 1;
 }
 
-function renderSyntaxError(DOM, AST, line) {
-  let nest = document.createElement("div");
-  nest.className = "text-danger font-weight-bold";
-
-  let line_number_span = document.createElement("span");
-  line_number_span.className = "lineno";
-  line_number_span.textContent = line;
-  nest.appendChild(line_number_span);
-  nest.append("Syntax error: ", AST[1]);
-
-  DOM.appendChild(nest);
-  return line + 1;
+function renderSyntaxError(AST) {
+  const error = document.createElement("span");
+  error.className = "text-danger font-weight-bold";
+  error.append(`Syntax error at: ${AST[1]}`);
+  return error;
 }
 
 function renderClause(AST, options) {
@@ -69,7 +72,7 @@ function renderClause(AST, options) {
   }
   if (op_text) {
     let wrapper = document.createElement("span");
-    wrapper.className = "folproof-quantifier";
+    wrapper.className = "quantifier";
 
     wrapper.insertAdjacentHTML("beforeend", op_text);
 
@@ -77,13 +80,10 @@ function renderClause(AST, options) {
     wrapper.append(". ");
 
     const clause = renderClause(AST[2], options);
-    wrapper.appendChild(clause); // TODO: why this append?
+    wrapper.appendChild(clause);
     if (requireParens(AST[0], AST[2], true, options)) {
-      wrapper.append("(");
-      wrapper.appendChild(clause);
+      wrapper.prepend("(");
       wrapper.append(")");
-    } else {
-      wrapper.appendChild(clause);
     }
 
     return wrapper;
@@ -107,38 +107,48 @@ function renderClause(AST, options) {
   }
   if (op_text) {
     debugMessage(AST[1], AST[2]);
-
-    let left = renderClause(AST[1], options);
+    const wrapper = document.createElement("span");
+    wrapper.className = "binary-op";
+    wrapper.appendChild(renderClause(AST[1], options));
     if (requireParens(AST[0], AST[1], true, options)) {
-      left.prepend("(");
-      left.append(")");
+      wrapper.prepend("(");
+      wrapper.append(")");
     }
 
-    left.append(" ");
-    left.insertAdjacentHTML("beforeend", op_text);
-    left.append(" ");
+    wrapper.insertAdjacentHTML("beforeend", ` ${op_text} `);
 
     let right = renderClause(AST[2], options);
     if (requireParens(AST[0], AST[2], false, options)) {
-      right.prepend("(");
-      right.append(")");
+      wrapper.append("(");
+      wrapper.appendChild(right);
+      wrapper.append(")");
+    } else {
+      wrapper.appendChild(right);
     }
-    left.appendChild(right);
 
-    return left;
+    return wrapper;
   }
 
   if (AST[0] === "id") {
     return renderTerm(AST, options);
-  } else if (AST[0] === "not") {
-    let left = renderClause(AST[1], options);
-    if (requireParens(AST[0], AST[1], true, options)) {
-      left.prepend("(");
-      left.append(")");
-    }
-    left.insertAdjacentHTML("afterbegin", "&not;");
-    return left;
   }
+
+  if (AST[0] === "not") {
+    const wrapper = document.createElement("span");
+    wrapper.className = "not";
+    wrapper.appendChild(renderClause(AST[1], options));
+    if (requireParens(AST[0], AST[1], true, options)) {
+      wrapper.prepend("(");
+      wrapper.append(")");
+    }
+    wrapper.insertAdjacentHTML("afterbegin", "&not;");
+    return wrapper;
+  }
+
+  if (AST[0] === "error") {
+    return renderSyntaxError(AST);
+  }
+
   return renderTerm(AST);
 }
 
@@ -263,7 +273,7 @@ function renderSimpleTerm(t) {
 function renderJustification(AST) {
   let justification = document.createElement("div");
   justification.className = "justification";
-  if (AST[0] == "sorry") {
+  if (AST[0] === "sorry") {
     justification.classList.add("text-warning");
   }
   justification.innerText = AST[0];
