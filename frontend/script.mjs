@@ -354,6 +354,17 @@ const examples = {
       "  ---",
       "10 ~(E x. (P(x) and Q(x))) : neg introduction 2-9",
     ],
+    10: [
+      "# One can use Proof Rondo to just check the syntactic correctness of formulas.",
+      "# For instance, the following is the failure model for a train crossing from the first lecture.",
+      "",
+      "TrainArrives → ClosingSignal",
+      "¬CommunicationFailure ∧ ClosingSignal → BarrierClosed",
+      "¬TrainStops ∧ TrainArrives → TrainOnCrossing",
+      "¬BarrierClosed ∧ TrainArrives → TrainBrakes",
+      "¬BrakeFailure ∧ TrainBrakes → TrainStops",
+      "TrainOnCrossing ∧ BarrierOpen → Unsafe",
+    ],
   },
 };
 
@@ -362,6 +373,6 @@ proofInput.dispatch({
   changes: {
     from: 0,
     to: proofInput.state.doc.length,
-    insert: examples.examples[9].join("\n"),
+    insert: examples.examples[10].join("\n"),
   },
 });
