@@ -100,43 +100,42 @@ justify				":".*
 				tokens.unshift("ENDOFFILE");
 				if (tokens.length) return tokens;
 				%}
-\n{spc}*"|"*"-"+			%{ /* manually close an assumption box */
-				this._log("MANUAL DEBOX");
-				this._iemitstack.shift();
-				return ['DEBOX', 'EOL'];
-				%}
+\n({spc}*"|"*)*"-"+ %{ /* manually close an assumption box */
+				        this._log("MANUAL DEBOX");
+				        this._iemitstack.shift();
+				        return ['DEBOX', 'EOL'];
+                    %}
 [\n\r]+{spc}*/![^\n\r]		/* eat blank lines */
-[\n|^]{spc}*\d*{spc}*"|"*		%{
-				/* Similar to the idea of semantic whitespace, we keep track of virtual
-				 * BOX/DEBOX characters based on a stack of | occurrences
-				 */
-				    var indentation = (yytext.match(/\|/g)||[]).length;
-				    if (indentation > this._iemitstack[0]) {
-					this._iemitstack.unshift(indentation);
-					this._log(this.topState(), "BOX", this.stateStackSize());
-					this.myBegin(this.topState(), 'deepening, due to indent'); // deepen our current state
-					return ['BOX', 'EOL'];
-				    }
+[\n|^]{spc}*\d*({spc}*"|"*)*    %{ /* Similar to the idea of semantic whitespace, we keep track of virtual
+                                    * BOX/DEBOX characters based on a stack of | occurrences
+                                    */
+                                    var indentation = (yytext.match(/\|/g)||[]).length;
+                                    if (indentation > this._iemitstack[0]) {
+                                        this._iemitstack.unshift(indentation);
+                                        this._log(this.topState(), "BOX", this.stateStackSize());
+                                        this.myBegin(this.topState(), 'deepening, due to indent'); // deepen our current state
+                                        return ['BOX', 'EOL'];
+                                    }
 
-				    var tokens = ["EOL"];
-				    while (indentation < this._iemitstack[0]) {
-					this.myPopState();
-					this._log(this.topState(), "DEBOX", this.stateStackSize());
-					tokens.push("DEBOX");
-					this._iemitstack.shift();
-				    }
-				    if (tokens[tokens.length-1] === "DEBOX")
-					    tokens.push("EOL");
-				    return tokens;
-				%}
+                                    var tokens = ["EOL"];
+                                    while (indentation < this._iemitstack[0]) {
+                                        this.myPopState();
+                                        this._log(this.topState(), "DEBOX", this.stateStackSize());
+                                        tokens.push("DEBOX");
+                                        this._iemitstack.shift();
+                                    }
+                                    if (tokens[tokens.length-1] === "DEBOX")
+                                        tokens.push("EOL");
+                                    return tokens;
+				                %}
 \n				return 'EOL'; 
 {spc}+				/* ignore whitespace */
 .*				return 'error';
 
 %%
-jisonLexerFn = lexer.setInput;
+const jisonLexerFn = lexer.setInput;
 lexer.setInput = function(input) {
-        var debug = false;
+        let debug = false;
         this._iemitstack = [0];
         this._log = function() { if (debug) console.log.apply(this, arguments); };
         this.myBegin = function(state, why) { this._log("Begin " + state + " because " + why); this.begin(state); };
