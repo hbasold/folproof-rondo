@@ -1,0 +1,28 @@
+# Train crossing model
+1 TrainArrives → ClosingSignal
+2 ¬CommunicationFailure ∧ ClosingSignal → BarrierClosed
+3 ¬TrainStops ∧ TrainArrives → TrainOnCrossing
+4 ¬BarrierClosed ∧ TrainArrives → TrainBrakes
+5 ¬BrakeFailure ∧ TrainBrakes → TrainStops
+6 TrainOnCrossing ∧ ¬BarrierClosed → Unsafe
+
+# Closed world assumptions
+7 CommunicationFailure ∨ (¬ClosingSignal) → (¬BarrierClosed)
+8 BrakeFailure ∨ ¬TrainBrakes → ¬TrainStops
+
+# Situation
+9 TrainArrives
+10 CommunicationFailure
+11 BrakeFailure
+
+# Proof that unsafe situation arises
+12 CommunicationFailure ∨ ¬ClosingSignal : or i1 10
+13 ¬BarrierClosed                        : -> e 7, 12
+14 ¬BarrierClosed ∧ TrainArrives         : and i 13, 9
+15 TrainBrakes                           : -> e 4, 14
+16 BrakeFailure ∨ ¬TrainBrakes           : or i1 11
+17 ¬TrainStops                           : -> e 8, 16
+18 ¬TrainStops ∧ TrainArrives            : and i 17, 9
+19 TrainOnCrossing                       : -> e 3, 18
+20 TrainOnCrossing ∧ ¬BarrierClosed      : and i 19, 13
+21 Unsafe                                : -> e 6, 20
