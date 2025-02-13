@@ -21,6 +21,8 @@ import {
 } from "@codemirror/commands";
 import { bracketMatching } from "@codemirror/language";
 import { closeBrackets } from "@codemirror/autocomplete";
+import { createPopper } from "@popperjs/core";
+import bootstrap from "bootstrap";
 
 let proofInput = new EditorView({
   parent: document.getElementById("proof-input"),
