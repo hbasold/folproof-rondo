@@ -53,7 +53,9 @@
     "globals": "^15.9.0",
     "jison": "latest",
     "mocha": "^10.7.3",
-    "prettier": "3.3.3"
+    "prettier": "3.3.3",
+    "@popperjs/core" : "2.11.8",
+    "bootstrap" : "5.3.3"
   },
   "scripts": {
     "parserUpdate": "jison src/parser/folproof-parser.jison src/parser/folproof-parser.jisonlex",
