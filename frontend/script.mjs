@@ -21,7 +21,9 @@ import {
 } from "@codemirror/commands";
 import { bracketMatching } from "@codemirror/language";
 import { closeBrackets } from "@codemirror/autocomplete";
+// eslint-disable-next-line no-unused-vars
 import { createPopper } from "@popperjs/core";
+// eslint-disable-next-line no-unused-vars
 import bootstrap from "bootstrap";
 
 let proofInput = new EditorView({
