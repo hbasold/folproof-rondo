@@ -148,8 +148,8 @@ describe("Rules Tests", () => {
   describe("Or Elimination Tests", () => {
     it("should succeed when assumptions produce same result", () => {
       const src =
-        "a or b\n~a\n~b\n| a : assumption\n| _|_ : neg e 2,4\n---\n" +
-        "| b : assumption\n| _|_ : neg e 3,6\n_|_ : or e 1,4-5,6-7";
+        "a or b\n~a\n~b\n| a : hypothesis\n| _|_ : neg e 2,4\n---\n" +
+        "| b : hypothesis\n| _|_ : neg e 3,6\n_|_ : or e 1,4-5,6-7";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(result.valid, result.message);
@@ -157,8 +157,8 @@ describe("Rules Tests", () => {
 
     it("should fail when assumptions don't begin with or side", () => {
       const src =
-        "a or b\n~a\n~b\n| c : assumption\n---\n" +
-        "| c : assumption\nc : or e 1,4-4,5-5";
+        "a or b\n~a\n~b\n| c : hypothesis\n---\n" +
+        "| c : hypothesis\nc : or e 1,4-4,5-5";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(!result.valid, result.message);
@@ -166,8 +166,8 @@ describe("Rules Tests", () => {
 
     it("should fail when assumptions don't produce same result", () => {
       const src =
-        "a or b\n~a\n~b\n| a : assumption\n| _|_ : neg e 2,4\n---\n" +
-        "| b : assumption\n| _|_ : neg e 3,6\n| c : contra e 6\n_|_ : or e 1,4-5,6-8";
+        "a or b\n~a\n~b\n| a : hypothesis\n| _|_ : neg e 2,4\n---\n" +
+        "| b : hypothesis\n| _|_ : neg e 3,6\n| c : contra e 6\n_|_ : or e 1,4-5,6-8";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(!result.valid, result.message);
@@ -192,14 +192,14 @@ describe("Rules Tests", () => {
 
   describe("Negation Introduction Tests", () => {
     it("should succeed when reference is contradiction", () => {
-      const src = "a\n| ~a : assumption\n| _|_ : neg e 1,2\n~~a : neg i 2-3";
+      const src = "a\n| ~a : hypothesis\n| _|_ : neg e 1,2\n~~a : neg i 2-3";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(result.valid, result.message);
     });
 
     it("should fail when reference is not contradiction", () => {
-      const src = "a\n| ~a : assumption\n~~a : neg i 2-2";
+      const src = "a\n| ~a : hypothesis\n~~a : neg i 2-2";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(!result.valid, result.message);
@@ -232,7 +232,7 @@ describe("Rules Tests", () => {
   describe("Implication Introduction Tests", () => {
     it("should succeed when left and right side match first and last step of assumption", () => {
       const src =
-        "|a : assumption\n|a or b : or i1 1\na -> (a or b) : -> i 1-2";
+        "|a : hypothesis\n|a or b : or i1 1\na -> (a or b) : -> i 1-2";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(result.valid, result.message);
@@ -240,7 +240,7 @@ describe("Rules Tests", () => {
 
     it("should fail when left or right side don't match beginning or end of assumption", () => {
       const src =
-        "|a : assumption\n|a or b : or i1 1\nb -> (a or b) : -> i 1-2";
+        "|a : hypothesis\n|a or b : or i1 1\nb -> (a or b) : -> i 1-2";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(!result.valid, result.message);
@@ -248,7 +248,7 @@ describe("Rules Tests", () => {
 
     it("should fail when left or right side don't match beginning or end of assumption", () => {
       const src =
-        "|a : assumption\n|a or c : or i1 1\na -> (a or b) : -> i 1-2";
+        "|a : hypothesis\n|a or c : or i1 1\na -> (a or b) : -> i 1-2";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(!result.valid, result.message);
@@ -310,7 +310,7 @@ describe("Rules Tests", () => {
 
   describe("Forall Introduction Tests", () => {
     it("should succeed when ref is assumption and final step matches current step, under subst", () => {
-      const src = "| with x0\n| P(x0) : assumption\nA x. P(x) : A.x/x0 i 1-1";
+      const src = "| with x0\n| P(x0) : hypothesis\nA x. P(x) : A.x/x0 i 1-1";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(result.valid, result.message);
@@ -324,14 +324,14 @@ describe("Rules Tests", () => {
     });
 
     it("should fail when reference range is not a scoping assumption", () => {
-      const src = "| P(x) : assumption\nA x. P(x) : A.x/x i 1-1";
+      const src = "| P(x) : hypothesis\nA x. P(x) : A.x/x i 1-1";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(!result.valid, result.message);
     });
 
     it("should fail when reference range ending step doesn't match current step under subst", () => {
-      const src = "| with x0\n| P(x0) : assumption\nA x. Q(x) : A.x/x0 i 1-1";
+      const src = "| with x0\n| P(x0) : hypothesis\nA x. Q(x) : A.x/x0 i 1-1";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(!result.valid, result.message);
@@ -339,7 +339,7 @@ describe("Rules Tests", () => {
 
     it("should fail with more than one substituted variable", () => {
       const src =
-        "| with x0\n| P(x0) : assumption\nA x. P(x) : A.x/x0,y/y0 i 1-1";
+        "| with x0\n| P(x0) : hypothesis\nA x. P(x) : A.x/x0,y/y0 i 1-1";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(!result.valid, result.message);
@@ -425,7 +425,7 @@ describe("Rules Tests", () => {
 
     it("should fail when referenced step range is not scoping assumption", () => {
       const src =
-        "E a. P(a)\n| P(x0) : assumption\n| P(x0) or Q(x0)\n : or i1 2\n| E a.(P(a) or Q(a)) : E.a/x0 i 3\nE a.(P(a) or Q(a)) : E.a/x0 elim 1,2-4";
+        "E a. P(a)\n| P(x0) : hypothesis\n| P(x0) or Q(x0)\n : or i1 2\n| E a.(P(a) or Q(a)) : E.a/x0 i 3\nE a.(P(a) or Q(a)) : E.a/x0 elim 1,2-4";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(!result.valid, result.message);
@@ -433,7 +433,7 @@ describe("Rules Tests", () => {
 
     it("should fail when assumption conclusion doesn't match current step", () => {
       const src =
-        "E a. P(a)\n| with x0\n| P(x0) : assumption\n| P(x0) or Q(x0) : or i1 2\nE a.(P(a) or Q(a)) : E.a/x0 elim 1,2-3";
+        "E a. P(a)\n| with x0\n| P(x0) : hypothesis\n| P(x0) or Q(x0) : or i1 2\nE a.(P(a) or Q(a)) : E.a/x0 elim 1,2-3";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(!result.valid, result.message);
@@ -443,7 +443,7 @@ describe("Rules Tests", () => {
       const src =
         "E a. Q(a)\n" +
         "| with x0\n" +
-        "| P(x0) : assumption\n" +
+        "| P(x0) : hypothesis\n" +
         "| P(x0) or Q(x0) : or i1 2\n" +
         "E a.(P(a) or Q(a)) : E.a/x0 elim 1,2-3";
       const ast = p.parse(src);
@@ -454,14 +454,14 @@ describe("Rules Tests", () => {
 
   describe("Copy Tests", () => {
     it("should succeed when reference line is exact match", () => {
-      const src = "a\n|~b : assumption\n|a : copy 1\n~b -> a : -> i 2-3";
+      const src = "a\n|~b : hypothesis\n|a : copy 1\n~b -> a : -> i 2-3";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(result.valid, result.message);
     });
 
     it("should fail when reference line is not exact match", () => {
-      const src = "a\n|~a : assumption\n|b : copy 1\n~a -> a : -> i 2-3";
+      const src = "a\n|~a : hypothesis\n|b : copy 1\n~a -> a : -> i 2-3";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(!result.valid, result.message);

@@ -53,12 +53,12 @@ const rules = {
       return true;
     }),
   }),
-  assumption: new Rule({
-    name: "Assumption",
+  hypothesis: new Rule({
+    name: "Hypothesis",
     type: "simple",
     verifier: new Justifier(null, function (proof, step) {
       if (proof.steps[step].isFirstStmt()) return true;
-      return "Assumptions can only be made at the start of an assumption box.";
+      return "Hypotheses can only be made at the start of an assumption box.";
     }),
   }),
   lem: new Rule({
@@ -88,6 +88,22 @@ const rules = {
       var refStep = proof.steps[steps[0]].getSentence();
       if (!Expr.equal(curStep, refStep))
         return "Copy: Current step is not semantically equal to the referenced step.";
+      return true;
+    }),
+  }),
+  assum: new Rule({
+    name: "Assum",
+    type: "derived",
+    verifier: new Justifier({ stepRefs: ["num"] }, function (
+      proof,
+      step,
+      part,
+      steps,
+    ) {
+      var curStep = proof.steps[step].getSentence();
+      var refStep = proof.steps[steps[0]].getSentence();
+      if (!Expr.equal(curStep, refStep))
+        return "Assum: Current step is not semantically equal to the referenced step.";
       return true;
     }),
   }),
@@ -129,7 +145,7 @@ const rules = {
         }
 
         if (assumptionExpr[0] !== "not")
-          return "Contra: Assumption is not a negation. Might you be thinking of not-introduction?";
+          return "Contra: Hypothesis is not a negation. Might you be thinking of not-introduction?";
 
         var semEq = Expr.equal(
           assumptionExpr[1],

@@ -98,13 +98,13 @@ break;
 case 5:
  this.$ = ['folbox', $$[$0-2], $$[$0-4], this._$]; 
 		if ($$[$0-2] && $$[$0-2][0] && $$[$0-2][0][0] == 'rule' && $$[$0-2][0][2].auto)
-			$$[$0-2][0][2] = ['assumption', null];
+			$$[$0-2][0][2] = ['hypothesis', null];
 	
 break;
 case 6:
  this.$ = ['box', $$[$0-2], this._$]; 
 		if ($$[$0-2] && $$[$0-2][0] && $$[$0-2][0][0] == 'rule' && $$[$0-2][0][2].auto)
-			$$[$0-2][0][2] = ['assumption', null];
+			$$[$0-2][0][2] = ['hypothesis', null];
 	
 break;
 case 7:
