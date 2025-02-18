@@ -40,7 +40,7 @@ describe("Verifier Tests", function () {
   it("Syntax errors result in invalid proofs", function () {
     const proofAST = [
       ["rule", ["id", "a"], ["premise"], null],
-      ["box", [["rule", ["id", "b"], ["assumption"], null], ["error"]], null],
+      ["box", [["rule", ["id", "b"], ["hypothesis"], null], ["error"]], null],
     ];
     const result = v.verifyFromAST(proofAST);
     assert.ok(
@@ -52,7 +52,7 @@ describe("Verifier Tests", function () {
   it("Proofs can be valid", function () {
     const proofAST = [
       ["rule", ["id", "a"], ["premise"], null],
-      ["box", [["rule", ["id", "b"], ["assumption"], null]], null],
+      ["box", [["rule", ["id", "b"], ["hypothesis"], null]], null],
     ];
     const result = v.verifyFromAST(proofAST);
     assert.ok(

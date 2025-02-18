@@ -23,12 +23,12 @@ box
 	: BOX with EOL clause_list EOL? DEBOX
 	{ $$ = ['folbox', $clause_list, $with, @$]; 
 		if ($clause_list && $clause_list[0] && $clause_list[0][0] == 'rule' && $clause_list[0][2].auto)
-			$clause_list[0][2] = ['assumption', null];
+			$clause_list[0][2] = ['hypothesis', null];
 	}	
 	| BOX clause_list EOL? DEBOX
 	{ $$ = ['box', $clause_list, @$]; 
 		if ($clause_list && $clause_list[0] && $clause_list[0][0] == 'rule' && $clause_list[0][2].auto)
-			$clause_list[0][2] = ['assumption', null];
+			$clause_list[0][2] = ['hypothesis', null];
 	}	
 	| sentence JUSTIFICATION?
 	{ $$ = $sentence[0] != 'error'
