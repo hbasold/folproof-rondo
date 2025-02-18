@@ -1,6 +1,6 @@
-import parser from "../folproof-parser.js";
-import { Verifier } from "../src/verifier.mjs";
-import { render } from "../folproof-web.mjs";
+import parser from "../../folproof-parser.js";
+import { Verifier } from "../../src/verifier.mjs";
+import { render } from "../../folproof-web.mjs";
 
 import { EditorState } from "@codemirror/state";
 import {
@@ -21,10 +21,20 @@ import {
 } from "@codemirror/commands";
 import { bracketMatching } from "@codemirror/language";
 import { closeBrackets } from "@codemirror/autocomplete";
-// eslint-disable-next-line no-unused-vars
-import { createPopper } from "@popperjs/core";
-// eslint-disable-next-line no-unused-vars
-import bootstrap from "bootstrap";
+
+async function registerServiceWorker() {
+  if ("serviceWorker" in navigator) {
+    try {
+      await navigator.serviceWorker.register("PWA/service-worker.js", {
+        scope: "./",
+      });
+    } catch (error) {
+      console.error(`Service worker registration failed with: ${error}`);
+    }
+  }
+}
+
+void registerServiceWorker();
 
 let proofInput = new EditorView({
   parent: document.getElementById("proof-input"),

@@ -47,19 +47,17 @@
     "@codemirror/state": "^6.4.1",
     "@codemirror/view": "^6.32.0",
     "@eslint/js": "^9.9.0",
-    "esbuild": "0.23.0",
+    "esbuild": "^0.25.0",
     "eslint": "^9.9.0",
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.9.0",
     "jison": "latest",
     "mocha": "^10.7.3",
-    "prettier": "3.3.3",
-    "@popperjs/core" : "2.11.8",
-    "bootstrap" : "5.3.3"
+    "prettier": "3.3.3"
   },
   "scripts": {
     "parserUpdate": "jison src/parser/folproof-parser.jison src/parser/folproof-parser.jisonlex",
-    "bundleWeb": "esbuild frontend/script.mjs --bundle --minify --outfile=frontend/bundle.js --external:fs",
+    "bundleWeb": "esbuild frontend/scripts/script.mjs --bundle --minify --outfile=frontend/scripts/bundle.js --external:fs",
     "test": "mocha"
   }
 }
