@@ -23,6 +23,6 @@
   clear: both;
 }
 
-.cm-selectionBackground {
-  background: rgba(217, 217, 217, 0.5) !important;
+.cm-editor .cm-selectionBackground {
+  background: rgba(217, 217, 217, 0.5);
 }
