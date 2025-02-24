@@ -1,4 +1,5 @@
 import { Verifier as v } from "../src/verifier.mjs";
+import p from "../folproof-parser.js";
 import { strict as assert } from "node:assert";
 
 describe("Verifier Tests", function () {
@@ -60,4 +61,26 @@ describe("Verifier Tests", function () {
       "A proof with only premises and assumptions should be valid.",
     );
   });
+
+  it("references to ranges should be to a box", () => {
+      const src =
+        "p \n" +
+        "p \n" +
+        "p -> p : -> i 1-2 \n";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+  });
+
+  it("references into a closed flag should be invalid", () => {
+      const src =
+        "| p \n" +
+        "| p : assum 1\n" +
+        "p -> p : -> i 1-2 \n" +
+        "p : assum 2 \n";
+      const ast = p.parse(src);
+      const result = v.verifyFromAST(ast);
+      assert.ok(!result.valid, result.message);
+  });
+
 });
