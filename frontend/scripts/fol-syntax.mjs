@@ -69,7 +69,7 @@ const folSyntax = StreamLanguage.define({
     if (stream.match(/^\d+(-\d+)?/)) return "number";
 
     if (stream.peek() === "-" || stream.peek() === "|") {
-      stream.eatWhile((c) => c === "-" || c === "|");
+      stream.eatWhile(/[-|]/);
       return "namespace";
     }
 
