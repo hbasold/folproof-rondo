@@ -26,3 +26,7 @@
 .cm-editor .cm-selectionBackground {
   background: rgba(217, 217, 217, 0.5);
 }
+
+.cm-editor .cm-cursor {
+  border-left: 1.2px solid var(--bs-body-color);
+}

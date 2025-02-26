@@ -14,7 +14,8 @@ import {
   highlightActiveLineGutter,
 } from "@codemirror/view";
 import {
-  indentWithTab,
+  insertTab,
+  indentLess,
   history,
   historyKeymap,
   defaultKeymap,
@@ -54,7 +55,12 @@ let proofInput = new EditorView({
         updateOutputSection();
       }
     }),
-    keymap.of([indentWithTab, ...historyKeymap, ...defaultKeymap]),
+    keymap.of([
+      ...historyKeymap,
+      ...defaultKeymap,
+      { key: "Tab", run: insertTab },
+      { key: "Shift-Tab", run: indentLess },
+    ]),
   ],
 });
 
