@@ -96,26 +96,26 @@ case 4: case 28:
  this.$ = []; 
 break;
 case 5:
- this.$ = ['folbox', $$[$0-2], $$[$0-4], this._$]; 
-		if ($$[$0-2] && $$[$0-2][0] && $$[$0-2][0][0] == 'rule' && $$[$0-2][0][2].auto)
-			$$[$0-2][0][2] = ['hypothesis', null];
-	
+ this.$ = ['folbox', $$[$0-2], $$[$0-4], this._$];
+        if ($$[$0-2] && $$[$0-2][0] && $$[$0-2][0][0] == 'rule' && $$[$0-2][0][2].auto)
+            $$[$0-2][0][2] = ['hypothesis', null];
+    
 break;
 case 6:
- this.$ = ['box', $$[$0-2], this._$]; 
-		if ($$[$0-2] && $$[$0-2][0] && $$[$0-2][0][0] == 'rule' && $$[$0-2][0][2].auto)
-			$$[$0-2][0][2] = ['hypothesis', null];
-	
+ this.$ = ['box', $$[$0-2], this._$];
+        if ($$[$0-2] && $$[$0-2][0] && $$[$0-2][0][0] == 'rule' && $$[$0-2][0][2].auto)
+            $$[$0-2][0][2] = ['hypothesis', null];
+    
 break;
 case 7:
  this.$ = $$[$0-1][0] != 'error'
-			? ['rule', $$[$0-1], $$[$0], this._$]
-			: $$[$0-1]; 
-		if (this.$[0] === 'rule' && !this.$[2]) {
-			this.$[2] = ['premise', null];
-			this.$[2].auto = true;
-		}
-	
+            ? ['rule', $$[$0-1], $$[$0], this._$]
+            : $$[$0-1];
+        if (this.$[0] === 'rule' && !this.$[2]) {
+            this.$[2] = ['premise', null];
+            this.$[2].auto = true;
+        }
+    
 break;
 case 8:
  this.$ = ['with', $$[$0]]; 
