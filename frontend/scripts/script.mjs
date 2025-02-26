@@ -28,7 +28,7 @@ import { closeBrackets } from "@codemirror/autocomplete";
 async function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
     try {
-      await navigator.serviceWorker.register("PWA/service-worker.js", {
+      await navigator.serviceWorker.register("service-worker.js", {
         // scope: "./",
       });
     } catch (error) {
@@ -214,7 +214,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 async function loadExamples() {
   try {
-    const response = await fetch("scripts/examples.json");
+    const response = await fetch("assets/examples.json");
     const data = await response.json();
 
     const proofs = data.proofs;
