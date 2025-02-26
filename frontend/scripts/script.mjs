@@ -2,6 +2,8 @@ import parser from "../../folproof-parser.js";
 import { Verifier } from "../../src/verifier.mjs";
 import { render } from "../../folproof-web.mjs";
 
+import { folLanguage } from "./fol-syntax.mjs";
+
 import { EditorState } from "@codemirror/state";
 import {
   EditorView,
@@ -34,7 +36,6 @@ async function registerServiceWorker() {
     }
   }
 }
-
 void registerServiceWorker();
 
 let proofInput = new EditorView({
@@ -50,6 +51,7 @@ let proofInput = new EditorView({
     closeBrackets(),
     lineNumbers(),
     highlightActiveLineGutter(),
+    folLanguage(),
     EditorView.updateListener.of((update) => {
       if (update.docChanged) {
         updateOutputSection();
@@ -148,7 +150,7 @@ clearButton.addEventListener("click", () => {
 
 /*!
  * Based on toggler for Bootstrap's docs (https://getbootstrap.com/)
- * Copyright 2011-2024 The Bootstrap Authors
+ * Copyright 2011- The Bootstrap Authors
  * Licensed under the Creative Commons Attribution 3.0 Unported License.
  */
 const getStoredTheme = () => localStorage.getItem("theme");

@@ -707,64 +707,65 @@ break;
 case 8:/* ignore digits, for now */
 break;
 case 9:
-				// Syntax: "[...] : ruleName [[elim/intro] [NumOrRange[, NumOrRange]*]]
-				
-				// strip the leading colon and spaces
-				yy_.yytext = yy_.yytext.substr(yy_.yytext.substr(1).search(/\S/));
-				yy_.yytext = yy_.yytext.match(/^[^\#]*/)[0];
-				yy_.yytext = yy_.yytext.trim();
+    // Syntax: "[...] : ruleName [[elim/intro] [NumOrRange[, NumOrRange]*]]
+    // strip the leading colon and spaces
+    yy_.yytext = yy_.yytext.substr(yy_.yytext.substr(1).search(/\S/));
+    yy_.yytext = yy_.yytext.match(/^[^\#]*/)[0];
+    yy_.yytext = yy_.yytext.trim();
 
-        // find the beginning of the first line number
-				var pos = yy_.yytext.search(/\s+\d+/);
-				var lineranges = null;
-				if (pos != -1) {
-					lineranges = yy_.yytext.substr(pos+1).split(/\s*,\s*/);
-          yy_.yytext = yy_.yytext.substr(0, pos);
-				}
+    // find the beginning of the first line number
+    var pos = yy_.yytext.search(/\s+\d+/);
+    var lineranges = null;
+    if (pos != -1) {
+        lineranges = yy_.yytext.substr(pos+1).split(/\s*,\s*/);
+        yy_.yytext = yy_.yytext.substr(0, pos);
+    }
 
-        // If there is a substitution, then it comes after a dot that separates the rule name from
-        // the substitution.
-        var ruleApp = yy_.yytext.split('.', 2);
-        var name = null;
-        var substParts = null;
-        if (ruleApp.length == 2){
-           name = ruleApp[0].trim();
-           var substParts = ruleApp[1].split(';').map((s) => s.trim());
-           var rem = substParts[substParts.length - 1].split(' ', 2);
-           substParts[substParts.length - 1] = rem[0];
-           if(rem.length >= 2){
-             yy_.yytext = rem[1];
-           } else {
-             yy_.yytext = "";
-           }
-        } else {
-           var parts = yy_.yytext.split(' ', 2);
-           name = parts[0];
-           if(parts.length >= 2){
-             yy_.yytext = parts[1];
-           } else {
-             yy_.yytext = "";
-           }
+    // If there is a substitution, then it comes after a dot that separates the rule name from
+    // the substitution.
+    var ruleApp = yy_.yytext.split('.', 2);
+    var name = null;
+    var substParts = null;
+    if (ruleApp.length == 2){
+       name = ruleApp[0].trim();
+       var substParts = ruleApp[1].split(';').map((s) => s.trim());
+       var rem = substParts[substParts.length - 1].split(' ', 2);
+       substParts[substParts.length - 1] = rem[0];
+       if(rem.length >= 2){
+         yy_.yytext = rem[1];
+       } else {
+         yy_.yytext = "";
+       }
+    } else {
+       var parts = yy_.yytext.split(' ', 2);
+       name = parts[0];
+       if(parts.length >= 2){
+         yy_.yytext = parts[1];
+       } else {
+         yy_.yytext = "";
+       }
+    }
+
+    var parts = yy_.yytext.match(/([a-zA-Z]+)(\d+)?/);
+    var rtype = null, side = null;
+    if (parts) {
+        rtype = parts[1];
+        if (parts.length >= 3){
+            side = parts[2];
         }
-				var parts = yy_.yytext.match(/([a-zA-Z]+)(\d+)?/);
-				var rtype = null, side = null;
-				if (parts) {
-					rtype = parts[1];
-          if (parts.length >= 3){
-						side = parts[2];
-					}
-				}
+    }
 
-        var sub = null;
-        if (substParts) {
-           sub = Array(0);
-           for (const s of substParts){
-				       sub.push(s.split('/'));
-           }
+    var sub = null;
+    if (substParts) {
+        sub = Array(0);
+        for (const s of substParts){
+            sub.push(s.split('/'));
         }
-				yy_.yytext = [name, rtype, side, lineranges, sub];
-				return 38;
-				
+    }
+
+    yy_.yytext = [name, rtype, side, lineranges, sub];
+    return 38;
+
 break;
 case 10:return 19;
 break;
@@ -833,7 +834,7 @@ case 24:return 2;
 break;
 }
 },
-rules: [/^(?:[\n\r]?#.*)/,/^(?:and|∧|&)/,/^(?:or|∨|v|\+)/,/^(?:implies|->|→)/,/^(?:iff|<->)/,/^(?:not|~|¬)/,/^(?:=)/,/^(?:with\b)/,/^(?:\d+)/,/^(?:(:.*))/,/^(?:E|∃)/,/^(?:A|∀)/,/^(?:\()/,/^(?:\))/,/^(?:_\|_|⊥|bot\b)/,/^(?:([a-zA-Z_][a-zA-Z_'"0-9\|]*))/,/^(?:,)/,/^(?:\.)/,/^(?:[\n\r]*$)/,/^(?:\n(([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)*-+)/,/^(?:[\n\r]+([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*(?![^\n\r]))/,/^(?:[\n|^]([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\d*(([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)*)/,/^(?:\n)/,/^(?:([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+)/,/^(?:.*)/],
+rules: [/^(?:[\n\r]?#.*)/,/^(?:and|∧|&)/,/^(?:or|∨|v|\+)/,/^(?:implies|->|→)/,/^(?:iff|<->|↔)/,/^(?:not|~|¬)/,/^(?:=)/,/^(?:with\b)/,/^(?:\d+)/,/^(?:(:.*))/,/^(?:E|∃)/,/^(?:A|∀)/,/^(?:\()/,/^(?:\))/,/^(?:_\|_|⊥|bot\b)/,/^(?:([a-zA-Z_][a-zA-Z_'"0-9\|]*))/,/^(?:,)/,/^(?:\.)/,/^(?:[\n\r]*$)/,/^(?:\n(([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)*-+)/,/^(?:[\n\r]+([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*(?![^\n\r]))/,/^(?:[\n|^]([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\d*(([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)*)/,/^(?:\n)/,/^(?:([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+)/,/^(?:.*)/],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"inclusive":true}}
 });
 const jisonLexerFn = lexer.setInput;
