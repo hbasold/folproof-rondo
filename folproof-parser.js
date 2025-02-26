@@ -784,49 +784,51 @@ break;
 case 17:return 20;
 break;
 case 18:
-				// remaining DEBOXes implied by EOF
-				var tokens = [];
+    // remaining DEBOXes implied by EOF
+    var tokens = [];
 
-				while (this._iemitstack[0]) {
-					tokens.unshift("DEBOX");
-					this._iemitstack.shift();
-				}
-				tokens.unshift("ENDOFFILE");
-				if (tokens.length) return tokens;
-				
+    while (this._iemitstack[0]) {
+        tokens.unshift("DEBOX");
+        this._iemitstack.shift();
+    }
+    tokens.unshift("ENDOFFILE");
+    if (tokens.length) return tokens;
+
 break;
-case 19: /* manually close an assumption box */
-				        this._log("MANUAL DEBOX");
-				        this._iemitstack.shift();
-				        return ['DEBOX', 'EOL'];
-                    
+case 19:
+    /* manually close an assumption box */
+    this._log("MANUAL DEBOX");
+    this._iemitstack.shift();
+    return ['DEBOX', 'EOL'];
+
 break;
 case 20:/* eat blank lines */
 break;
-case 21: /* Similar to the idea of semantic whitespace, we keep track of virtual
-                                    * BOX/DEBOX characters based on a stack of | occurrences
-                                    */
-                                    var indentation = (yy_.yytext.match(/\|/g)||[]).length;
-                                    if (indentation > this._iemitstack[0]) {
-                                        this._iemitstack.unshift(indentation);
-                                        this._log(this.topState(), "BOX", this.stateStackSize());
-                                        this.myBegin(this.topState(), 'deepening, due to indent'); // deepen our current state
-                                        return ['BOX', 'EOL'];
-                                    }
+case 21:
+    /* Similar to the idea of semantic whitespace, we keep track of virtual
+     * BOX/DEBOX characters based on a stack of | occurrences
+     */
+    var indentation = (yy_.yytext.match(/\|/g)||[]).length;
+    if (indentation > this._iemitstack[0]) {
+        this._iemitstack.unshift(indentation);
+        this._log(this.topState(), "BOX", this.stateStackSize());
+        this.myBegin(this.topState(), 'deepening, due to indent'); // deepen our current state
+        return ['BOX', 'EOL'];
+    }
 
-                                    var tokens = ["EOL"];
-                                    while (indentation < this._iemitstack[0]) {
-                                        this.myPopState();
-                                        this._log(this.topState(), "DEBOX", this.stateStackSize());
-                                        tokens.push("DEBOX");
-                                        this._iemitstack.shift();
-                                    }
-                                    if (tokens[tokens.length-1] === "DEBOX")
-                                        tokens.push("EOL");
-                                    return tokens;
-				                
+    var tokens = ["EOL"];
+    while (indentation < this._iemitstack[0]) {
+        this.myPopState();
+        this._log(this.topState(), "DEBOX", this.stateStackSize());
+        tokens.push("DEBOX");
+        this._iemitstack.shift();
+    }
+    if (tokens[tokens.length-1] === "DEBOX")
+        tokens.push("EOL");
+    return tokens;
+
 break;
-case 22:return 8; 
+case 22:return 8;
 break;
 case 23:/* ignore whitespace */
 break;
@@ -839,12 +841,12 @@ conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,
 });
 const jisonLexerFn = lexer.setInput;
 lexer.setInput = function(input) {
-        let debug = false;
-        this._iemitstack = [0];
-        this._log = function() { if (debug) console.log.apply(this, arguments); };
-        this.myBegin = function(state, why) { this._log("Begin " + state + " because " + why); this.begin(state); };
-        this.myPopState = function() { this._log("Popping " + this.popState() + " to " + this.topState()); };
-        return jisonLexerFn.call(this, input);
+    let debug = false;
+    this._iemitstack = [0];
+    this._log = function() { if (debug) console.log.apply(this, arguments); };
+    this.myBegin = function(state, why) { this._log("Begin " + state + " because " + why); this.begin(state); };
+    this.myPopState = function() { this._log("Popping " + this.popState() + " to " + this.topState()); };
+    return jisonLexerFn.call(this, input);
 };;
 return lexer;
 })();
