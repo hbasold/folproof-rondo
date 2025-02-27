@@ -1,6 +1,6 @@
 {
   "name": "Proof Rondo",
-  "start_url": "/",
+  "start_url": "../index.html",
   "theme_color": "#d45500",
   "background_color": "#ffffff",
   "display": "standalone",
