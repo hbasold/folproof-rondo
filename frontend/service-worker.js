@@ -1,7 +1,7 @@
 async function cacheFirstWithRefresh(request) {
   const fetchResponsePromise = fetch(request).then(async (networkResponse) => {
     if (networkResponse.ok) {
-      const cache = await caches.open("v1");
+      const cache = await caches.open("ProofRondo-v1");
       cache.put(request, networkResponse.clone());
     }
     return networkResponse;

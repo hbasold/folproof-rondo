@@ -8,6 +8,7 @@
 
     <meta name="apple-mobile-web-app-title" content="Proof Rondo" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"
@@ -16,17 +17,22 @@
     <link
       rel="icon"
       type="image/png"
-      href="PWA/favicon-96x96.png"
+      href="assets/icons/favicon-96x96.png"
       sizes="96x96"
     />
-    <link rel="icon" href="PWA/favicon.svg" sizes="any" type="image/svg+xml" />
-    <link rel="shortcut icon" href="PWA/favicon.ico" />
+    <link
+      rel="icon"
+      href="assets/icons/favicon.svg"
+      sizes="any"
+      type="image/svg+xml"
+    />
+    <link rel="shortcut icon" href="favicon.ico" />
     <link
       rel="apple-touch-icon"
       sizes="180x180"
-      href="PWA/apple-touch-icon.png"
+      href="assets/icons/apple-touch-icon.png"
     />
-    <link rel="manifest" href="PWA/manifest.json" />
+    <link rel="manifest" href="assets/manifest.json" />
 
     <link href="css/bootstrap.min.css" rel="stylesheet" />
     <link href="css/style.css" rel="stylesheet" />
@@ -170,130 +176,13 @@
             >
               Select an Example
             </button>
-            <ul class="dropdown-menu">
-              <li>
-                <button value="10" type="button" class="dropdown-item example">
-                  Example 1.6
-                </button>
-              </li>
-              <li>
-                <button value="1" type="button" class="dropdown-item example">
-                  Example 3.1
-                </button>
-              </li>
-              <li>
-                <button value="0" type="button" class="dropdown-item example">
-                  Example 5.8
-                </button>
-              </li>
-              <li>
-                <button value="2" type="button" class="dropdown-item example">
-                  Example 5.12
-                </button>
-              </li>
-              <li>
-                <button value="9" type="button" class="dropdown-item example">
-                  Negation Forall
-                </button>
-              </li>
-              <li>
-                <button value="3" type="button" class="dropdown-item example">
-                  Drinkers Paradox
-                </button>
-              </li>
-              <li>
-                <button value="4" type="button" class="dropdown-item example">
-                  Example 7.13
-                </button>
-              </li>
-              <li>
-                <button value="5" type="button" class="dropdown-item example">
-                  Example 9.13
-                </button>
-              </li>
-              <li>
-                <button value="6" type="button" class="dropdown-item example">
-                  Example Solution
-                </button>
-              </li>
-              <li>
-                <button value="7" type="button" class="dropdown-item example">
-                  Uniform Proof Example Solution
-                </button>
-              </li>
-              <li>
-                <button value="6" type="button" class="dropdown-item example">
-                  Example Solution
-                </button>
-              </li>
-              <li>
-                <button value="7" type="button" class="dropdown-item example">
-                  Uniform Proof Example Solution
-                </button>
-              </li>
-              <li>
-                <button value="8" type="button" class="dropdown-item example">
-                  Admissible Rules
-                </button>
-              </li>
-            </ul>
+            <ul id="example-dropdown" class="dropdown-menu"></ul>
           </fieldset>
           <fieldset
+            id="example-buttons"
             class="btn-group d-none d-xl-inline-flex"
             aria-label="Button group with nested dropdown"
-          >
-            <button value="10" type="button" class="btn btn-primary example">
-              Example 1.6
-            </button>
-            <button value="1" type="button" class="btn btn-primary example">
-              Example 3.1
-            </button>
-            <button value="0" type="button" class="btn btn-primary example">
-              Example 5.8
-            </button>
-            <button value="2" type="button" class="btn btn-primary example">
-              Example 5.12
-            </button>
-            <button value="9" type="button" class="btn btn-primary example">
-              Negation Forall
-            </button>
-            <button value="3" type="button" class="btn btn-primary example">
-              Drinkers Paradox
-            </button>
-            <button value="4" type="button" class="btn btn-primary example">
-              Example 7.13
-            </button>
-            <button value="5" type="button" class="btn btn-primary example">
-              Example 9.13
-            </button>
-
-            <fieldset class="btn-group">
-              <button
-                type="button"
-                class="btn btn-primary dropdown-toggle"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Exam Examples
-              </button>
-              <ul class="dropdown-menu">
-                <li>
-                  <button value="6" type="button" class="dropdown-item example">
-                    Example Solution
-                  </button>
-                </li>
-                <li>
-                  <button value="7" type="button" class="dropdown-item example">
-                    Uniform Proof Example Solution
-                  </button>
-                </li>
-              </ul>
-            </fieldset>
-
-            <button value="8" type="button" class="btn btn-primary example">
-              Admissible Rules
-            </button>
-          </fieldset>
+          ></fieldset>
         </div>
 
         <div class="col-12 col-lg-7">

@@ -96,26 +96,26 @@ case 4: case 28:
  this.$ = []; 
 break;
 case 5:
- this.$ = ['folbox', $$[$0-2], $$[$0-4], this._$]; 
-		if ($$[$0-2] && $$[$0-2][0] && $$[$0-2][0][0] == 'rule' && $$[$0-2][0][2].auto)
-			$$[$0-2][0][2] = ['hypothesis', null];
-	
+ this.$ = ['folbox', $$[$0-2], $$[$0-4], this._$];
+        if ($$[$0-2] && $$[$0-2][0] && $$[$0-2][0][0] == 'rule' && $$[$0-2][0][2].auto)
+            $$[$0-2][0][2] = ['hypothesis', null];
+    
 break;
 case 6:
- this.$ = ['box', $$[$0-2], this._$]; 
-		if ($$[$0-2] && $$[$0-2][0] && $$[$0-2][0][0] == 'rule' && $$[$0-2][0][2].auto)
-			$$[$0-2][0][2] = ['hypothesis', null];
-	
+ this.$ = ['box', $$[$0-2], this._$];
+        if ($$[$0-2] && $$[$0-2][0] && $$[$0-2][0][0] == 'rule' && $$[$0-2][0][2].auto)
+            $$[$0-2][0][2] = ['hypothesis', null];
+    
 break;
 case 7:
  this.$ = $$[$0-1][0] != 'error'
-			? ['rule', $$[$0-1], $$[$0], this._$]
-			: $$[$0-1]; 
-		if (this.$[0] === 'rule' && !this.$[2]) {
-			this.$[2] = ['premise', null];
-			this.$[2].auto = true;
-		}
-	
+            ? ['rule', $$[$0-1], $$[$0], this._$]
+            : $$[$0-1];
+        if (this.$[0] === 'rule' && !this.$[2]) {
+            this.$[2] = ['premise', null];
+            this.$[2].auto = true;
+        }
+    
 break;
 case 8:
  this.$ = ['with', $$[$0]]; 
@@ -707,64 +707,65 @@ break;
 case 8:/* ignore digits, for now */
 break;
 case 9:
-				// Syntax: "[...] : ruleName [[elim/intro] [NumOrRange[, NumOrRange]*]]
-				
-				// strip the leading colon and spaces
-				yy_.yytext = yy_.yytext.substr(yy_.yytext.substr(1).search(/\S/));
-				yy_.yytext = yy_.yytext.match(/^[^\#]*/)[0];
-				yy_.yytext = yy_.yytext.trim();
+    // Syntax: "[...] : ruleName [[elim/intro] [NumOrRange[, NumOrRange]*]]
+    // strip the leading colon and spaces
+    yy_.yytext = yy_.yytext.substr(yy_.yytext.substr(1).search(/\S/));
+    yy_.yytext = yy_.yytext.match(/^[^\#]*/)[0];
+    yy_.yytext = yy_.yytext.trim();
 
-        // find the beginning of the first line number
-				var pos = yy_.yytext.search(/\s+\d+/);
-				var lineranges = null;
-				if (pos != -1) {
-					lineranges = yy_.yytext.substr(pos+1).split(/\s*,\s*/);
-          yy_.yytext = yy_.yytext.substr(0, pos);
-				}
+    // find the beginning of the first line number
+    var pos = yy_.yytext.search(/\s+\d+/);
+    var lineranges = null;
+    if (pos != -1) {
+        lineranges = yy_.yytext.substr(pos+1).split(/\s*,\s*/);
+        yy_.yytext = yy_.yytext.substr(0, pos);
+    }
 
-        // If there is a substitution, then it comes after a dot that separates the rule name from
-        // the substitution.
-        var ruleApp = yy_.yytext.split('.', 2);
-        var name = null;
-        var substParts = null;
-        if (ruleApp.length == 2){
-           name = ruleApp[0].trim();
-           var substParts = ruleApp[1].split(';').map((s) => s.trim());
-           var rem = substParts[substParts.length - 1].split(' ', 2);
-           substParts[substParts.length - 1] = rem[0];
-           if(rem.length >= 2){
-             yy_.yytext = rem[1];
-           } else {
-             yy_.yytext = "";
-           }
-        } else {
-           var parts = yy_.yytext.split(' ', 2);
-           name = parts[0];
-           if(parts.length >= 2){
-             yy_.yytext = parts[1];
-           } else {
-             yy_.yytext = "";
-           }
+    // If there is a substitution, then it comes after a dot that separates the rule name from
+    // the substitution.
+    var ruleApp = yy_.yytext.split('.', 2);
+    var name = null;
+    var substParts = null;
+    if (ruleApp.length == 2){
+       name = ruleApp[0].trim();
+       var substParts = ruleApp[1].split(';').map((s) => s.trim());
+       var rem = substParts[substParts.length - 1].split(' ', 2);
+       substParts[substParts.length - 1] = rem[0];
+       if(rem.length >= 2){
+         yy_.yytext = rem[1];
+       } else {
+         yy_.yytext = "";
+       }
+    } else {
+       var parts = yy_.yytext.split(' ', 2);
+       name = parts[0];
+       if(parts.length >= 2){
+         yy_.yytext = parts[1];
+       } else {
+         yy_.yytext = "";
+       }
+    }
+
+    var parts = yy_.yytext.match(/([a-zA-Z]+)(\d+)?/);
+    var rtype = null, side = null;
+    if (parts) {
+        rtype = parts[1];
+        if (parts.length >= 3){
+            side = parts[2];
         }
-				var parts = yy_.yytext.match(/([a-zA-Z]+)(\d+)?/);
-				var rtype = null, side = null;
-				if (parts) {
-					rtype = parts[1];
-          if (parts.length >= 3){
-						side = parts[2];
-					}
-				}
+    }
 
-        var sub = null;
-        if (substParts) {
-           sub = Array(0);
-           for (const s of substParts){
-				       sub.push(s.split('/'));
-           }
+    var sub = null;
+    if (substParts) {
+        sub = Array(0);
+        for (const s of substParts){
+            sub.push(s.split('/'));
         }
-				yy_.yytext = [name, rtype, side, lineranges, sub];
-				return 38;
-				
+    }
+
+    yy_.yytext = [name, rtype, side, lineranges, sub];
+    return 38;
+
 break;
 case 10:return 19;
 break;
@@ -783,49 +784,51 @@ break;
 case 17:return 20;
 break;
 case 18:
-				// remaining DEBOXes implied by EOF
-				var tokens = [];
+    // remaining DEBOXes implied by EOF
+    var tokens = [];
 
-				while (this._iemitstack[0]) {
-					tokens.unshift("DEBOX");
-					this._iemitstack.shift();
-				}
-				tokens.unshift("ENDOFFILE");
-				if (tokens.length) return tokens;
-				
+    while (this._iemitstack[0]) {
+        tokens.unshift("DEBOX");
+        this._iemitstack.shift();
+    }
+    tokens.unshift("ENDOFFILE");
+    if (tokens.length) return tokens;
+
 break;
-case 19: /* manually close an assumption box */
-				        this._log("MANUAL DEBOX");
-				        this._iemitstack.shift();
-				        return ['DEBOX', 'EOL'];
-                    
+case 19:
+    /* manually close an assumption box */
+    this._log("MANUAL DEBOX");
+    this._iemitstack.shift();
+    return ['DEBOX', 'EOL'];
+
 break;
 case 20:/* eat blank lines */
 break;
-case 21: /* Similar to the idea of semantic whitespace, we keep track of virtual
-                                    * BOX/DEBOX characters based on a stack of | occurrences
-                                    */
-                                    var indentation = (yy_.yytext.match(/\|/g)||[]).length;
-                                    if (indentation > this._iemitstack[0]) {
-                                        this._iemitstack.unshift(indentation);
-                                        this._log(this.topState(), "BOX", this.stateStackSize());
-                                        this.myBegin(this.topState(), 'deepening, due to indent'); // deepen our current state
-                                        return ['BOX', 'EOL'];
-                                    }
+case 21:
+    /* Similar to the idea of semantic whitespace, we keep track of virtual
+     * BOX/DEBOX characters based on a stack of | occurrences
+     */
+    var indentation = (yy_.yytext.match(/\|/g)||[]).length;
+    if (indentation > this._iemitstack[0]) {
+        this._iemitstack.unshift(indentation);
+        this._log(this.topState(), "BOX", this.stateStackSize());
+        this.myBegin(this.topState(), 'deepening, due to indent'); // deepen our current state
+        return ['BOX', 'EOL'];
+    }
 
-                                    var tokens = ["EOL"];
-                                    while (indentation < this._iemitstack[0]) {
-                                        this.myPopState();
-                                        this._log(this.topState(), "DEBOX", this.stateStackSize());
-                                        tokens.push("DEBOX");
-                                        this._iemitstack.shift();
-                                    }
-                                    if (tokens[tokens.length-1] === "DEBOX")
-                                        tokens.push("EOL");
-                                    return tokens;
-				                
+    var tokens = ["EOL"];
+    while (indentation < this._iemitstack[0]) {
+        this.myPopState();
+        this._log(this.topState(), "DEBOX", this.stateStackSize());
+        tokens.push("DEBOX");
+        this._iemitstack.shift();
+    }
+    if (tokens[tokens.length-1] === "DEBOX")
+        tokens.push("EOL");
+    return tokens;
+
 break;
-case 22:return 8; 
+case 22:return 8;
 break;
 case 23:/* ignore whitespace */
 break;
@@ -833,17 +836,17 @@ case 24:return 2;
 break;
 }
 },
-rules: [/^(?:[\n\r]?#.*)/,/^(?:and|∧|&)/,/^(?:or|∨|v|\+)/,/^(?:implies|->|→)/,/^(?:iff|<->)/,/^(?:not|~|¬)/,/^(?:=)/,/^(?:with\b)/,/^(?:\d+)/,/^(?:(:.*))/,/^(?:E|∃)/,/^(?:A|∀)/,/^(?:\()/,/^(?:\))/,/^(?:_\|_|⊥|bot\b)/,/^(?:([a-zA-Z_][a-zA-Z_'"0-9\|]*))/,/^(?:,)/,/^(?:\.)/,/^(?:[\n\r]*$)/,/^(?:\n(([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)*-+)/,/^(?:[\n\r]+([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*(?![^\n\r]))/,/^(?:[\n|^]([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\d*(([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)*)/,/^(?:\n)/,/^(?:([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+)/,/^(?:.*)/],
+rules: [/^(?:[\n\r]?#.*)/,/^(?:and|∧|&)/,/^(?:or|∨|v|\+)/,/^(?:implies|->|→)/,/^(?:iff|<->|↔)/,/^(?:not|~|¬)/,/^(?:=)/,/^(?:with\b)/,/^(?:\d+)/,/^(?:(:.*))/,/^(?:E|∃)/,/^(?:A|∀)/,/^(?:\()/,/^(?:\))/,/^(?:_\|_|⊥|bot\b)/,/^(?:([a-zA-Z_][a-zA-Z_'"0-9\|]*))/,/^(?:,)/,/^(?:\.)/,/^(?:[\n\r]*$)/,/^(?:\n(([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)*-+)/,/^(?:[\n\r]+([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*(?![^\n\r]))/,/^(?:[\n|^]([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\d*(([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)*)/,/^(?:\n)/,/^(?:([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+)/,/^(?:.*)/],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"inclusive":true}}
 });
 const jisonLexerFn = lexer.setInput;
 lexer.setInput = function(input) {
-        let debug = false;
-        this._iemitstack = [0];
-        this._log = function() { if (debug) console.log.apply(this, arguments); };
-        this.myBegin = function(state, why) { this._log("Begin " + state + " because " + why); this.begin(state); };
-        this.myPopState = function() { this._log("Popping " + this.popState() + " to " + this.topState()); };
-        return jisonLexerFn.call(this, input);
+    let debug = false;
+    this._iemitstack = [0];
+    this._log = function() { if (debug) console.log.apply(this, arguments); };
+    this.myBegin = function(state, why) { this._log("Begin " + state + " because " + why); this.begin(state); };
+    this.myPopState = function() { this._log("Popping " + this.popState() + " to " + this.topState()); };
+    return jisonLexerFn.call(this, input);
 };;
 return lexer;
 })();

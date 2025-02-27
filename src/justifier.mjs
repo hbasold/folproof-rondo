@@ -1,136 +1,213 @@
 import { debugMessage } from "./util.mjs";
 import p from "../folproof-parser.js";
 
-var Justifier = function Justifier(format, fn) {
-  // format = { hasPart : (true/false), stepRefs : ("num" | "range")*, subst : (true/false) };
-  var self = this;
+/**
+ * The Justifier class is used to define the format and function for a
+ * particular justification.
+ *
+ * The implementation below parses and checks the parameters according to the
+ * provided format. The function is then called with the parsed parameters.
+ *
+ * This function is defined as part of a rule in rules.mjs.
+ */
+class Justifier {
+  /**
+   * Create a new justifier with the given format and function.
+   *
+   * format = {
+   *  hasPart : (true/false),
+   *  stepRefs : ("num" | "range")*,
+   *  subst : (true/false) };
+   *
+   * @param format {Object} how should the parameters be formatted
+   * @param fn {Function} represents the justification of a specific rule
+   */
+  constructor(format, fn) {
+    this.format = format;
+    this.fn = fn;
+  }
 
-  this.exec = function (proof, step, part, steps, subst) {
+  /**
+   * Check the parameters according to the format and then
+   * call the function with the parsed parameters.
+   *
+   * @param proof the proof object
+   * @param step the current step number (~ line number)
+   * @param part the part number (1 or 2), e.g. on "and e2"
+   * @param steps the step references
+   * @param subst the substitution
+   * @returns {*|string} string on error, otherwise the result of the function
+   */
+  exec = (proof, step, part, steps, subst) => {
     debugMessage("Justifier", step, part, steps, subst);
-    var checked = self.checkParams(step, part, steps, subst);
+    let checked = this.checkParams(step, part, steps, subst);
     if (typeof checked === "string") return checked;
     debugMessage("Calling justifier on checked", checked);
-    return fn(proof, step, checked[0], checked[1], checked[2]);
+    return this.fn(proof, step, checked[0], checked[1], checked[2]);
   };
 
-  this.checkParams = function checkParams(curStep, part, steps, subst) {
-    if (format === null) {
-      if (part != null)
-        return "Step part (e.g., 2 in 'and e2') not applicable, in this context.";
-      if (steps != null) return "Step references not applicable.";
-      if (subst != null) return "Substitutions not applicable.";
+  /**
+   * Check the step references.
+   *
+   * @param curStep the current step number
+   * @param steps the step references
+   * @param refNums parsed step references
+   * @returns {string} string on error, otherwise null
+   */
+  checkParamsStepRefs(curStep, steps, refNums) {
+    if (steps == null) {
+      return "Step reference required.";
+    }
+
+    let refStepFormat;
+    if (
+      this.format.stepRefs.length > 0 &&
+      this.format.stepRefs[this.format.stepRefs.length - 1] === "nums"
+    ) {
+      refStepFormat = this.format.stepRefs.slice(0, -1);
+      const extraSteps = steps.length - refStepFormat.length;
+      if (extraSteps > 0) {
+        refStepFormat = refStepFormat.concat(Array(extraSteps).fill("num"));
+      }
+    } else {
+      refStepFormat = this.format.stepRefs;
+    }
+
+    if (steps.length !== refStepFormat.length) {
+      let f = refStepFormat.map((e) => {
+        return e === "num" ? "n" : "n-m";
+      });
+      return `Step reference mismatch; required format: ${f.join(", ")}.`;
+    }
+
+    for (let i = 0; i < steps.length; i++) {
+      if (refStepFormat[i] === "num") {
+        let n = parseInt(steps[i]) - 1;
+        if (!(n >= 0 && n < curStep)) {
+          return `Step reference #${i + 1} (${n + 1}) must be in 
+            [1-${curStep}].`;
+        }
+        refNums.push(n);
+      } else {
+        const errorMsg = `Step reference #${i + 1} (${steps[i]}) must 
+          be a range a-b with a <= b.`;
+
+        let ab = steps[i].split("-");
+        if (ab.length !== 2) {
+          return errorMsg;
+        }
+
+        ab = [parseInt(ab[0]), parseInt(ab[1])];
+        if (
+          isNaN(ab[0]) ||
+          isNaN(ab[1]) ||
+          ab[0] < 1 ||
+          ab[1] < 1 ||
+          ab[0] > ab[1] ||
+          ab[1] > curStep
+        ) {
+          return errorMsg;
+        }
+
+        refNums.push([ab[0] - 1, ab[1] - 1]);
+      }
+    }
+  }
+
+  /**
+   * Check the parameters according to the format.
+   *
+   * @param curStep the current step number
+   * @param part the part number
+   * @param steps the step references
+   * @param subst the substitution
+   * @returns {[number | null, array, array | null]|string} string on error
+   */
+  checkParams(curStep, part, steps, subst) {
+    if (
+      (this.format === null && part != null) ||
+      (this.format != null && !this.format.hasPart && part != null)
+    ) {
+      return "Step part (e.g., 2 in 'and e2') not applicable.";
+    }
+
+    if (
+      (this.format === null && steps != null) ||
+      (this.format != null && !this.format.stepRefs && steps != null)
+    ) {
+      return "Step references not applicable.";
+    }
+
+    if (
+      (this.format === null && subst != null) ||
+      (this.format != null && !this.format.subst && subst != null)
+    ) {
+      return "Substitution not applicable.";
+    }
+
+    if (this.format == null) {
       return [];
     }
 
-    var partNum = null,
-      refNums = [],
-      parsedSubst = null;
-    if (format.hasPart) {
+    let partNum = null;
+    if (this.format.hasPart) {
       partNum = parseInt(part);
-      if (!(partNum == 1 || partNum == 2)) return "Part number must be 1 or 2";
-    } else if (part != null)
-      return "Step part (e.g., 2 in 'and e2') not applicable, in this context.";
-
-    if (format.stepRefs) {
-      var refStepFormat;
-      if (
-        (format.stepRefs.length > 0) &
-        (format.stepRefs[format.stepRefs.length - 1] == "nums")
-      ) {
-        refStepFormat = format.stepRefs.slice(0, -1);
-        var extraSteps = steps.length - refStepFormat.length;
-        if (extraSteps > 0) {
-          refStepFormat = refStepFormat.concat(Array(extraSteps).fill("num"));
-        }
-      } else {
-        refStepFormat = format.stepRefs;
+      if (isNaN(partNum) || !(partNum === 1 || partNum === 2)) {
+        return "Part number must be 1 or 2.";
       }
-      if (steps.length != refStepFormat.length) {
-        var f = refStepFormat.map(function (e) {
-          return e == "num" ? "n" : "n-m";
-        });
-        return (
-          "Step reference mismatch; required format: " + f.join(", ") + "."
-        );
-      }
-      for (var i = 0; i < steps.length; i++) {
-        if (refStepFormat[i] == "num") {
-          var n = parseInt(steps[i]) - 1;
-          if (!(n >= 0 && n < curStep))
-            return (
-              "Step reference #" + (i + 1) + " must be 1 <= step < current."
-            );
-          refNums.push(n);
-        } else {
-          var ab = steps[i].split("-");
-          if (ab.length != 2)
-            return (
-              "Step reference # " +
-              (i + 1) +
-              " must be range, a-b, with a <= b."
-            );
-
-          ab = [parseInt(ab[0]) - 1, parseInt(ab[1]) - 1];
-          if (ab[0] > ab[1] || Math.max(ab[0], ab[1]) >= curStep)
-            return (
-              "Step reference # " +
-              (i + 1) +
-              " must be range, a-b, with a <= b."
-            );
-          refNums.push(ab);
-        }
-      }
-    } else {
-      if (steps != null) return "Step references not applicable, here.";
     }
 
-    if (format.subst) {
-      if (!subst)
-        return "Substitution specification required (e.g., A.x/x0 intro n-m)";
-      var parsedSubst = subst.map(parseSubst);
-      var error = parsedSubst.find((x) => typeof x == "string");
-      if (error) return error;
-      // w = subst.map(function(e) { return e.match("^[A-Za-z_][A-Za-z_0-9]*$"); });
-      // var allValidIds = w.reduce(function(a, e) { return a && e && e.length == 1 && e[0] });
-      // if (w.length != 2 || !allValidIds)
-      // 	return "Substitution format must match (e.g., A.x/x0 intro n-m.)";
+    let refNums = [];
+    if (this.format.stepRefs) {
+      const error = this.checkParamsStepRefs(curStep, steps, refNums);
+      if (typeof error === "string") {
+        return error;
+      }
+    }
 
-      // w = w.map(function(e) { return e[0] });
+    let parsedSubst = null;
+    if (this.format.subst) {
+      if (!subst) {
+        return "Substitution specification required (e.g., A.x/x0 intro n-m).";
+      }
+
+      parsedSubst = subst.map(this.parseSubst);
+      const error = parsedSubst.find((x) => typeof x == "string");
+      if (error) {
+        return error;
+      }
+
       debugMessage("subst", subst, "parsedSubst", parsedSubst);
-    } else {
-      if (subst) return "Substitution unexpected.";
     }
 
     return [partNum, refNums, parsedSubst];
-  };
-};
+  }
 
-var parseSubst = function (subst) {
-  if (subst.length != 2)
-    return "Substitution must consist of a variable and a term (e.g., x/f(c))";
-  var idRegex = "^[A-Za-z_][A-Za-z_0-9]*$";
-  var res = subst[0].match(idRegex);
-  if (!res)
-    return (
-      "Substitution must substitute for a variable, but got " + subst[0] + "."
-    );
-  var substAst = p.parser.parse(subst[1]);
-  if (typeof substAst === "string") {
-    return substAst;
-  } else {
-    // the AST will be of the form [["rule", term, ...]], as the top-level parser is "proof"
-    var term = substAst[0][1];
-    // The term cannot be a formula, hence it must have an identifier at the root
-    if (term[0] == "id") {
-      return [res[0], term];
+  parseSubst(subst) {
+    if (subst.length !== 2) {
+      return "Substitution must consist of a variable and a term (e.g., x/f(c)).";
+    }
+
+    const idRegex = /^[A-Za-z_]\w*$/;
+    if (!idRegex.test(subst[0])) {
+      return `Substitution must substitute for a variable, but got ${subst[0]}.`;
+    }
+
+    const substAst = p.parser.parse(subst[1]);
+    if (typeof substAst === "string") {
+      return substAst;
     } else {
-      return (
-        "Substitution does not have a valid term, should be of the form x/f(c), but got " +
-        subst[1] +
-        "."
-      );
+      // AST will be of form [["rule", term, ...]], as top-level parser is "proof"
+      const term = substAst[0][1];
+      // The term cannot be a formula, hence it must have an identifier at the root
+      if (term[0] === "id") {
+        return [subst[0], term];
+      } else {
+        return `Substitution does not have a valid term, should be of the form 
+      x/f(c), but got ${subst[1]}.`;
+      }
     }
   }
-};
+}
 
 export { Justifier };
