@@ -62,7 +62,7 @@ describe("Verifier Tests", function () {
     );
   });
 
-  it("references to ranges should be to a box", () => {
+  it("References to ranges should be to a box", () => {
       const src =
         "p \n" +
         "p \n" +
@@ -72,7 +72,16 @@ describe("Verifier Tests", function () {
       assert.ok(!result.valid, result.message);
   });
 
-  it("references into a closed flag should be invalid", () => {
+  it("Should invalidate references to a closed flag (simple)", () => {
+    const src =
+      "| p\n" +
+      "p : copy 1\n";
+    const ast = p.parse(src);
+    const result = v.verifyFromAST(ast);
+    assert.ok(!result.valid, result.message);
+  });
+
+  it("References into a closed flag should be invalid", () => {
       const src =
         "| p \n" +
         "| p : assum 1\n" +
@@ -81,6 +90,15 @@ describe("Verifier Tests", function () {
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(!result.valid, result.message);
+  });
+
+  it("Should check whether a variable is quantified when substituting", () => {
+    const src =
+      "V(a)\n" +
+      "∃x.V(y) : E.y/a i 1\n";
+    const ast = p.parse(src);
+    const result = v.verifyFromAST(ast);
+    assert.ok(!result.valid, result.message);
   });
 
 });

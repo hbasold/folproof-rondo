@@ -100,8 +100,8 @@ const rules = {
       part,
       steps,
     ) {
-      var curStep = proof.steps[step].getSentence();
-      var refStep = proof.steps[steps[0]].getSentence();
+      const curStep = proof.steps[step].getSentence();
+      const refStep = proof.steps[steps[0]].getSentence();
       if (!Expr.equal(curStep, refStep))
         return "Assum: Current step is not semantically equal to the referenced step.";
       return true;
@@ -590,9 +590,9 @@ const rules = {
       steps,
       subst,
     ) {
-      var currStep = proof.steps[step];
-      var currExpr = currStep.getSentence();
-      var refExpr = proof.steps[steps[0]].getSentence();
+      const currStep = proof.steps[step];
+      const currExpr = currStep.getSentence();
+      const refExpr = proof.steps[steps[0]].getSentence();
       debugMessage(
         "ex-intro",
         "refExpr",
@@ -602,13 +602,21 @@ const rules = {
         "subst",
         subst,
       );
-      if (currExpr[0] !== "exists")
+      if (currExpr[0] !== "exists") {
         return "Exists-x-Intro: Current step is not an 'exists' expression.";
-      if (subst.length > 1)
+      }
+      if (subst.length > 1) {
         return "Exists-x-Intro: Introducing more than one quantifier at the same time is currently not supported";
+      }
+      if (currExpr[1] !== subst[0][0]) {
+        return `Exists-x-Intro: The substitution variable (${subst[0][0]}) does 
+        not match the quantified variable (${currExpr[1]}).`;
+      }
 
-      var currExprSub = Expr.substitute(currExpr[2], subst);
-      if (Expr.equal(refExpr, currExprSub)) return true;
+      const currExprSub = Expr.substitute(currExpr[2], subst);
+      if (Expr.equal(refExpr, currExprSub)) {
+        return true;
+      }
 
       return (
         "Exists-x-Intro: Referenced step " +
