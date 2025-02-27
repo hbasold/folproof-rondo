@@ -1,31 +1,128 @@
 import { debugMessage } from "./util.mjs";
 import p from "../folproof-parser.js";
 
+/**
+ * The Justifier class is used to define the format and function for a
+ * particular justification.
+ *
+ * The implementation below parses and checks the parameters according to the
+ * provided format. The function is then called with the parsed parameters.
+ *
+ * This function is defined as part of a rule in rules.mjs.
+ */
 class Justifier {
   /**
-   * Creates a new justifier with the given format and function.
+   * Create a new justifier with the given format and function.
    *
    * format = {
    *  hasPart : (true/false),
    *  stepRefs : ("num" | "range")*,
    *  subst : (true/false) };
    *
-   * @param format
-   * @param fn
+   * @param format {Object} how should the parameters be formatted
+   * @param fn {Function} represents the justification of a specific rule
    */
   constructor(format, fn) {
     this.format = format;
     this.fn = fn;
   }
 
+  /**
+   * Check the parameters according to the format and then
+   * call the function with the parsed parameters.
+   *
+   * @param proof the proof object
+   * @param step the current step number (~ line number)
+   * @param part the part number (1 or 2), e.g. on "and e2"
+   * @param steps the step references
+   * @param subst the substitution
+   * @returns {*|string} string on error, otherwise the result of the function
+   */
   exec = (proof, step, part, steps, subst) => {
     debugMessage("Justifier", step, part, steps, subst);
     let checked = this.checkParams(step, part, steps, subst);
     if (typeof checked === "string") return checked;
     debugMessage("Calling justifier on checked", checked);
     return this.fn(proof, step, checked[0], checked[1], checked[2]);
+  };
+
+  /**
+   * Check the step references.
+   *
+   * @param curStep the current step number
+   * @param steps the step references
+   * @param refNums parsed step references
+   * @returns {string} string on error, otherwise null
+   */
+  checkParamsStepRefs(curStep, steps, refNums) {
+    if (steps == null) {
+      return "Step reference required.";
+    }
+
+    let refStepFormat;
+    if (
+      this.format.stepRefs.length > 0 &&
+      this.format.stepRefs[this.format.stepRefs.length - 1] === "nums"
+    ) {
+      refStepFormat = this.format.stepRefs.slice(0, -1);
+      const extraSteps = steps.length - refStepFormat.length;
+      if (extraSteps > 0) {
+        refStepFormat = refStepFormat.concat(Array(extraSteps).fill("num"));
+      }
+    } else {
+      refStepFormat = this.format.stepRefs;
+    }
+
+    if (steps.length !== refStepFormat.length) {
+      let f = refStepFormat.map((e) => {
+        return e === "num" ? "n" : "n-m";
+      });
+      return `Step reference mismatch; required format: ${f.join(", ")}.`;
+    }
+
+    for (let i = 0; i < steps.length; i++) {
+      if (refStepFormat[i] === "num") {
+        let n = parseInt(steps[i]) - 1;
+        if (!(n >= 0 && n < curStep)) {
+          return `Step reference #${i + 1} (${n + 1}) must be in 
+            [1-${curStep}].`;
+        }
+        refNums.push(n);
+      } else {
+        const errorMsg = `Step reference #${i + 1} (${steps[i]}) must 
+          be a range a-b with a <= b.`;
+
+        let ab = steps[i].split("-");
+        if (ab.length !== 2) {
+          return errorMsg;
+        }
+
+        ab = [parseInt(ab[0]), parseInt(ab[1])];
+        if (
+          isNaN(ab[0]) ||
+          isNaN(ab[1]) ||
+          ab[0] < 1 ||
+          ab[1] < 1 ||
+          ab[0] > ab[1] ||
+          ab[1] > curStep
+        ) {
+          return errorMsg;
+        }
+
+        refNums.push([ab[0] - 1, ab[1] - 1]);
+      }
+    }
   }
 
+  /**
+   * Check the parameters according to the format.
+   *
+   * @param curStep the current step number
+   * @param part the part number
+   * @param steps the step references
+   * @param subst the substitution
+   * @returns {[number | null, array, array | null]|string} string on error
+   */
   checkParams(curStep, part, steps, subst) {
     if (
       (this.format === null && part != null) ||
@@ -62,62 +159,9 @@ class Justifier {
 
     let refNums = [];
     if (this.format.stepRefs) {
-      if (steps == null) {
-        return "Step reference required.";
-      }
-
-      let refStepFormat;
-      if (
-        this.format.stepRefs.length > 0 &&
-        this.format.stepRefs[this.format.stepRefs.length - 1] === "nums"
-      ) {
-        refStepFormat = this.format.stepRefs.slice(0, -1);
-        const extraSteps = steps.length - refStepFormat.length;
-        if (extraSteps > 0) {
-          refStepFormat = refStepFormat.concat(Array(extraSteps).fill("num"));
-        }
-      } else {
-        refStepFormat = this.format.stepRefs;
-      }
-
-      if (steps.length !== refStepFormat.length) {
-        let f = refStepFormat.map((e) => {
-          return e === "num" ? "n" : "n-m";
-        });
-        return `Step reference mismatch; required format: ${f.join(", ")}.`;
-      }
-
-      for (let i = 0; i < steps.length; i++) {
-        if (refStepFormat[i] === "num") {
-          let n = parseInt(steps[i]) - 1;
-          if (!(n >= 0 && n < curStep)) {
-            return `Step reference #${i + 1} (${n + 1}) must be in 
-            [1-${curStep}].`;
-          }
-          refNums.push(n);
-        } else {
-          const errorMsg = `Step reference #${i + 1} (${steps[i]}) must 
-          be a range a-b with a <= b.`;
-
-          let ab = steps[i].split("-");
-          if (ab.length !== 2) {
-            return errorMsg;
-          }
-
-          ab = [parseInt(ab[0]), parseInt(ab[1])];
-          if (
-            isNaN(ab[0]) ||
-            isNaN(ab[1]) ||
-            ab[0] < 1 ||
-            ab[1] < 1 ||
-            ab[0] > ab[1] ||
-            ab[1] > curStep
-          ) {
-            return errorMsg;
-          }
-
-          refNums.push([ab[0] - 1, ab[1] - 1]);
-        }
+      const error = this.checkParamsStepRefs(curStep, steps, refNums);
+      if (typeof error === "string") {
+        return error;
       }
     }
 
