@@ -559,10 +559,16 @@ const rules = {
         "subst",
         subst,
       );
-      if (refExpr[0] !== "forall")
+      if (refExpr[0] !== "forall") {
         return "All-x-Elim: Referenced step is not a for-all expression.";
-      if (subst.length > 1)
+      }
+      if (subst.length > 1) {
         return "All-x-elim: Eliminating more than one quantifier at the same time is currently not supported";
+      }
+      if (refExpr[1] !== subst[0][0]) {
+        return `All-x-elim: The substitution variable (${subst[0][0]}) does 
+        not match the quantified variable (${refExpr[1]}).`;
+      }
 
       var refExprSub = Expr.substitute(refExpr[2], subst);
       if (Expr.equal(refExprSub, currExpr)) return true;

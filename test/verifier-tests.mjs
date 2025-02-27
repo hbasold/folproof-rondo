@@ -92,10 +92,19 @@ describe("Verifier Tests", function () {
       assert.ok(!result.valid, result.message);
   });
 
-  it("Should check whether a variable is quantified when substituting", () => {
+  it("Should check whether a variable is quantified on E intro", () => {
     const src =
       "V(a)\n" +
       "∃x.V(y) : E.y/a i 1\n";
+    const ast = p.parse(src);
+    const result = v.verifyFromAST(ast);
+    assert.ok(!result.valid, result.message);
+  });
+
+  it("Should check whether a variable is quantified on A elim", () => {
+    const src =
+      "A x.(P(y) -> ~Q(y))\n" +
+      "P(x0) -> ~Q(x0) : A.y/x0 elim 1\n";
     const ast = p.parse(src);
     const result = v.verifyFromAST(ast);
     assert.ok(!result.valid, result.message);
