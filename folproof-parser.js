@@ -709,59 +709,42 @@ break;
 case 9:
     // Syntax: "[...] : ruleName [[elim/intro] [NumOrRange[, NumOrRange]*]]
     // strip the leading colon and spaces
-    yy_.yytext = yy_.yytext.substr(yy_.yytext.substr(1).search(/\S/));
+    yy_.yytext = yy_.yytext.slice(yy_.yytext.slice(1).search(/\S/));
     yy_.yytext = yy_.yytext.match(/^[^\#]*/)[0];
     yy_.yytext = yy_.yytext.trim();
 
     // find the beginning of the first line number
-    var pos = yy_.yytext.search(/\s+\d+/);
-    var lineranges = null;
-    if (pos != -1) {
-        lineranges = yy_.yytext.substr(pos+1).split(/\s*,\s*/);
-        yy_.yytext = yy_.yytext.substr(0, pos);
+    const pos = yy_.yytext.search(/\s+\d+/);
+    let lineranges = null;
+    if (pos !== -1) {
+        lineranges = yy_.yytext.slice(pos + 1).split(/\s*,\s*/);
+        yy_.yytext = yy_.yytext.slice(0, pos);
     }
 
-    // If there is a substitution, then it comes after a dot that separates the rule name from
-    // the substitution.
-    var ruleApp = yy_.yytext.split('.', 2);
-    var name = null;
-    var substParts = null;
-    if (ruleApp.length == 2){
-       name = ruleApp[0].trim();
-       var substParts = ruleApp[1].split(';').map((s) => s.trim());
-       var rem = substParts[substParts.length - 1].split(' ', 2);
-       substParts[substParts.length - 1] = rem[0];
-       if(rem.length >= 2){
-         yy_.yytext = rem[1];
-       } else {
-         yy_.yytext = "";
-       }
+    let name = null;
+    let sub = null;
+    // If there is a substitution, then a dot separates it and the rule name
+    const ruleApp = yy_.yytext.split('.', 2);
+    if (ruleApp.length === 2) {
+        name = ruleApp[0].trim();
+        let substParts = ruleApp[1].split(';').map((s) => s.trim());
+
+        let lastIndex = substParts.length - 1;
+        let lastPart = substParts.at(-1);
+        let splitPos = lastPart.lastIndexOf(' ');
+        if (splitPos !== -1) {
+            substParts[lastIndex] = lastPart.slice(0, splitPos);
+            yy_.yytext = lastPart.slice(splitPos + 1);
+        } else {
+            yy_.yytext = "";
+        }
+
+        sub = substParts.map(s => s.split('/'));
     } else {
-       var parts = yy_.yytext.split(' ', 2);
-       name = parts[0];
-       if(parts.length >= 2){
-         yy_.yytext = parts[1];
-       } else {
-         yy_.yytext = "";
-       }
+        [name, yy_.yytext = ""] = yy_.yytext.split(' ', 2);
     }
 
-    var parts = yy_.yytext.match(/([a-zA-Z]+)(\d+)?/);
-    var rtype = null, side = null;
-    if (parts) {
-        rtype = parts[1];
-        if (parts.length >= 3){
-            side = parts[2];
-        }
-    }
-
-    var sub = null;
-    if (substParts) {
-        sub = Array(0);
-        for (const s of substParts){
-            sub.push(s.split('/'));
-        }
-    }
+    let [, rtype = null, side = null] = yy_.yytext.match(/([a-zA-Z]+)(\d+)?/) || [];
 
     yy_.yytext = [name, rtype, side, lineranges, sub];
     return 38;

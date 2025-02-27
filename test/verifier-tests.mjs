@@ -110,4 +110,13 @@ describe("Verifier Tests", function () {
     assert.ok(!result.valid, result.message);
   });
 
+  it("Should allow spaces in the final substitution", () => {
+    const src =
+      "Ax. P(x)\n" +
+      "P(g(c, d)) : A.x/g(c, d) e 1\n";
+    const ast = p.parse(src);
+    const result = v.verifyFromAST(ast);
+    assert.ok(result.valid, result.message);
+  });
+
 });
