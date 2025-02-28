@@ -1,3 +1,7 @@
+:root {
+  --pf-selection-background: rgba(217, 217, 217, 0.5);
+}
+
 #render-panel {
   font-family: monospace;
 }
@@ -24,9 +28,13 @@
 }
 
 .cm-editor .cm-selectionBackground {
-  background: rgba(217, 217, 217, 0.5);
+  background: var(--pf-selection-background);
 }
 
 .cm-editor .cm-cursor {
   border-left: 1.2px solid var(--bs-body-color);
+}
+
+.cm-editor.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground {
+  background: var(--pf-selection-background);
 }

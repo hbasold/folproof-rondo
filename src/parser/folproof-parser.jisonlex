@@ -24,59 +24,42 @@ justify     ":".*
 {justify} %{
     // Syntax: "[...] : ruleName [[elim/intro] [NumOrRange[, NumOrRange]*]]
     // strip the leading colon and spaces
-    yytext = yytext.substr(yytext.substr(1).search(/\S/));
+    yytext = yytext.slice(yytext.slice(1).search(/\S/));
     yytext = yytext.match(/^[^\#]*/)[0];
     yytext = yytext.trim();
 
     // find the beginning of the first line number
-    var pos = yytext.search(/\s+\d+/);
-    var lineranges = null;
-    if (pos != -1) {
-        lineranges = yytext.substr(pos+1).split(/\s*,\s*/);
-        yytext = yytext.substr(0, pos);
+    const pos = yytext.search(/\s+\d+/);
+    let lineranges = null;
+    if (pos !== -1) {
+        lineranges = yytext.slice(pos + 1).split(/\s*,\s*/);
+        yytext = yytext.slice(0, pos);
     }
 
-    // If there is a substitution, then it comes after a dot that separates the rule name from
-    // the substitution.
-    var ruleApp = yytext.split('.', 2);
-    var name = null;
-    var substParts = null;
-    if (ruleApp.length == 2){
-       name = ruleApp[0].trim();
-       var substParts = ruleApp[1].split(';').map((s) => s.trim());
-       var rem = substParts[substParts.length - 1].split(' ', 2);
-       substParts[substParts.length - 1] = rem[0];
-       if(rem.length >= 2){
-         yytext = rem[1];
-       } else {
-         yytext = "";
-       }
+    let name = null;
+    let sub = null;
+    // If there is a substitution, then a dot separates it and the rule name
+    const ruleApp = yytext.split('.', 2);
+    if (ruleApp.length === 2) {
+        name = ruleApp[0].trim();
+        let substParts = ruleApp[1].split(';').map((s) => s.trim());
+
+        let lastIndex = substParts.length - 1;
+        let lastPart = substParts.at(-1);
+        let splitPos = lastPart.lastIndexOf(' ');
+        if (splitPos !== -1) {
+            substParts[lastIndex] = lastPart.slice(0, splitPos);
+            yytext = lastPart.slice(splitPos + 1);
+        } else {
+            yytext = "";
+        }
+
+        sub = substParts.map(s => s.split('/'));
     } else {
-       var parts = yytext.split(' ', 2);
-       name = parts[0];
-       if(parts.length >= 2){
-         yytext = parts[1];
-       } else {
-         yytext = "";
-       }
+        [name, yytext = ""] = yytext.split(' ', 2);
     }
 
-    var parts = yytext.match(/([a-zA-Z]+)(\d+)?/);
-    var rtype = null, side = null;
-    if (parts) {
-        rtype = parts[1];
-        if (parts.length >= 3){
-            side = parts[2];
-        }
-    }
-
-    var sub = null;
-    if (substParts) {
-        sub = Array(0);
-        for (const s of substParts){
-            sub.push(s.split('/'));
-        }
-    }
+    let [, rtype = null, side = null] = yytext.match(/([a-zA-Z]+)(\d+)?/) || [];
 
     yytext = [name, rtype, side, lineranges, sub];
     return 'JUSTIFICATION';
