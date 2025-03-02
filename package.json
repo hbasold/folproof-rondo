@@ -59,6 +59,7 @@
   "scripts": {
     "parserUpdate": "jison src/parser/folproof-parser.jison src/parser/folproof-parser.jisonlex",
     "bundleWeb": "esbuild frontend/scripts/script.mjs --bundle --minify --outfile=frontend/scripts/bundle.js --external:fs",
-    "test": "mocha"
+    "test": "mocha",
+    "updateAndBundle": "npm run parserUpdate && npm run bundleWeb"
   }
 }

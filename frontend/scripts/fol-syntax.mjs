@@ -33,8 +33,21 @@ const operatorKeywords = new Set([
 ]);
 
 const folSyntax = StreamLanguage.define({
-  token(stream) {
+  startState() {
+    return { inQuantifier: false };
+  },
+
+  token(stream, state) {
     if (stream.eatSpace()) return null;
+
+    if (state.inQuantifier && stream.match(/^[a-zA-Z_][a-zA-Z_'"0-9|]*/)) {
+      return "variable";
+    }
+
+    if (state.inQuantifier && stream.match(/^\./)) {
+      state.inQuantifier = false;
+      return "logicOperator";
+    }
 
     if (stream.match(/^#.*$/)) return "comment";
 
@@ -51,6 +64,7 @@ const folSyntax = StreamLanguage.define({
       stream.match(/^[∀A∃E]\s*[a-zA-Z_][a-zA-Z_'"0-9|]*\s*\./, false)
     ) {
       stream.next();
+      state.inQuantifier = true;
       return "logicOperator";
     }
 
