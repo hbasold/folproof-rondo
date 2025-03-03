@@ -161,6 +161,7 @@ class Verifier {
     debugMessage("ast", ast);
     for (let i = 0; i < ast.length; i++) {
       if (ast[i][0] === "rule") {
+        debugMessage("Pre-processing rule: ", "step", step, "scope", JSON.stringify(scope));
         proof.steps[step] = new Statement(
           ast[i][1],
           ast[i][2],
@@ -174,13 +175,13 @@ class Verifier {
         let newScope = scope.slice(0);
         newScope.push(ast[i][2][1]);
         debugMessage(
-          "folbox",
+          "Pre-processing folbox",
           "step",
           step,
           "scope",
-          scope,
+            JSON.stringify(scope),
           "newScope",
-          newScope,
+          JSON.stringify(newScope),
         );
         step = Verifier.preprocessBox(proof, ast[i][1], step, newScope);
       } else if (ast[i][0] === "box") {
