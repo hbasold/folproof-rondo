@@ -204,9 +204,17 @@ const rules = {
     introduction: new Justifier(
       { hasPart: false, stepRefs: ["range"], subst: false },
       function (proof, step, part, steps) {
-        var truth = proof.steps[steps[0][0]].getSentence();
-        var result = proof.steps[steps[0][1]].getSentence();
+        var startStep = proof.steps[steps[0][0]];
+        var endStep = proof.steps[steps[0][1]];
+        var truth = startStep.getSentence();
+        var result = endStep.getSentence();
         var implies = proof.steps[step].getSentence();
+        debugMessage("-> intro", "start", startStep, "end", endStep);
+        if(!(startStep.isFirstStmt() && endStep.isLastStmt())){
+          return (
+            "Implies-Intro: Reference must be to the opening and closing of a flag."
+          );
+        }
         if (implies[0] != "->")
           return (
             "Implies-Intro: Current step is not an implication, but got " +
@@ -357,6 +365,12 @@ const rules = {
     ) {
       var assumptionExpr = proof.steps[steps[0][0]].getSentence();
       var contraExpr = proof.steps[steps[0][1]].getSentence();
+      if(!(proof.steps[steps[0][0]].isFirstStmt() && proof.steps[steps[0][1]].isLastStmt())){
+        return (
+          "Neg-Intro: Reference must be to the opening and closing of a flag."
+        );
+      }
+
       if (!Expr.isContradiction(contraExpr)) {
         return "Neg-Intro: Final step in range must be absurdity.";
       }
@@ -483,7 +497,8 @@ const rules = {
       var startStep = proof.steps[steps[0][0]];
       var startExpr = startStep.getSentence();
       var scope = startStep.getScope(); // ex: [['x0','x'], ['y0', 'y'], ...], LIFO
-      var endExpr = proof.steps[steps[0][1]].getSentence();
+      var endStep = proof.steps[steps[0][1]];
+      var endExpr = endStep.getSentence();
       debugMessage(
         "all-intro",
         "startExpr",
@@ -497,6 +512,12 @@ const rules = {
         "subst",
         subst,
       );
+      if(!(startStep.isFirstStmt() && endStep.isLastStmt())){
+        return (
+          "All-x-Intro: Reference must be to the opening and closing of a flag."
+        );
+      }
+
       if (currExpr[0] !== "forall")
         return "All-x-Intro: Current step is notf a 'for-all' expression.";
       if (scope.length == 0 || scope[scope.length - 1] == null)
@@ -645,7 +666,14 @@ const rules = {
         var startStep = proof.steps[steps[1][0]];
         var startExpr = startStep.getSentence();
         var scope = startStep.getScope(); // ex: [['x0','x'], ['y0', 'y'], ...], LIFO
-        var endExpr = proof.steps[steps[1][1]].getSentence();
+        var endStep = proof.steps[steps[1][1]];
+        var endExpr = endStep.getSentence();
+        if(!(startStep.isFirstStmt() && endStep.isLastStmt())){
+          return (
+            "Exists-x-Elim: Reference must be to the opening and closing of a flag."
+          );
+        }
+
         if (refExpr[0] !== "exists")
           return "Exists-x-Elim: Referenced step is not an 'exists' expression.";
         if (scope.length == 0 || scope[scope.length - 1] == null)
