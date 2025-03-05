@@ -165,4 +165,11 @@ describe("Parser Tests", function () {
     const result = v.verifyFromAST(ast);
     assert.ok(result.valid, result.message);
   });
+
+  it("Should correctly differentiate between quantifier and id", () => {
+    const src = "E Ex.Ex";
+    const ast = p.parse(src);
+    const result = v.verifyFromAST(ast);
+    assert.ok(result.valid, result.message);
+  });
 });

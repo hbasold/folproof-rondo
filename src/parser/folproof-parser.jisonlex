@@ -1,3 +1,5 @@
+%x inQuantifier
+
 /*
 objid     [a-z_][a-zA-Z_'"0-9\|]*
 predid    [a-zA-Z][a-zA-Z_'"0-9\|]*
@@ -9,6 +11,7 @@ numrange	[0-9]+(\-[0-9]+)?
 justify     ":".*
 
 %%
+
 [\n\r]?"#".*        /* comments are ignored */
 "and"|"∧"|"&"		return 'AND';
 "or"|"∨"|"v"|"+"	return 'OR';
@@ -65,19 +68,27 @@ justify     ":".*
     return 'JUSTIFICATION';
 %};
 
-"E"|"∃"			return 'EXISTS';
+"∃"			    return 'EXISTS';
+"∀"			    return 'FORALL';
+("A"|"E")/({spc}*{id}{spc}*".") %{
+    this.pushState('inQuantifier');
+    return yytext[0] === 'A' ? 'FORALL' : 'EXISTS';
+%}
+
 /* "in"			return 'IN';*/
 /*"empty"		return 'EMPTYSET';*/
-"A"|"∀"			return 'FORALL';
 /* "()"			return 'DOUBLEPAREN'; */
 "("				return 'LPAREN';
 ")"				return 'RPAREN';
 "_|_"|"⊥"|"bot" return 'BOTTOM';
 /* {objid}	    return 'OBJID';
 {predid}		return 'PREDID'; */
-{id}			return 'ID';
+<*>{id}			return 'ID';
 ","				return 'COMMA';
-"."				return 'DOT';
+<*>"." %{
+    this.popState();
+    return 'DOT';
+%}
 
 [\n\r]*<<EOF>> %{
     // remaining DEBOXes implied by EOF
@@ -125,10 +136,11 @@ justify     ":".*
 %}
 
 \n      return 'EOL';
-{spc}+  /* ignore whitespace */
+<*>{spc}+  /* ignore whitespace */
 .*      return 'error';
 
 %%
+
 const jisonLexerFn = lexer.setInput;
 lexer.setInput = function(input) {
     let debug = false;
