@@ -66,7 +66,7 @@ let proofInput = new EditorView({
   ],
 });
 
-const parentheses = document.getElementById("parentheses");
+const parentheses = document.getElementById("parentheses-setting");
 const resultBox = document.getElementById("result-box");
 const resultElement = document.getElementById("result");
 const renderPanel = document.getElementById("render-panel");
@@ -134,6 +134,27 @@ clearButton.addEventListener("click", () => {
     },
   });
 });
+
+const layoutSetting = document.getElementById("layout-setting");
+
+function updateLayout() {
+  const inputContainer = document.getElementById("proof-input-col");
+  const layoutChoice = localStorage.getItem("layoutChoice") || "side";
+  layoutSetting.value = layoutChoice;
+
+  if (layoutChoice === "side") {
+    inputContainer.classList.add("col-lg-7");
+  } else {
+    inputContainer.classList.remove("col-lg-7");
+  }
+}
+
+layoutSetting.addEventListener("change", (event) => {
+  localStorage.setItem("layoutChoice", event.target.value);
+  updateLayout();
+});
+
+updateLayout();
 
 /*!
  * Based on toggler for Bootstrap's docs (https://getbootstrap.com/)
