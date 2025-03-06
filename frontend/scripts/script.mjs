@@ -25,6 +25,11 @@ import {
 import { bracketMatching } from "@codemirror/language";
 import { closeBrackets } from "@codemirror/autocomplete";
 
+/**
+ * Register service worker for offline support.
+ *
+ * @returns {Promise<void>} resolves when the service worker is registered
+ */
 async function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
     try {
@@ -36,8 +41,21 @@ async function registerServiceWorker() {
     }
   }
 }
+
 void registerServiceWorker();
 
+const refreshBanner = document.getElementById("refresh-banner");
+navigator.serviceWorker.addEventListener("message", (event) => {
+  if (event.data.action === "refresh" && refreshBanner) {
+    refreshBanner.classList.remove("d-none");
+  }
+});
+
+/**
+ * The editor view for the proof input.
+ *
+ * @type {EditorView} the editor view
+ */
 let proofInput = new EditorView({
   parent: document.getElementById("proof-input"),
   extensions: [
@@ -137,6 +155,9 @@ clearButton.addEventListener("click", () => {
 
 const layoutSetting = document.getElementById("layout-setting");
 
+/**
+ * Update the layout based on the current setting(s).
+ */
 function updateLayout() {
   const inputContainer = document.getElementById("proof-input-col");
   const layoutChoice = localStorage.getItem("layoutChoice") || "side";
@@ -229,10 +250,11 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-/*
- * Example loading
+/**
+ * Load examples from the examples.json file and populate display elements.
+ *
+ * @returns {Promise<void>} resolves when examples are loaded
  */
-
 async function loadExamples() {
   try {
     const response = await fetch("assets/examples.json");
@@ -257,6 +279,13 @@ async function loadExamples() {
   }
 }
 
+/**
+ * Create a dropdown menu of example proofs.
+ *
+ * Used on small screens.
+ *
+ * @param proofs {Object} the example proofs
+ */
 function createExampleDropdown(proofs) {
   const dropdownMenu = document.getElementById("example-dropdown");
 
@@ -268,6 +297,13 @@ function createExampleDropdown(proofs) {
   }
 }
 
+/**
+ * Create a set of buttons for example proofs.
+ *
+ * Used on larger screens.
+ *
+ * @param proofs {Object} the example proofs
+ */
 function createExampleNavbar(proofs) {
   const container = document.getElementById("example-buttons");
 
@@ -318,6 +354,13 @@ function createExampleNavbar(proofs) {
   });
 }
 
+/**
+ * Create a button for an example proof.
+ *
+ * @param example {Object} the example proof
+ * @param isDropdown {boolean} whether the button is for a dropdown menu
+ * @returns {HTMLButtonElement} the button element
+ */
 function createExampleButton(example, isDropdown = false) {
   const button = document.createElement("button");
   button.type = "button";

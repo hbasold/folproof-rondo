@@ -1,15 +1,17 @@
-async function cacheFirstWithRefresh(request) {
-  const fetchResponsePromise = fetch(request).then(async (networkResponse) => {
+async function networkFirst(request) {
+  try {
+    const networkResponse = await fetch(request);
     if (networkResponse.ok) {
-      const cache = await caches.open("ProofRondo-v1");
+      const cache = await caches.open("ProofRondo");
       cache.put(request, networkResponse.clone());
     }
     return networkResponse;
-  });
-
-  return (await caches.match(request)) || (await fetchResponsePromise);
+  } catch {
+    const cachedResponse = await caches.match(request);
+    return cachedResponse || Response.error();
+  }
 }
 
 self.addEventListener("fetch", (event) => {
-  event.respondWith(cacheFirstWithRefresh(event.request));
+  event.respondWith(networkFirst(event.request));
 });
