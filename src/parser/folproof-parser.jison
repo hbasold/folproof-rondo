@@ -86,15 +86,6 @@ e_not
     { $$ = $1; }
     ;
 
-/*
-e_eq
-    : term1 EQUALS term2
-    { $$ = ['=', $term1, $term2]; }
-    | atom
-    { $$ = $1; }
-    ;
-*/
-
 atom
     : term EQUALS term
     { $$ = ['=', $1, $3]; }
@@ -105,17 +96,6 @@ atom
     | LPAREN sentence RPAREN
     { $$ = $sentence; $$.userParens = true; }
     ;
-
-/*
-pred
-    : ID LPAREN term_list RPAREN
-    { $$ = ['id', $ID, $term_list]; }
-    | ID LPAREN RPAREN
-    { $$ = ['id', $ID, []]; }
-    | ID
-    { $$ = ['id', $ID]; }
-    ;
-*/
 
 term_list
     : term
