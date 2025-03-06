@@ -57,9 +57,9 @@
     "prettier": "3.3.3"
   },
   "scripts": {
-    "parserUpdate": "jison src/parser/folproof-parser.jison src/parser/folproof-parser.jisonlex",
+    "updateParser": "jison src/parser/folproof-parser.jison src/parser/folproof-parser.jisonlex",
     "bundleWeb": "esbuild frontend/scripts/script.mjs --bundle --minify --outfile=frontend/scripts/bundle.js --external:fs",
-    "test": "mocha",
-    "updateAndBundle": "npm run parserUpdate && npm run bundleWeb"
+    "updateAndBundle": "npm run updateParser && npm run bundleWeb",
+    "test": "mocha"
   }
 }
