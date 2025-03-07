@@ -12,17 +12,17 @@ justify     ":".*
 
 %%
 
-[\n\r]?"#".*        /* comments are ignored */
-"and"|"∧"|"&"		return 'AND';
-"or"|"∨"|"v"|"+"	return 'OR';
-"implies"|"->"|"→"  return 'IMPLIES';
-"iff"|"<->"|"↔"		return 'IFF';
-"not"|"~"|"¬"		return 'NOT';
-"="				    return 'EQUALS';
-/* "every"			return 'EVERY'; */
-"with"				return 'WITH';
-/* "of"				return "OF"; */
-\d+				    /* ignore digits, for now */
+[\n\r]?"#".*                /* comments are ignored */
+("and"/{spc}+)|"∧"|"&"		return 'AND';
+("or"/{spc}+)|"∨"|"v"|"+"   return 'OR';
+("implies"/{spc}+)|"->"|"→" return 'IMPLIES';
+("iff"/{spc}+)|"<->"|"↔"	return 'IFF';
+("not"/{spc}+)|"~"|"¬"		return 'NOT';
+"="				            return 'EQUALS';
+/* "every"			        return 'EVERY'; */
+"with"/{spc}+				return 'WITH';
+/* "of"				        return "OF"; */
+\d+				            /* ignore digits, for now */
 
 {justify} %{
     // Syntax: "[...] : ruleName [[elim/intro] [NumOrRange[, NumOrRange]*]]
@@ -68,23 +68,23 @@ justify     ":".*
     return 'JUSTIFICATION';
 %};
 
-"∃"			    return 'EXISTS';
-"∀"			    return 'FORALL';
+"∃" return 'EXISTS';
+"∀" return 'FORALL';
 ("A"|"E")/({spc}*{id}{spc}*".") %{
     this.pushState('inQuantifier');
     return yytext[0] === 'A' ? 'FORALL' : 'EXISTS';
 %}
 
-/* "in"			return 'IN';*/
-/*"empty"		return 'EMPTYSET';*/
-/* "()"			return 'DOUBLEPAREN'; */
-"("				return 'LPAREN';
-")"				return 'RPAREN';
-"_|_"|"⊥"|"bot" return 'BOTTOM';
-/* {objid}	    return 'OBJID';
-{predid}		return 'PREDID'; */
-<*>{id}			return 'ID';
-","				return 'COMMA';
+/* "in"			            return 'IN';*/
+/*"empty"		            return 'EMPTYSET';*/
+/* "()"			            return 'DOUBLEPAREN'; */
+"("				            return 'LPAREN';
+")"				            return 'RPAREN';
+("bot"/{spc}+)|"_|_"|"⊥"    return 'BOTTOM';
+/* {objid}	                return 'OBJID';
+{predid}		            return 'PREDID'; */
+<*>{id}			            return 'ID';
+","				            return 'COMMA';
 <*>"." %{
     this.popState();
     return 'DOT';
