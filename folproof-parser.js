@@ -96,7 +96,7 @@ case 4: case 28:
  this.$ = []; 
 break;
 case 5:
- this.$ = ['folbox', $$[$0-2], $$[$0-4], this._$];
+ this.$ = ['folbox', [$$[$0-4], ...$$[$0-2]], this._$];
         if ($$[$0-2] && $$[$0-2][0] && $$[$0-2][0][0] == 'rule' && $$[$0-2][0][2].auto)
             $$[$0-2][0][2] = ['hypothesis', null];
     
@@ -118,7 +118,7 @@ case 7:
     
 break;
 case 8:
- this.$ = ['with', $$[$0]]; 
+ this.$ = ['rule', ['id', $$[$0]], [$$[$0-1], null]]; 
 break;
 case 10:
  this.$ = ['error', yytext]; 

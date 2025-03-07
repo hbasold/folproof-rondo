@@ -119,6 +119,7 @@ class Verifier {
     if (!rule) {
       return "Cannot find rule: " + name;
     }
+    why[0] = rule.getName();
     if (rule.getType() === "simple" || rule.getType() === "derived") {
       const fn = rule.getSimpleVerifier();
       if (!fn) throw new Error("Not implemented for " + name);
@@ -151,7 +152,7 @@ class Verifier {
   }
 
   static preprocess(ast) {
-    let proof = { steps: [] };
+    let proof = { steps: [], blocks: [] };
     Verifier.preprocessBox(proof, ast, 0, []);
     debugMessage("processed proof", proof);
     return proof;
@@ -161,34 +162,43 @@ class Verifier {
     debugMessage("ast", ast);
     for (let i = 0; i < ast.length; i++) {
       if (ast[i][0] === "rule") {
-        debugMessage("Pre-processing rule: ", "step", step, "scope", JSON.stringify(scope));
+        debugMessage(
+          "Pre-processing rule: ",
+          "step",
+          step,
+          "scope",
+          JSON.stringify(scope),
+        );
         proof.steps[step] = new Statement(
-          ast[i][1],
-          ast[i][2],
+          ast[i][1], // sentence
+          ast[i][2], // justification
           scope,
-          ast[i][3],
+          ast[i][3], // loc (parser info)
           i === 0,
           i === ast.length - 1,
         );
         step = step + 1;
       } else if (ast[i][0] === "folbox") {
         let newScope = scope.slice(0);
-        newScope.push(ast[i][2][1]);
+        newScope.push(ast[i][1][0][1][1]); // adds N from '| with N' to scope
         debugMessage(
           "Pre-processing folbox",
           "step",
           step,
           "scope",
-            JSON.stringify(scope),
+          JSON.stringify(scope),
           "newScope",
           JSON.stringify(newScope),
         );
+        // ast[i][1] is the box's content
         step = Verifier.preprocessBox(proof, ast[i][1], step, newScope);
       } else if (ast[i][0] === "box") {
         let newScope = scope.slice(0);
         debugMessage("box", "step", step, "scope", scope, "newScope", newScope);
+        // ast[i][1] is the box's content
         step = Verifier.preprocessBox(proof, ast[i][1], step, newScope);
       } else if (ast[i][0] === "error") {
+        // Directly add error to proof
         proof.steps[step] = ast[i];
       }
     }

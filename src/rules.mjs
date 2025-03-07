@@ -39,6 +39,14 @@ class Rule {
 }
 
 const rules = {
+  with: new Rule({
+    name: "Variable assumption",
+    type: "simple",
+    verifier: new Justifier(null, function (proof, step) {
+      // Correct placement of 'with' is enforced by the parser
+      return true;
+    }),
+  }),
   premise: new Rule({
     name: "Premise",
     type: "simple",

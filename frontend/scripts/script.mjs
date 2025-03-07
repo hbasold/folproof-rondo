@@ -44,12 +44,16 @@ async function registerServiceWorker() {
 
 void registerServiceWorker();
 
-const refreshBanner = document.getElementById("refresh-banner");
-navigator.serviceWorker.addEventListener("message", (event) => {
-  if (event.data.action === "refresh" && refreshBanner) {
-    refreshBanner.classList.remove("d-none");
+function skipLines(lineNo, state) {
+  if (lineNo >= 1 && lineNo <= state.doc.lines) {
+    const line = state.doc.line(lineNo);
+    if (/^\s*(#.*|-+)?$/.test(line.text)) {
+      return ""; // Skip comments, closing lines, and empty lines
+    }
   }
-});
+
+  return String(lineNo);
+}
 
 /**
  * The editor view for the proof input.
@@ -70,6 +74,7 @@ let proofInput = new EditorView({
     lineNumbers(),
     highlightActiveLineGutter(),
     folLanguage(),
+    lineNumbers({ formatNumber: skipLines }),
     EditorView.updateListener.of((update) => {
       if (update.docChanged) {
         updateOutputSection();

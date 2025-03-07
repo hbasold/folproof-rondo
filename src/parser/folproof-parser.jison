@@ -21,7 +21,7 @@ clause_list
 
 box
     : BOX with EOL clause_list EOL? DEBOX
-    { $$ = ['folbox', $clause_list, $with, @$];
+    { $$ = ['folbox', [$with, ...$clause_list], @$];
         if ($clause_list && $clause_list[0] && $clause_list[0][0] == 'rule' && $clause_list[0][2].auto)
             $clause_list[0][2] = ['hypothesis', null];
     }
@@ -43,7 +43,7 @@ box
 
 with
     : WITH ID
-    { $$ = ['with', $2]; }
+    { $$ = ['rule', ['id', $ID], [$WITH, null]]; }
     ;
 
 sentence
