@@ -310,7 +310,7 @@ describe("Rules Tests", () => {
 
   describe("Forall Introduction Tests", () => {
     it("should succeed when ref is assumption and final step matches current step, under subst", () => {
-      const src = "| with x0\n| P(x0) : hypothesis\nA x. P(x) : A.x/x0 i 1-1";
+      const src = "| with x0\n| P(x0) : hypothesis\nA x. P(x) : A.x/x0 i 1-2";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(result.valid, result.message);
@@ -351,8 +351,8 @@ describe("Rules Tests", () => {
         "| r \n" +
         "|| with x0 \n" +
         "|| P(c,x0)      : A.x/x0 e 1 \n" +
-        "| ∀x.P(c,x)     : A.x/x0 i 3-3 \n" +
-        "r -> ∀x.P(c,x)  : -> i 2-4";
+        "| ∀x.P(c,x)     : A.x/x0 i 3-4 \n" +
+        "r -> ∀x.P(c,x)  : -> i 2-5";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(result.valid, result.message);
@@ -364,9 +364,9 @@ describe("Rules Tests", () => {
         "| with x0 \n" +
         "|| with y0 \n" +
         "|| Ay.P(x0, y)    : A.x/x0 e 1 \n" +
-        "|| P(x0,y0)       : A.y/y0 e 2 \n" +
-        "| ∀y.P(x0,y)      : A.y/y0 i 2-3 \n" +
-        "∀x.Ay.P(x, y)     : A.x/x0 i 2-4";
+        "|| P(x0,y0)       : A.y/y0 e 4 \n" +
+        "| ∀y.P(x0,y)      : A.y/y0 i 3-5 \n" +
+        "∀x.Ay.P(x, y)     : A.x/x0 i 2-6";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(result.valid, result.message);
@@ -376,9 +376,9 @@ describe("Rules Tests", () => {
       const src =
         "| with x0\n" +
         "||P(x0)\n" +
-        "||P(x0)        : copy 1\n" +
-        "|P(x0) → P(x0) : -> i 1-2\n" +
-        "∀y.P(y) → P(y) : A.y/x0 i 1-3";
+        "||P(x0)        : copy 2\n" +
+        "|P(x0) → P(x0) : -> i 2-3\n" +
+        "∀y.P(y) → P(y) : A.y/x0 i 1-4";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(result.valid, result.message);
@@ -407,9 +407,9 @@ describe("Rules Tests", () => {
         "E a. P(a)\n" +
         "| with x0\n" +
         "| P(x0)\n" +
-        "| P(x0) or Q(x0)     : or i1 2\n" +
-        "| E a.(P(a) or Q(a)) : E.a/x0 i 3\n" +
-        "E a.(P(a) or Q(a))   : E.a/x0 elim 1,2-4";
+        "| P(x0) or Q(x0)     : or i1 3\n" +
+        "| E a.(P(a) or Q(a)) : E.a/x0 i 4\n" +
+        "E a.(P(a) or Q(a))   : E.a/x0 elim 1,2-5";
       const ast = p.parse(src);
       const result = v.verifyFromAST(ast);
       assert.ok(result.valid, result.message);

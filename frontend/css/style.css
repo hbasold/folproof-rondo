@@ -12,7 +12,7 @@
 
 .FOL-box,
 .simple-box {
-  border: 1px solid black;
+  border: 1px solid var(--bs-body-color);
   border-radius: 3px;
   padding: 2px;
 }
@@ -43,5 +43,5 @@
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 0.5rem 1rem;
-  align-items: center;
+  align-items: baseline;
 }

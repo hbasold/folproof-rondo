@@ -152,7 +152,7 @@ class Verifier {
   }
 
   static preprocess(ast) {
-    let proof = { steps: [], blocks: [] };
+    let proof = { steps: [] };
     Verifier.preprocessBox(proof, ast, 0, []);
     debugMessage("processed proof", proof);
     return proof;

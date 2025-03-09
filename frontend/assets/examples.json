@@ -20,26 +20,26 @@
       "category": "Chapter 3",
       "name": "Example 3.1",
       "proof": [
-        "1 r and u -> w : premise",
-        "2 u and ~w     : premise",
-        "3 | r",
-        "4 | u          : and e1 2",
-        "5 | r and u    : and i 3,4",
-        "6 | w          : -> e 1, 5",
-        "7 | ~w         : and e2 2",
-        "8 | _|_        : neg e 6,7",
-        "9 ~r           : neg i 3-8"
+        "r and u -> w : premise",
+        "u and ~w     : premise",
+        "| r",
+        "| u          : and e1 2",
+        "| r and u    : and i 3,4",
+        "| w          : -> e 1, 5",
+        "| ~w         : and e2 2",
+        "| _|_        : neg e 6,7",
+        "~r           : neg i 3-8"
       ]
     },
     "20": {
       "category": "Chapter 5",
       "name": "Example 5.8",
       "proof": [
-        "1 Ax.P(c, x)   : premise",
+        "Ax.P(c, x)   : premise",
         "| with x0",
-        "2 | P(c,x0)    : A.x/x0 e 1",
-        "3 | Ey.P(y,x0) : E.y/c i 2",
-        "4 Ax.Ey.P(y,x) : A.x/x0 i 2-3"
+        "| P(c,x0)    : A.x/x0 e 1",
+        "| Ey.P(y,x0) : E.y/c i 3",
+        "Ax.Ey.P(y,x) : A.x/x0 i 2-4"
       ]
     },
     "30": {
@@ -55,29 +55,29 @@
         "|| with x0",
         "|| ~~P(x0)               : A.x/x0 e 4",
         "||| ~P(x0)",
-        "||| _|_                  : neg e 5,6",
-        "|| P(x0)                 : contra 6-7",
-        "| Ax.P(x)                : A.x/x0 i 5-8",
-        "| _|_                    : neg e 2,9",
-        "Ex.~P(x)                 : contra 3-10"
+        "||| _|_                  : neg e 6,7",
+        "|| P(x0)                 : contra 7-8",
+        "| Ax.P(x)                : A.x/x0 i 5-9",
+        "| _|_                    : neg e 2,10",
+        "Ex.~P(x)                 : contra 3-11"
       ]
     },
     "40": {
       "name": "Negation Forall",
       "proof": [
-        "1 A x.(P(x) -> ~Q(x))",
-        "2 | E x.(P(x) and Q(x))    : hypothesis",
-        "  || with x0",
-        "3 || P(x0) and Q(x0)       : hypothesis",
-        "4 || P(x0)                 : and elim1 3",
-        "5 || P(x0) -> ~Q(x0)       : A.x/x0 elim 1",
-        "6 || ~Q(x0)                : -> e 5,4",
-        "7 || Q(x0)                 : and elim2 3",
-        "8 || _|_                   : neg elim 6,7",
-        "   ---",
-        "9 | _|_                    : E.x/x0 elim 2,3-8",
-        "  ---",
-        "10 ~(E x. (P(x) and Q(x))) : neg introduction 2-9"
+        "A x.(P(x) -> ~Q(x))",
+        "| E x.(P(x) and Q(x))    : hypothesis",
+        "|| with x0",
+        "|| P(x0) and Q(x0)       : hypothesis",
+        "|| P(x0)                 : and elim1 4",
+        "|| P(x0) -> ~Q(x0)       : A.x/x0 elim 1",
+        "|| ~Q(x0)                : -> e 6,5",
+        "|| Q(x0)                 : and elim2 4",
+        "|| _|_                   : neg elim 7,8",
+        " ---",
+        "| _|_                    : E.x/x0 elim 2,3-9",
+        "---",
+        "~(E x. (P(x) and Q(x))) : neg introduction 2-10"
       ]
     },
     "50": {
@@ -91,24 +91,24 @@
         "|| P(x0)",
         "||| P(x0) & D(x0)",
         "||| Ax.P(x) -> D(x)                        : copy 4",
-        "|| (P(x0) & D(x0) -> (Ax.P(x) -> D(x)))    : -> i 6-7",
-        "|| (Ey. P(y) & D(y) -> (Ax.P(x) -> D(x)))  : E.y/x0 i 8",
-        "| (Ey. P(y) & D(y) -> (Ax.P(x) -> D(x)))   : E.x/x0 e 2, 5-9",
+        "|| (P(x0) & D(x0) -> (Ax.P(x) -> D(x)))    : -> i 7-8",
+        "|| (Ey. P(y) & D(y) -> (Ax.P(x) -> D(x)))  : E.y/x0 i 9",
+        "| (Ey. P(y) & D(y) -> (Ax.P(x) -> D(x)))   : E.x/x0 e 2, 5-10",
         "------",
         "| ~(Ax.P(x) -> D(x))",
-        "| (Ex. P(x) & ~D(x))                       : -> e 1, 11",
+        "| (Ex. P(x) & ~D(x))                       : -> e 1, 12",
         "|| with x0",
         "|| P(x0) & ~D(x0)",
         "||| P(x0) & D(x0)",
-        "||| ~D(x0)                                 : and e2 13",
-        "||| D(x0)                                  : and e2 14",
-        "||| _|_                                    : neg e 15,16",
-        "||| Ax.P(x) -> D(x)                        : bot e 17",
-        "|| (P(x0) & D(x0) -> (Ax.P(x) -> D(x)))    : -> i 14-18",
-        "|| (Ey. P(y) & D(y) -> (Ax.P(x) -> D(x)))  : E.y/x0 i 19",
-        "| (Ey. P(y) & D(y) -> (Ax.P(x) -> D(x)))   : E.x/x0 e 12, 13-20",
+        "||| ~D(x0)                                 : and e2 15",
+        "||| D(x0)                                  : and e2 16",
+        "||| _|_                                    : neg e 17,18",
+        "||| Ax.P(x) -> D(x)                        : bot e 19",
+        "|| (P(x0) & D(x0) -> (Ax.P(x) -> D(x)))    : -> i 16-20",
+        "|| (Ey. P(y) & D(y) -> (Ax.P(x) -> D(x)))  : E.y/x0 i 21",
+        "| (Ey. P(y) & D(y) -> (Ax.P(x) -> D(x)))   : E.x/x0 e 13, 14-22",
         "------",
-        "(Ey. P(y) & D(y) -> (Ax.P(x) -> D(x)))     : or e 3, 4-10, 11-21"
+        "(Ey. P(y) & D(y) -> (Ax.P(x) -> D(x)))     : or e 3, 4-11, 12-23"
       ]
     },
     "60": {
@@ -134,11 +134,11 @@
         "||| with y0",
         "||| x0 = p(y0,y0)",
         "||| p(x0, o) = p(x0, o)                              : = i",
-        "||| p(x0, o) = p(p(y0,y0), o)                        : = e 2,3",
-        "||| Ey. p(x0, o) = p(p(y,y), o)                      : E.y/y0 i 4",
-        "|| Ey. p(x0, o) = p(p(y,y), o)                       : E.y/y0 e 1,2-5",
-        "| (Ey. x0 = p(y,y)) -> Ey. p(x0, o) = p(p(y,y), o)   : -> i 1-6",
-        "Ax. (Ey. x = p(y,y)) -> (Ey. p(x, o) = p(p(y,y), o)) : A.x/x0 i 1-7"
+        "||| p(x0, o) = p(p(y0,y0), o)                        : = e 4,5",
+        "||| Ey. p(x0, o) = p(p(y,y), o)                      : E.y/y0 i 6",
+        "|| Ey. p(x0, o) = p(p(y,y), o)                       : E.y/y0 e 2,3-7",
+        "| (Ey. x0 = p(y,y)) -> Ey. p(x0, o) = p(p(y,y), o)   : -> i 2-8",
+        "Ax. (Ey. x = p(y,y)) -> (Ey. p(x, o) = p(p(y,y), o)) : A.x/x0 i 1-9"
       ]
     },
     "80": {
@@ -148,18 +148,18 @@
         "# This is a possible solution to the exam question that asks for a proof of a formula from",
         "# the given formulas, here in lines 1 - 3.",
         "",
-        "1  (Ex0. Ax1. x0 = i(g(x0), i(x1 , i(x0 , x1)))) & (Ax2. x2 = x2)",
-        "2  (Ex3. O(i(i(g(x3), d(x3 , x3 , x3)), x3), x3 , x3) & T(x3)) & (Ax4. x4 = x4)",
-        "3  Ex5. (Ax6. x6 = g(g(d(x5 , x6 , x5)))) v x5 = x5",
-        "4  Ex0. Ax1. x0 = i(g(x0), i(x1 , i(x0 , x1))) : and e1 1",
-        "   | with y0",
-        "5  | Ax1. y0 = i(g(y0), i(x1 , i(y0 , x1)))",
-        "6  | y0 = i(g(y0), i(y0 , i(y0 , y0)))         : A.x1/y0 e 5",
-        "7  || T(y0)",
-        "8  || T(i(g(y0), i(y0 , i(y0 , y0))))          : = e 6,7",
-        "9  | T(y0) -> T(i(g(y0), i(y0 , i(y0 , y0))))  : -> i 7-8",
-        "10 | Ey. T(y) -> T(i(g(y), i(y , i(y , y))))   : E.y/y0 i 9",
-        "11 Ey. T(y) -> T(i(g(y), i(y , i(y , y))))     : E.x0/y0 e 4, 5-10"
+        "(Ex0. Ax1. x0 = i(g(x0), i(x1 , i(x0 , x1)))) & (Ax2. x2 = x2)",
+        "(Ex3. O(i(i(g(x3), d(x3 , x3 , x3)), x3), x3 , x3) & T(x3)) & (Ax4. x4 = x4)",
+        "Ex5. (Ax6. x6 = g(g(d(x5 , x6 , x5)))) v x5 = x5",
+        "Ex0. Ax1. x0 = i(g(x0), i(x1 , i(x0 , x1))) : and e1 1",
+        "| with y0",
+        "| Ax1. y0 = i(g(y0), i(x1 , i(y0 , x1)))",
+        "| y0 = i(g(y0), i(y0 , i(y0 , y0)))         : A.x1/y0 e 6",
+        "|| T(y0)",
+        "|| T(i(g(y0), i(y0 , i(y0 , y0))))          : = e 7,8",
+        "| T(y0) -> T(i(g(y0), i(y0 , i(y0 , y0))))  : -> i 8-9",
+        "| Ey. T(y) -> T(i(g(y), i(y , i(y , y))))   : E.y/y0 i 10",
+        "Ey. T(y) -> T(i(g(y), i(y , i(y , y))))     : E.x0/y0 e 4, 5-11"
       ]
     },
     "90": {

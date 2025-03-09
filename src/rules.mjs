@@ -40,7 +40,7 @@ class Rule {
 
 const rules = {
   with: new Rule({
-    name: "Variable assumption",
+    name: "Var. Assum.",
     type: "simple",
     verifier: new Justifier(null, function (proof, step) {
       // Correct placement of 'with' is enforced by the parser
@@ -65,7 +65,13 @@ const rules = {
     name: "Hypothesis",
     type: "simple",
     verifier: new Justifier(null, function (proof, step) {
-      if (proof.steps[step].isFirstStmt()) return true;
+      if (
+        proof.steps[step].isFirstStmt() ||
+        (proof.steps[step - 1].isFirstStmt() &&
+          proof.steps[step - 1].getJustification()[0] === rules["with"].name)
+      ) {
+        return true;
+      }
       return "Hypotheses can only be made at the start of an assumption box.";
     }),
   }),
@@ -73,18 +79,21 @@ const rules = {
     name: "LEM",
     type: "derived",
     verifier: new Justifier(null, function (proof, step) {
-      var s = proof.steps[step].getSentence();
-      if (s[0] !== "or") return "LEM: must be phi or not phi.";
-      var left = s[1],
-        right = s[2];
-      if (right[0] !== "not" || !Expr.equal(left, right[1]))
+      const sentence = proof.steps[step].getSentence();
+      if (sentence[0] !== "or") {
+        return "LEM: must be phi or not phi.";
+      }
+      const left = sentence[1];
+      const right = sentence[2];
+      if (right[0] !== "not" || !Expr.equal(left, right[1])) {
         return "LEM: right side must be negation of left.";
+      }
 
       return true;
     }),
   }),
   copy: new Rule({
-    name: "COPY",
+    name: "Copy",
     type: "derived",
     verifier: new Justifier({ stepRefs: ["num"] }, function (
       proof,
@@ -92,15 +101,17 @@ const rules = {
       part,
       steps,
     ) {
-      var curStep = proof.steps[step].getSentence();
-      var refStep = proof.steps[steps[0]].getSentence();
-      if (!Expr.equal(curStep, refStep))
+      const current_sentence = proof.steps[step].getSentence();
+      const reference_sentence = proof.steps[steps[0]].getSentence();
+      if (!Expr.equal(current_sentence, reference_sentence)) {
         return "Copy: Current step is not semantically equal to the referenced step.";
+      }
+
       return true;
     }),
   }),
   assum: new Rule({
-    name: "Assum",
+    name: "Assum.",
     type: "derived",
     verifier: new Justifier({ stepRefs: ["num"] }, function (
       proof,
@@ -185,7 +196,7 @@ const rules = {
     ),
   }),
   notnot: new Rule({
-    name: "Double-negation",
+    name: "DN",
     type: "normal",
     elimination: new Justifier(
       { hasPart: false, stepRefs: ["num"], subst: false },
@@ -207,7 +218,7 @@ const rules = {
     ),
   }),
   "->": new Rule({
-    name: "Implication",
+    name: "→",
     type: "normal",
     introduction: new Justifier(
       { hasPart: false, stepRefs: ["range"], subst: false },
@@ -218,10 +229,8 @@ const rules = {
         var result = endStep.getSentence();
         var implies = proof.steps[step].getSentence();
         debugMessage("-> intro", "start", startStep, "end", endStep);
-        if(!(startStep.isFirstStmt() && endStep.isLastStmt())){
-          return (
-            "Implies-Intro: Reference must be to the opening and closing of a flag."
-          );
+        if (!(startStep.isFirstStmt() && endStep.isLastStmt())) {
+          return "Implies-Intro: Reference must be to the opening and closing of a flag.";
         }
         if (implies[0] != "->")
           return (
@@ -273,7 +282,7 @@ const rules = {
     ),
   }),
   and: new Rule({
-    name: "And",
+    name: "∧",
     type: "normal",
     introduction: new Justifier({ stepRefs: ["num", "num"] }, function (
       proof,
@@ -320,7 +329,7 @@ const rules = {
     }),
   }),
   or: new Rule({
-    name: "Or",
+    name: "∨",
     type: "normal",
     introduction: new Justifier({ hasPart: true, stepRefs: ["num"] }, function (
       proof,
@@ -363,7 +372,7 @@ const rules = {
     ),
   }),
   neg: new Rule({
-    name: "Neg",
+    name: "¬",
     type: "normal",
     introduction: new Justifier({ stepRefs: ["range"] }, function (
       proof,
@@ -373,10 +382,13 @@ const rules = {
     ) {
       var assumptionExpr = proof.steps[steps[0][0]].getSentence();
       var contraExpr = proof.steps[steps[0][1]].getSentence();
-      if(!(proof.steps[steps[0][0]].isFirstStmt() && proof.steps[steps[0][1]].isLastStmt())){
-        return (
-          "Neg-Intro: Reference must be to the opening and closing of a flag."
-        );
+      if (
+        !(
+          proof.steps[steps[0][0]].isFirstStmt() &&
+          proof.steps[steps[0][1]].isLastStmt()
+        )
+      ) {
+        return "Neg-Intro: Reference must be to the opening and closing of a flag.";
       }
 
       if (!Expr.isContradiction(contraExpr)) {
@@ -417,7 +429,7 @@ const rules = {
     }),
   }),
   "<->": new Rule({
-    name: "Bi-implication",
+    name: "↔",
     type: "normal",
     introduction: new Justifier({ stepRefs: ["num", "num"] }, function (
       proof,
@@ -491,7 +503,7 @@ const rules = {
     }),
   }),
   a: new Rule({
-    name: "ForAll",
+    name: "∀",
     type: "normal",
     introduction: new Justifier({ stepRefs: ["range"], subst: true }, function (
       proof,
@@ -502,9 +514,17 @@ const rules = {
     ) {
       var currStep = proof.steps[step];
       var currExpr = currStep.getSentence();
+
       var startStep = proof.steps[steps[0][0]];
-      var startExpr = startStep.getSentence();
+      let startExpr;
+      if (startStep.getJustification()[0] === rules["with"].name) {
+        startExpr = proof.steps[steps[0][0] + 1].getSentence();
+      } else {
+        startExpr = startStep.getSentence();
+      }
+
       var scope = startStep.getScope(); // ex: [['x0','x'], ['y0', 'y'], ...], LIFO
+
       var endStep = proof.steps[steps[0][1]];
       var endExpr = endStep.getSentence();
       debugMessage(
@@ -520,15 +540,18 @@ const rules = {
         "subst",
         subst,
       );
-      if(!(startStep.isFirstStmt() && endStep.isLastStmt())){
-        return (
-          "All-x-Intro: Reference must be to the opening and closing of a flag."
-        );
+      if (
+        !(
+          startStep.isFirstStmt() &&
+          (endStep.isLastStmt() || startStep.isFirstStmt())
+        )
+      ) {
+        return "All-x-Intro: Reference must be to the opening and closing of a flag.";
       }
 
       if (currExpr[0] !== "forall")
-        return "All-x-Intro: Current step is notf a 'for-all' expression.";
-      if (scope.length == 0 || scope[scope.length - 1] == null)
+        return "All-x-Intro: Current step is not a 'for-all' expression.";
+      if (scope.length === 0 || scope[scope.length - 1] == null)
         return (
           "All-x-Intro: The provided range does not have a scoping assumption (e.g., an x0 box started by 'with') in step " +
           (steps[0][0] + 1) +
@@ -616,7 +639,7 @@ const rules = {
     }),
   }),
   e: new Rule({
-    name: "Exists",
+    name: "∃",
     type: "normal",
     introduction: new Justifier({ stepRefs: ["num"], subst: true }, function (
       proof,
@@ -670,21 +693,33 @@ const rules = {
       function (proof, step, part, steps, subst) {
         var currStep = proof.steps[step];
         var currExpr = currStep.getSentence();
+
         var refExpr = proof.steps[steps[0]].getSentence();
+
         var startStep = proof.steps[steps[1][0]];
-        var startExpr = startStep.getSentence();
+        let startExpr;
+        if (startStep.getJustification()[0] === rules["with"].name) {
+          startExpr = proof.steps[steps[1][0] + 1].getSentence();
+        } else {
+          startExpr = startStep.getSentence();
+        }
+
         var scope = startStep.getScope(); // ex: [['x0','x'], ['y0', 'y'], ...], LIFO
+
         var endStep = proof.steps[steps[1][1]];
         var endExpr = endStep.getSentence();
-        if(!(startStep.isFirstStmt() && endStep.isLastStmt())){
-          return (
-            "Exists-x-Elim: Reference must be to the opening and closing of a flag."
-          );
+        if (
+          !(
+            startStep.isFirstStmt() &&
+            (endStep.isLastStmt() || startStep.isFirstStmt())
+          )
+        ) {
+          return "Exists-x-Elim: Reference must be to the opening and closing of a flag.";
         }
 
         if (refExpr[0] !== "exists")
           return "Exists-x-Elim: Referenced step is not an 'exists' expression.";
-        if (scope.length == 0 || scope[scope.length - 1] == null)
+        if (scope.length === 0 || scope[scope.length - 1] == null)
           return "Exists-x-Elim: Range must be within an assumption scope (e.g., an x0 box).";
         if (subst.length > 1)
           return "Exists-x-Elim: Eliminating more than one quantifier at the same time is currently not supported";
@@ -713,7 +748,7 @@ const rules = {
     ),
   }),
   b: new Rule({
-    name: "Backchaining",
+    name: "B",
     type: "derived",
     verifier: new Justifier(
       { stepRefs: ["num", "nums"], subst: true },
@@ -783,7 +818,7 @@ const rules = {
     ),
   }),
   "=": new Rule({
-    name: "Equality",
+    name: "=",
     type: "normal",
     introduction: new Justifier(
       {

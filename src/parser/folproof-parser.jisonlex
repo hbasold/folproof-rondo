@@ -135,9 +135,9 @@ justify     ":".*
     return tokens;
 %}
 
-\n      return 'EOL';
-<*>{spc}+  /* ignore whitespace */
-.*      return 'error';
+\n          return 'EOL';
+<*>{spc}+   /* ignore whitespace */
+.*          return 'error';
 
 %%
 

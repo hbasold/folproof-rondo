@@ -119,4 +119,13 @@ describe("Verifier Tests", function () {
     assert.ok(result.valid, result.message);
   });
 
+  it("test2", () => {
+    const src =
+      "| with x0\n" +
+      "| P(x0) and Q(x0)       : hypothesis\n";
+    const ast = p.parse(src);
+    const result = v.verifyFromAST(ast);
+    assert.ok(result.valid, result.message);
+  });
+
 });

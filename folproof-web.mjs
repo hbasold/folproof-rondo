@@ -273,12 +273,12 @@ function renderSimpleTerm(t) {
 function renderJustification(AST) {
   let justification = document.createElement("div");
   justification.className = "justification";
-  if (AST[0] === "sorry") {
+  if (AST[0] === "Sorry") {
     justification.classList.add("text-warning");
   }
   justification.innerText = AST[0];
   if (AST[1]) {
-    justification.append(" ", AST[1]);
+    justification.append(AST[1]);
   }
   if (AST[2]) {
     justification.append(AST[2]);

@@ -44,16 +44,30 @@ async function registerServiceWorker() {
 
 void registerServiceWorker();
 
-function skipLines(lineNo, state) {
-  if (lineNo >= 1 && lineNo <= state.doc.lines) {
-    const line = state.doc.line(lineNo);
-    if (/^\s*(#.*|-+)?$/.test(line.text)) {
-      return ""; // Skip comments, closing lines, and empty lines
-    }
+class LineNumberFormatter {
+  constructor() {
+    this.skippedLineCount = 0;
   }
 
-  return String(lineNo);
+  skipLines(lineNo, state) {
+    if (lineNo >= 1 && lineNo <= state.doc.lines) {
+      const line = state.doc.line(lineNo);
+      // Skip comments, closing lines, and empty lines
+      if (/^\s*(#.*|-+)?$/.test(line.text)) {
+        this.skippedLineCount++;
+        return "";
+      }
+    }
+
+    return String(lineNo - this.skippedLineCount);
+  }
+
+  reset() {
+    this.skippedLineCount = 0;
+  }
 }
+
+const lineNumberFormatter = new LineNumberFormatter();
 
 /**
  * The editor view for the proof input.
@@ -74,8 +88,12 @@ let proofInput = new EditorView({
     lineNumbers(),
     highlightActiveLineGutter(),
     folLanguage(),
-    lineNumbers({ formatNumber: skipLines }),
+    lineNumbers({
+      formatNumber: (lineNo, state) =>
+        lineNumberFormatter.skipLines(lineNo, state),
+    }),
     EditorView.updateListener.of((update) => {
+      lineNumberFormatter.reset();
       if (update.docChanged) {
         updateOutputSection();
       }
