@@ -292,6 +292,8 @@ function renderJustification(AST) {
     justification.appendChild(sub);
   }
   if (AST[3]) {
+    justification.append(',');
+    AST[3] = AST[3].map((item) => item.replace(/-/g, "–"));
     justification.append(" ", AST[3].join(", "));
   }
   return justification;
