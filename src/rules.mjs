@@ -43,7 +43,6 @@ const rules = {
     name: "Var. Assum.",
     type: "simple",
     verifier: new Justifier(null, function (proof, step) {
-      // Correct placement of 'with' is enforced by the parser
       return true;
     }),
   }),
@@ -67,7 +66,8 @@ const rules = {
     verifier: new Justifier(null, function (proof, step) {
       if (
         proof.steps[step].isFirstStmt() ||
-        (proof.steps[step - 1].isFirstStmt() &&
+        (step > 0 &&
+          proof.steps[step - 1].isFirstStmt() &&
           proof.steps[step - 1].getJustification()[0] === rules["with"].name)
       ) {
         return true;
@@ -119,9 +119,9 @@ const rules = {
       part,
       steps,
     ) {
-      const curStep = proof.steps[step].getSentence();
-      const refStep = proof.steps[steps[0]].getSentence();
-      if (!Expr.equal(curStep, refStep))
+      const current_sentence = proof.steps[step].getSentence();
+      const reference_sentence = proof.steps[steps[0]].getSentence();
+      if (!Expr.equal(current_sentence, reference_sentence))
         return "Assum: Current step is not semantically equal to the referenced step.";
       return true;
     }),
@@ -135,18 +135,21 @@ const rules = {
       part,
       steps,
     ) {
-      var impStep = proof.steps[steps[0]].getSentence();
-      if (impStep[0] !== "->")
+      const impStep = proof.steps[steps[0]].getSentence();
+      if (impStep[0] !== "->") {
         return "MT: 1st referenced step must be implication.";
-      var left = impStep[1],
-        right = impStep[2];
-      var negStep = proof.steps[steps[1]].getSentence();
-      if (negStep[0] !== "not" || !Expr.equal(negStep[1], right))
+      }
+      const left = impStep[1];
+      const right = impStep[2];
+      const negStep = proof.steps[steps[1]].getSentence();
+      if (negStep[0] !== "not" || !Expr.equal(negStep[1], right)) {
         return "MT: 2nd ref step must be negation of right side of 1st ref step.";
+      }
 
-      var s = proof.steps[step].getSentence();
-      if (s[0] !== "not" || !Expr.equal(left, s[1]))
+      const s = proof.steps[step].getSentence();
+      if (s[0] !== "not" || !Expr.equal(left, s[1])) {
         return "MT: current step must be negation of left side of ref step.";
+      }
 
       return true;
     }),
@@ -157,22 +160,21 @@ const rules = {
     verifier: new Justifier(
       { hasPart: false, stepRefs: ["range"], subst: false },
       function (proof, step, part, steps) {
-        var assumptionExpr = proof.steps[steps[0][0]].getSentence();
-        var contraExpr = proof.steps[steps[0][1]].getSentence();
+        const assumptionExpr = proof.steps[steps[0][0]].getSentence();
+        const contraExpr = proof.steps[steps[0][1]].getSentence();
         if (!Expr.isContradiction(contraExpr)) {
           return "Contra: Final step in range must be a contradiction.";
         }
 
-        if (assumptionExpr[0] !== "not")
+        if (assumptionExpr[0] !== "not") {
           return "Contra: Hypothesis is not a negation. Might you be thinking of not-introduction?";
+        }
 
-        var semEq = Expr.equal(
-          assumptionExpr[1],
-          proof.steps[step].getSentence(),
-        );
-        if (semEq) return true;
-
-        return "Contra: Negation of assumption doesn't match current step.";
+        if (Expr.equal(assumptionExpr[1], proof.steps[step].getSentence())) {
+          return true;
+        } else {
+          return "Contra: Negation of assumption doesn't match current step.";
+        }
       },
     ),
   }),
@@ -182,9 +184,8 @@ const rules = {
     elimination: new Justifier(
       { hasPart: false, stepRefs: ["num"], subst: false },
       function (proof, step, part, steps) {
-        var refStep = proof.steps[steps[0]].getSentence();
+        const refStep = proof.steps[steps[0]].getSentence();
         if (!Expr.isContradiction(refStep)) {
-          // if (refStep[0] != 'id' || (refStep[1] != 'contradiction' && refStep[1] != '_|_'))
           return (
             "Bot-elim: Referenced step is not absurdity, but got " +
             Expr.pretty(refStep) +
@@ -201,8 +202,8 @@ const rules = {
     elimination: new Justifier(
       { hasPart: false, stepRefs: ["num"], subst: false },
       function (proof, step, part, steps) {
-        var curStep = proof.steps[step].getSentence();
-        var refStep = proof.steps[steps[0]].getSentence();
+        const curStep = proof.steps[step].getSentence();
+        const refStep = proof.steps[steps[0]].getSentence();
         if (refStep[0] !== "not" || refStep[1][0] !== "not")
           return (
             "Notnot-elim: Referenced step is not a double-negation, but got " +
@@ -223,28 +224,31 @@ const rules = {
     introduction: new Justifier(
       { hasPart: false, stepRefs: ["range"], subst: false },
       function (proof, step, part, steps) {
-        var startStep = proof.steps[steps[0][0]];
-        var endStep = proof.steps[steps[0][1]];
-        var truth = startStep.getSentence();
-        var result = endStep.getSentence();
-        var implies = proof.steps[step].getSentence();
-        debugMessage("-> intro", "start", startStep, "end", endStep);
-        if (!(startStep.isFirstStmt() && endStep.isLastStmt())) {
-          return "Implies-Intro: Reference must be to the opening and closing of a flag.";
+        const startStep = proof.steps[steps[0][0]];
+        const endStep = proof.steps[steps[0][1]];
+        let truth;
+        if (startStep.getJustification()[0] === rules["with"].name) {
+          truth = proof.steps[steps[0][0] + 1].getSentence();
+        } else {
+          truth = startStep.getSentence();
         }
-        if (implies[0] != "->")
+
+        const result = endStep.getSentence();
+        const implies = proof.steps[step].getSentence();
+        debugMessage("-> intro", "start", startStep, "end", endStep);
+
+        if (implies[0] !== "->") {
           return (
             "Implies-Intro: Current step is not an implication, but got " +
             Expr.pretty(implies) +
             " instead."
           );
+        }
 
-        var truthSemEq = Expr.equal(implies[1], truth);
-        if (!truthSemEq)
+        if (!Expr.equal(implies[1], truth))
           return "Implies-Intro: The left side does not match the assumption.";
 
-        var resultSemEq = Expr.equal(implies[2], result);
-        if (!resultSemEq)
+        if (!Expr.equal(implies[2], result))
           return "Implies-Intro: The result does not match the right side.";
 
         return true;
@@ -253,24 +257,19 @@ const rules = {
     elimination: new Justifier(
       { hasPart: false, stepRefs: ["num", "num"], subst: false },
       function (proof, step, part, steps) {
-        var truthStep = steps[1],
-          impliesStep = steps[0];
-        if (truthStep >= step || impliesStep >= step)
-          return "Implies-Elim: Referenced proof steps must precede current step.";
+        const truthStep = steps[1];
+        const impliesStep = steps[0];
 
-        var truth = proof.steps[truthStep].getSentence();
-        var implies = proof.steps[impliesStep].getSentence();
-        if (implies[0] != "->")
+        const truth = proof.steps[truthStep].getSentence();
+        const implies = proof.steps[impliesStep].getSentence();
+        if (implies[0] !== "->") {
           return (
             "Implies-Elim: Step " + (steps[0] + 1) + " is not an implication"
           );
-        var truthSemEq = Expr.equal(implies[1], truth);
-        var resultSemEq = Expr.equal(
-          implies[2],
-          proof.steps[step].getSentence(),
-        );
-        if (truthSemEq) {
-          if (resultSemEq) {
+        }
+
+        if (Expr.equal(implies[1], truth)) {
+          if (Expr.equal(implies[2], proof.steps[step].getSentence())) {
             return true;
           } else {
             return "Implies-Elim: The left side does not imply this result.";
@@ -290,22 +289,21 @@ const rules = {
       part,
       steps,
     ) {
-      var s = proof.steps[step].getSentence();
-      if (s[0] !== "and")
+      const s = proof.steps[step].getSentence();
+      if (s[0] !== "and") {
         return (
           "And-Intro: Current step is not an 'and'-expression." +
           proof.steps[step].getSentence()
         );
-
-      if (Expr.equal(s[1], proof.steps[steps[0]].getSentence())) {
-        if (Expr.equal(s[2], proof.steps[steps[1]].getSentence())) {
-          return true;
-        } else {
-          return "And-Intro: Right side doesn't match referenced step.";
-        }
       }
 
-      return "And-Intro: Left side doesn't match referenced step.";
+      if (!Expr.equal(s[1], proof.steps[steps[0]].getSentence())) {
+        return "And-Intro: Left side doesn't match referenced step.";
+      }
+      if (!Expr.equal(s[2], proof.steps[steps[1]].getSentence())) {
+        return "And-Intro: Right side doesn't match referenced step.";
+      }
+      return true;
     }),
     elimination: new Justifier({ hasPart: true, stepRefs: ["num"] }, function (
       proof,
@@ -313,19 +311,16 @@ const rules = {
       part,
       steps,
     ) {
-      var andExp = proof.steps[steps[0]].getSentence();
-      if (andExp[0] != "and")
+      const andExp = proof.steps[steps[0]].getSentence();
+      if (andExp[0] !== "and") {
         return "And-Elim: Referenced step is not an 'and' expression.";
+      }
 
-      var semEq = Expr.equal(andExp[part], proof.steps[step].getSentence());
+      if (!Expr.equal(andExp[part], proof.steps[step].getSentence())) {
+        return `And-Elim: In referenced line, side ${part} does not match current step.`;
+      }
 
-      if (semEq) return true;
-
-      return (
-        "And-Elim: In referenced line, side " +
-        part +
-        " does not match current step."
-      );
+      return true;
     }),
   }),
   or: new Rule({
@@ -337,23 +332,26 @@ const rules = {
       part,
       steps,
     ) {
-      var s = proof.steps[step].getSentence();
-      if (s[0] !== "or")
+      const s = proof.steps[step].getSentence();
+      if (s[0] !== "or") {
         return "Or-Intro: Current step is not an 'or'-expression.";
+      }
 
-      if (Expr.equal(s[part], proof.steps[steps[0]].getSentence())) return true;
+      if (!Expr.equal(s[part], proof.steps[steps[0]].getSentence())) {
+        return "Or-Intro: Side " + part + " doesn't match referenced step.";
+      }
 
-      return "Or-Intro: Side " + part + " doesn't match referenced step.";
+      return true;
     }),
     elimination: new Justifier(
       { stepRefs: ["num", "range", "range"] },
       function (proof, step, part, steps) {
-        var currStepExpr = proof.steps[step].getSentence();
-        var orStepExpr = proof.steps[steps[0]].getSentence();
-        var a1p1Expr = proof.steps[steps[1][0]].getSentence();
-        var a1p2Expr = proof.steps[steps[1][1]].getSentence();
-        var a2p1Expr = proof.steps[steps[2][0]].getSentence();
-        var a2p2Expr = proof.steps[steps[2][1]].getSentence();
+        const currStepExpr = proof.steps[step].getSentence();
+        const orStepExpr = proof.steps[steps[0]].getSentence();
+        const a1p1Expr = proof.steps[steps[1][0]].getSentence();
+        const a1p2Expr = proof.steps[steps[1][1]].getSentence();
+        const a2p1Expr = proof.steps[steps[2][0]].getSentence();
+        const a2p2Expr = proof.steps[steps[2][1]].getSentence();
 
         // and through the gauntlet...
         if (orStepExpr[0] !== "or")
@@ -382,14 +380,6 @@ const rules = {
     ) {
       var assumptionExpr = proof.steps[steps[0][0]].getSentence();
       var contraExpr = proof.steps[steps[0][1]].getSentence();
-      if (
-        !(
-          proof.steps[steps[0][0]].isFirstStmt() &&
-          proof.steps[steps[0][1]].isLastStmt()
-        )
-      ) {
-        return "Neg-Intro: Reference must be to the opening and closing of a flag.";
-      }
 
       if (!Expr.isContradiction(contraExpr)) {
         return "Neg-Intro: Final step in range must be absurdity.";
@@ -540,14 +530,6 @@ const rules = {
         "subst",
         subst,
       );
-      if (
-        !(
-          startStep.isFirstStmt() &&
-          (endStep.isLastStmt() || startStep.isFirstStmt())
-        )
-      ) {
-        return "All-x-Intro: Reference must be to the opening and closing of a flag.";
-      }
 
       if (currExpr[0] !== "forall")
         return "All-x-Intro: Current step is not a 'for-all' expression.";
@@ -708,14 +690,6 @@ const rules = {
 
         var endStep = proof.steps[steps[1][1]];
         var endExpr = endStep.getSentence();
-        if (
-          !(
-            startStep.isFirstStmt() &&
-            (endStep.isLastStmt() || startStep.isFirstStmt())
-          )
-        ) {
-          return "Exists-x-Elim: Reference must be to the opening and closing of a flag.";
-        }
 
         if (refExpr[0] !== "exists")
           return "Exists-x-Elim: Referenced step is not an 'exists' expression.";

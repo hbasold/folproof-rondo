@@ -1,6 +1,5 @@
 import parser from "../folproof-parser.js";
 import { strict as assert } from "node:assert";
-import p from "../folproof-parser.js";
 import { Verifier as v } from "../src/verifier.mjs";
 
 describe("Parser Tests", function () {
@@ -161,14 +160,14 @@ describe("Parser Tests", function () {
 
   it("Should parse quantifiers on the right of a connective", () => {
     const src = "p v Ex. x";
-    const ast = p.parse(src);
+    const ast = parser.parse(src);
     const result = v.verifyFromAST(ast);
     assert.ok(result.valid, result.message);
   });
 
   it("Should correctly differentiate between quantifier and id", () => {
     const src = "E Ex.Ex";
-    const ast = p.parse(src);
+    const ast = parser.parse(src);
     const result = v.verifyFromAST(ast);
     assert.ok(result.valid, result.message);
   });

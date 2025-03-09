@@ -284,15 +284,19 @@ function renderJustification(AST) {
   }
   justification.innerText = AST[0];
   if (AST[1]) {
-    justification.append(AST[1][0].toUpperCase());
+    if (AST[0].toLowerCase().startsWith("premise")) {
+      justification.append(" ", AST[1]);
+    } else {
+      justification.append(AST[1][0].toUpperCase());
+    }
   }
   if (AST[2]) {
     const sub = document.createElement("sub");
-    sub.textContent = AST[2]
+    sub.textContent = AST[2];
     justification.appendChild(sub);
   }
   if (AST[3]) {
-    justification.append(',');
+    justification.append(",");
     AST[3] = AST[3].map((item) => item.replace(/-/g, "–"));
     justification.append(" ", AST[3].join(", "));
   }

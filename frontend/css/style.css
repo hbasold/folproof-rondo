@@ -6,6 +6,10 @@
   font-family: monospace;
 }
 
+.justification {
+  white-space: nowrap;
+}
+
 .FOL-box,
 .simple-box {
   border: 1px solid var(--bs-body-color);
