@@ -177,7 +177,7 @@ const rules = {
     ),
   }),
   bot: new Rule({
-    name: "Absurdity",
+    name: "⊥",
     type: "normal",
     elimination: new Justifier(
       { hasPart: false, stepRefs: ["num"], subst: false },

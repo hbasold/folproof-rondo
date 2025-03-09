@@ -37,17 +37,23 @@ function renderRule(DOM, AST, line, options) {
   let nest = document.createElement("div");
   nest.className = "rule";
 
+  let step = document.createElement("div");
+  step.style.display = "inline-block";
+
   let line_number_span = document.createElement("span");
   line_number_span.className = "lineno";
   line_number_span.textContent = line;
-  nest.appendChild(line_number_span);
+  step.appendChild(line_number_span);
 
   if (AST[0] === "error") {
-    nest.appendChild(renderSyntaxError(AST));
+    step.appendChild(renderSyntaxError(AST));
+    nest.appendChild(step);
     DOM.appendChild(nest);
     return line + 1;
   }
-  nest.appendChild(renderClause(AST[1], options));
+
+  step.appendChild(renderClause(AST[1], options));
+  nest.appendChild(step);
   nest.appendChild(renderJustification(AST[2]));
 
   DOM.appendChild(nest);
@@ -278,10 +284,12 @@ function renderJustification(AST) {
   }
   justification.innerText = AST[0];
   if (AST[1]) {
-    justification.append(AST[1]);
+    justification.append(AST[1][0].toUpperCase());
   }
   if (AST[2]) {
-    justification.append(AST[2]);
+    const sub = document.createElement("sub");
+    sub.textContent = AST[2]
+    justification.appendChild(sub);
   }
   if (AST[3]) {
     justification.append(" ", AST[3].join(", "));

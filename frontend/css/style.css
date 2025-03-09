@@ -6,10 +6,6 @@
   font-family: monospace;
 }
 
-.justification {
-  float: right;
-}
-
 .FOL-box,
 .simple-box {
   border: 1px solid var(--bs-body-color);
@@ -24,7 +20,9 @@
 }
 
 .rule {
-  clear: both;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
 }
 
 .cm-editor .cm-selectionBackground {
