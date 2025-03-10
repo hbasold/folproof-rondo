@@ -107,10 +107,18 @@ let proofInput = new EditorView({
   ],
 });
 
-const parentheses = document.getElementById("parentheses-setting");
 const resultBox = document.getElementById("result-box");
 const resultElement = document.getElementById("result");
 const renderPanel = document.getElementById("render-panel");
+
+const parentheses = document.getElementById("parentheses-setting");
+const restrictPropositional = document.getElementById("propositional-setting");
+restrictPropositional.addEventListener("change", updateOutputSection);
+
+const signatureFunction = document.getElementById("signature-function-input");
+signatureFunction.addEventListener("input", updateOutputSection);
+const signatureRelation = document.getElementById("signature-relation-input");
+signatureRelation.addEventListener("input", updateOutputSection);
 
 /**
  * Update the output section based on the current proof content and settings.
@@ -123,7 +131,11 @@ function updateOutputSection() {
     };
 
     AST = parser.parse(proofInput.state.doc.toString());
-    const result = Verifier.verifyFromAST(AST);
+    const result = Verifier.verifyFromAST(
+      AST,
+      restrictPropositional.checked,
+      (signatureFunction.value + " " + signatureRelation.value).trim(),
+    );
     const result_HTML = document.createElement("p");
     result_HTML.textContent = result.message;
 

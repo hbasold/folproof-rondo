@@ -1,5 +1,6 @@
 import { debugMessage } from "./util.mjs";
 import { rules } from "./rules.mjs";
+import { isPropositional } from "./expr.mjs";
 
 class Statement {
   constructor(sentenceAST, justificationAST, scope, loc, isFirst, isLast) {
@@ -37,11 +38,19 @@ class Statement {
 }
 
 class Verifier {
-  static verifyFromAST(ast) {
-    return Verifier.verify(Verifier.preprocess(ast));
+  static verifyFromAST(
+    ast,
+    restrictPropositional = null,
+    restrictSignature = null,
+  ) {
+    return Verifier.verify(
+      Verifier.preprocess(ast),
+      restrictPropositional,
+      restrictSignature,
+    );
   }
 
-  static verify(proof) {
+  static verify(proof, restrictPropositional = null, restrictSignature = null) {
     let result = {
       message: "Proof is valid.",
       valid: true,
@@ -49,8 +58,42 @@ class Verifier {
       remainingSorries: 0,
     };
 
+    let parsedSignature = null;
+    if (restrictSignature) {
+      parsedSignature = restrictSignature.split(/\s+/).reduce((acc, entry) => {
+        const parts = entry.split("/");
+        if (parts.length !== 2) {
+          result.valid = false;
+          result.message = `Invalid signature format, was '${entry}', expected 
+          ID/arity.`;
+          result.errorStep = "Preprocessing";
+          return acc;
+        }
+
+        const [id, arity] = parts;
+        acc[id] = parseInt(arity);
+        if (isNaN(acc[id])) {
+          result.valid = false;
+          result.message = `Invalid signature arity, was '${arity}', expected a 
+          number.`;
+          result.errorStep = "Preprocessing";
+        }
+        return acc;
+      }, {});
+
+      if (!result.valid) {
+        return result;
+      }
+    }
+
     for (let step = 0; step < proof.steps.length; ++step) {
-      Verifier.validateStatement(result, proof, step);
+      Verifier.validateStatement(
+        result,
+        proof,
+        step,
+        restrictPropositional,
+        parsedSignature,
+      );
       if (!result.valid) {
         break;
       }
@@ -58,7 +101,13 @@ class Verifier {
     return result;
   }
 
-  static validateStatement(result, proof, step) {
+  static validateStatement(
+    result,
+    proof,
+    step,
+    restrictPropositional,
+    restrictSignature,
+  ) {
     let statement = proof.steps[step];
     if (
       statement[0] === "error" ||
@@ -68,6 +117,20 @@ class Verifier {
       result.message = "Proof invalid due to syntax errors.";
       result.errorStep = step + 1;
       return;
+    }
+
+    console.log("statement", statement);
+    if (restrictPropositional || restrictSignature) {
+      Verifier.checkRestrictions(
+        result,
+        statement.getSentence(),
+        restrictPropositional,
+        restrictSignature,
+      );
+      if (!result.valid) {
+        result.errorStep = step + 1;
+        return;
+      }
     }
 
     let why = statement.getJustification();
@@ -108,6 +171,54 @@ class Verifier {
       result.errorSrcLoc = statement.getMeta();
     }
     result.valid = false;
+  }
+
+  static checkRestrictions(
+    result,
+    statement,
+    restrictPropositional,
+    restrictSignature,
+    prevInID = false,
+  ) {
+    const curInID = statement[0] === "id";
+    if (
+      (restrictPropositional && !isPropositional(statement)) ||
+      (restrictPropositional && prevInID && curInID)
+    ) {
+      result.valid = false;
+      result.message =
+        "Propositional restriction: Only propositional logic is allowed.";
+      return;
+    }
+
+    if (restrictSignature && curInID && statement.length === 3) {
+      const arity = restrictSignature[statement[1]];
+      if (arity === undefined) {
+        result.valid = false;
+        result.message = `Signature restriction: '${statement[1]}' not in 
+        signature.`;
+        return;
+      }
+
+      if (statement[2].length !== arity) {
+        result.valid = false;
+        result.message = `Signature restriction: '${statement[1]}' expected 
+        ${arity} arguments, got ${statement[2].length}.`;
+      }
+
+      for (const arg of statement[2]) {
+        Verifier.checkRestrictions(
+          result,
+          arg,
+          restrictPropositional,
+          restrictSignature,
+          curInID,
+        );
+        if (!result.valid) {
+          return;
+        }
+      }
+    }
   }
 
   static lookupValidator(why) {

@@ -235,27 +235,43 @@
               <span class="col-form-label fw-bold">Strictness:</span>
 
               <fieldset>
-                <div class="form-check">
-                  <label for="restrict-propositional" class="form-check-label"
+                <div class="form-check my-1">
+                  <label for="propositional-setting" class="form-check-label"
                     >Restrict to propositional logic</label
                   >
                   <input
                     type="checkbox"
-                    id="restrict-propositional"
+                    id="propositional-setting"
                     class="form-check-input"
                   />
                 </div>
 
                 <div>
-                  <label for="restrict-signature" class="col-form-label"
-                    >Restrict to signature:</label
-                  >
-                  <input
-                    type="text"
-                    id="restrict-signature"
-                    class="form-control"
-                    aria-describedby="restrict-signature"
-                  />
+                  <span class="col-form-label">Restrict to signature:</span>
+                  <div class="input-group my-1">
+                    <span class="input-group-text" id="signature-function"
+                      >ℱ</span
+                    >
+                    <input
+                      id="signature-function-input"
+                      type="text"
+                      class="form-control"
+                      placeholder="e.g. a/0 b/3 c/2"
+                      aria-label="Function symbols/arity"
+                      aria-describedby="signature-function"
+                    />
+                    <span class="input-group-text" id="signature-relation"
+                      >ℛ</span
+                    >
+                    <input
+                      id="signature-relation-input"
+                      type="text"
+                      class="form-control"
+                      placeholder="e.g. P/0 Q/2 R/4"
+                      aria-label="Relation symbols/arity"
+                      aria-describedby="signature-relation"
+                    />
+                  </div>
                 </div>
               </fieldset>
             </div>
