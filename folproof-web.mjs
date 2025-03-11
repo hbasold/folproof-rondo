@@ -264,7 +264,7 @@ function renderSimpleTerm(t) {
     sym = others[sym];
   }
   const output = document.createElement("span");
-  output.innerHTML = sym;
+  output.textContent = sym;
   if (parts[2]) {
     output.className = "special-symbol";
     const sub = document.createElement("sub");

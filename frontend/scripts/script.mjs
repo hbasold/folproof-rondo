@@ -160,10 +160,10 @@ function updateOutputSection() {
     sorries.textContent = `Remaining sorries: ${result.remainingSorries}`;
     result_HTML.appendChild(sorries);
 
-    resultElement.innerHTML = "";
+    resultElement.textContent = "";
     resultElement.appendChild(result_HTML);
   } catch (ex) {
-    resultElement.innerHTML = ex;
+    resultElement.textContent = ex;
     resultBox.className = resultBox.className.replace(
       /alert-\w*/,
       "alert-danger",
@@ -171,7 +171,7 @@ function updateOutputSection() {
   }
 
   const HTML = render(AST, { parentheses: parentheses.value });
-  renderPanel.innerHTML = "";
+  renderPanel.textContent = "";
   renderPanel.appendChild(HTML);
 }
 
