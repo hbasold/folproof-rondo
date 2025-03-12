@@ -119,7 +119,7 @@ class Verifier {
       return;
     }
 
-    console.log("statement", statement);
+    debugMessage("statement", statement);
     if (restrictPropositional || restrictSignature) {
       Verifier.checkRestrictions(
         result,
