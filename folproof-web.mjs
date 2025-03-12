@@ -259,14 +259,12 @@ function renderSimpleTerm(t) {
   // &Omega; and &omega; are different. &OmEGa; does not exist, hence the quirkiness
   // to allow users to distinguish between lower and uppercase greek letters.
   if (greek_letters.includes(sym[0].toLowerCase() + sym.substring(1))) {
-    // FIXME: This will not work with textContent below, because the & will be turned into &amp;
-    // https://stackoverflow.com/questions/49197622/how-to-use-an-entity-with-textcontent
     sym = "&" + sym + ";";
   } else if (others[sym]) {
     sym = others[sym];
   }
   const output = document.createElement("span");
-  output.textContent = sym;
+  output.innerHTML = sym;
   if (parts[2]) {
     output.className = "special-symbol";
     const sub = document.createElement("sub");

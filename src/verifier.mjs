@@ -67,17 +67,24 @@ class Verifier {
           result.message = `Invalid signature format, was '${entry}', expected 
           ID/arity.`;
           result.errorStep = "Preprocessing";
-          return acc;
+          return result;
         }
 
         const [id, arity] = parts;
-        acc[id] = parseInt(arity);
-        if (isNaN(acc[id])) {
+        const parsedArity = parseInt(arity);
+        if (isNaN(parsedArity)) {
           result.valid = false;
           result.message = `Invalid signature arity, was '${arity}', expected a 
           number.`;
           result.errorStep = "Preprocessing";
+          return result;
         }
+
+        if (!acc[id]) {
+          acc[id] = new Set();
+        }
+        acc[id].add(parsedArity);
+
         return acc;
       }, {});
 
@@ -192,18 +199,20 @@ class Verifier {
     }
 
     if (restrictSignature && curInID && statement.length === 3) {
-      const arity = restrictSignature[statement[1]];
-      if (arity === undefined) {
+      const arities = restrictSignature[statement[1]];
+      if (arities === undefined) {
         result.valid = false;
         result.message = `Signature restriction: '${statement[1]}' not in 
         signature.`;
         return;
       }
 
-      if (statement[2].length !== arity) {
+      if (!arities.has(statement[2].length)) {
         result.valid = false;
-        result.message = `Signature restriction: '${statement[1]}' expected 
-        ${arity} arguments, got ${statement[2].length}.`;
+        const aritiesString = Array.from(arities).sort().join(", ");
+        result.message = `Signature restriction: '${statement[1]}' got 
+        ${statement[2].length} argument(s), but expected: ${aritiesString}.`;
+        return;
       }
 
       for (const arg of statement[2]) {
@@ -239,11 +248,11 @@ class Verifier {
 
     if (why[1]) {
       const elimOrIntro = why[1].toLowerCase();
-      if ("introduction".indexOf(elimOrIntro) === 0) {
+      if ("introduction".startsWith(elimOrIntro)) {
         const fn = rule.getIntroVerifier();
         if (!fn) throw new Error("Not implemented for " + name);
         return fn.exec;
-      } else if ("elimination".indexOf(elimOrIntro) === 0) {
+      } else if ("elimination".startsWith(elimOrIntro)) {
         const fn = rule.getElimVerifier();
         if (!fn) throw new Error("Not implemented for " + name);
         return fn.exec;
