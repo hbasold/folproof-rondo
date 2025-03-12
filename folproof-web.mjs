@@ -251,14 +251,16 @@ function renderSimpleTerm(t) {
   ];
 
   const others = {
-    bot: "&perp;",
-    contradiction: "&perp;",
+    bot: "⊥",
+    contradiction: "⊥",
   };
   const parts = t.match(/(.*?)(\d+)?$/);
   let sym = parts[1];
   // &Omega; and &omega; are different. &OmEGa; does not exist, hence the quirkiness
   // to allow users to distinguish between lower and uppercase greek letters.
   if (greek_letters.includes(sym[0].toLowerCase() + sym.substring(1))) {
+    // FIXME: This will not work with textContent below, because the & will be turned into &amp;
+    // https://stackoverflow.com/questions/49197622/how-to-use-an-entity-with-textcontent
     sym = "&" + sym + ";";
   } else if (others[sym]) {
     sym = others[sym];
