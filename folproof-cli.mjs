@@ -19,6 +19,11 @@ program
     "Logic Rondo\nA JavaScript First-Order Logic (FOL) proof verifier.",
   )
   .option("-d, --debug, --verbose", "extra verbose output")
+  .option("--restrictPropositional", "restrict proof to propositional logic")
+  .option(
+    "--restrictSignature <signature>",
+    "restrict proof to signature, e.g. 'b/3 c/0 A/2'",
+  )
   .version(packageJSON.version)
   .argument("<file>", ".folproof source file")
   .showHelpAfterError("(add --help for additional information)");
@@ -35,7 +40,11 @@ try {
   debugMessage("File has been read.");
   const AST = parser.parse(content);
   debugMessage("File content has been parsed.");
-  const result = Verifier.verifyFromAST(AST);
+  const result = Verifier.verifyFromAST(
+    AST,
+    options.restrictPropositional,
+    options.restrictSignature,
+  );
   debugMessage("AST has been verified, with as result:");
   console.log(successColour(JSON.stringify(result, null, 2)));
 } catch (ex) {

@@ -139,11 +139,11 @@ describe("Expression Printer Tests", function () {
     assert.deepEqual(prt, expected);
   });
 
-  it("Printing negation-equality with parentheses", function () {
+  it("Printing negation-equality without parentheses", function () {
     const src = "~(a = b)";
     const e = P.parse(src)[0][1];
     const prt = E.pretty(e);
-    const expected = "~(a = b)";
+    const expected = "~a = b";
     assert.deepEqual(prt, expected);
   });
 

@@ -40,7 +40,7 @@ class Justifier {
    */
   exec = (proof, step, part, steps, subst) => {
     debugMessage("Justifier", step, part, steps, subst);
-    let checked = this.checkParams(step, part, steps, subst);
+    let checked = this.checkParams(proof, step, part, steps, subst);
     if (typeof checked === "string") return checked;
     debugMessage("Calling justifier on checked", checked);
     return this.fn(proof, step, checked[0], checked[1], checked[2]);
@@ -49,12 +49,13 @@ class Justifier {
   /**
    * Check the step references.
    *
+   * @param proof the proof object
    * @param curStep the current step number
    * @param steps the step references
    * @param refNums parsed step references
    * @returns {string} string on error, otherwise null
    */
-  checkParamsStepRefs(curStep, steps, refNums) {
+  checkParamsStepRefs(proof, curStep, steps, refNums) {
     if (steps == null) {
       return "Step reference required.";
     }
@@ -89,8 +90,8 @@ class Justifier {
         }
         refNums.push(n);
       } else {
-        const errorMsg = `Step reference #${i + 1} (${steps[i]}) must 
-          be a range a-b with a <= b.`;
+        const errorMsg = `Range reference #${i + 1} (${steps[i]}) must 
+          be a range a-b with 1 <= a <= b <= ${curStep}.`;
 
         let ab = steps[i].split("-");
         if (ab.length !== 2) {
@@ -109,6 +110,16 @@ class Justifier {
           return errorMsg;
         }
 
+        if (
+          !(
+            proof.steps[ab[0] - 1].isFirstStmt() &&
+            proof.steps[ab[1] - 1].isLastStmt()
+          )
+        ) {
+          return `Range reference #${i + 1} (${steps[i]}) must be to the 
+          opening and closing of a flag.`;
+        }
+
         refNums.push([ab[0] - 1, ab[1] - 1]);
       }
     }
@@ -117,32 +128,33 @@ class Justifier {
   /**
    * Check the parameters according to the format.
    *
+   * @param proof the proof object
    * @param curStep the current step number
    * @param part the part number
    * @param steps the step references
    * @param subst the substitution
    * @returns {[number | null, array, array | null]|string} string on error
    */
-  checkParams(curStep, part, steps, subst) {
+  checkParams(proof, curStep, part, steps, subst) {
     if (
       (this.format === null && part != null) ||
       (this.format != null && !this.format.hasPart && part != null)
     ) {
-      return "Step part (e.g., 2 in 'and e2') not applicable.";
+      return "Step part (e.g., 2 in 'and e2') is not applicable here.";
     }
 
     if (
       (this.format === null && steps != null) ||
       (this.format != null && !this.format.stepRefs && steps != null)
     ) {
-      return "Step references not applicable.";
+      return "Step references are not applicable here.";
     }
 
     if (
       (this.format === null && subst != null) ||
       (this.format != null && !this.format.subst && subst != null)
     ) {
-      return "Substitution not applicable.";
+      return "Substitution is not applicable here.";
     }
 
     if (this.format == null) {
@@ -152,14 +164,16 @@ class Justifier {
     let partNum = null;
     if (this.format.hasPart) {
       partNum = parseInt(part);
-      if (isNaN(partNum) || !(partNum === 1 || partNum === 2)) {
-        return "Part number must be 1 or 2.";
+      if (isNaN(partNum)) {
+        return "Part number (1 for left, 2 for right) is missing or not a number.";
+      } else if (!(partNum === 1 || partNum === 2)) {
+        return "Part number must be 1 (for left) or 2 (for right).";
       }
     }
 
     let refNums = [];
     if (this.format.stepRefs) {
-      const error = this.checkParamsStepRefs(curStep, steps, refNums);
+      const error = this.checkParamsStepRefs(proof, curStep, steps, refNums);
       if (typeof error === "string") {
         return error;
       }

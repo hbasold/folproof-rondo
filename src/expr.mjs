@@ -5,12 +5,13 @@ import {
   binary_connectives,
   operator_precedence,
   operator_ascii,
+  propositional,
 } from "./config.mjs";
 
 // Substitutes in parallel in expr by all the variables that are mapped in subst
 function substitute(expr, subst, bound) {
   debugMessage("substitute", expr, subst);
-  bound = bound ? bound : [];
+  bound = bound || [];
 
   // remove parens, which are basically stylistic no-ops
   while (expr[0] === "paren") expr = expr[1];
@@ -35,7 +36,7 @@ function substitute(expr, subst, bound) {
         const s = subst.find((s) => s[0] === expr[1]);
         if (s) {
           return s[1];
-        } // [expr[0], b];
+        }
       }
       return expr;
     }
@@ -160,6 +161,15 @@ function isAtom(expr) {
   return expr[0] === "id" || expr[0] === "=";
 }
 
+function isPropositional(expr) {
+  console.assert(
+    Array.isArray(expr) && expr.length > 0,
+    "Expected expression but got %o",
+    expr,
+  );
+  return propositional.indexOf(expr[0]) >= 0;
+}
+
 function prettyParentheses(i, j, doc) {
   if (j < i) {
     return "(" + doc + ")";
@@ -171,7 +181,7 @@ function prettyParentheses(i, j, doc) {
 function prettyArgs(args) {
   let pretty_args = "";
   for (const arg of args) {
-    if (!(pretty_args.length === 0)) {
+    if (pretty_args.length !== 0) {
       pretty_args += ", ";
     }
     pretty_args += prettyTerm(arg);
@@ -228,7 +238,7 @@ function pretty(expr) {
 function prettySubst(subst) {
   let doc = "";
   for (const s of subst) {
-    if (!(doc.length === 0)) {
+    if (doc.length !== 0) {
       doc += ";";
     }
     doc += s[0] + "/" + pretty(s[1]);
@@ -236,4 +246,12 @@ function prettySubst(subst) {
   return doc;
 }
 
-export { substitute, equal, isContradiction, isAtom, pretty, prettySubst };
+export {
+  substitute,
+  equal,
+  isContradiction,
+  isAtom,
+  isPropositional,
+  pretty,
+  prettySubst,
+};

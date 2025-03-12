@@ -18,6 +18,7 @@ export const noticeColour = chalk.blue;
 export const quantifiers = ["forall", "exists"];
 export const unary_connectives = ["not"];
 export const binary_connectives = ["<->", "->", "and", "or", "="];
+export const propositional = ["<->", "->", "and", "or", "not", "bot", "id"]
 export const operator_precedence = {
   not: 4,
   "=": 4,

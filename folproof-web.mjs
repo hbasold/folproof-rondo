@@ -37,17 +37,23 @@ function renderRule(DOM, AST, line, options) {
   let nest = document.createElement("div");
   nest.className = "rule";
 
+  let step = document.createElement("div");
+  step.style.display = "inline-block";
+
   let line_number_span = document.createElement("span");
   line_number_span.className = "lineno";
   line_number_span.textContent = line;
-  nest.appendChild(line_number_span);
+  step.appendChild(line_number_span);
 
   if (AST[0] === "error") {
-    nest.appendChild(renderSyntaxError(AST));
+    step.appendChild(renderSyntaxError(AST));
+    nest.appendChild(step);
     DOM.appendChild(nest);
     return line + 1;
   }
-  nest.appendChild(renderClause(AST[1], options));
+
+  step.appendChild(renderClause(AST[1], options));
+  nest.appendChild(step);
   nest.appendChild(renderJustification(AST[2]));
 
   DOM.appendChild(nest);
@@ -245,20 +251,22 @@ function renderSimpleTerm(t) {
   ];
 
   const others = {
-    bot: "&perp;",
-    contradiction: "&perp;",
+    bot: "⊥",
+    contradiction: "⊥",
   };
   const parts = t.match(/(.*?)(\d+)?$/);
   let sym = parts[1];
   // &Omega; and &omega; are different. &OmEGa; does not exist, hence the quirkiness
   // to allow users to distinguish between lower and uppercase greek letters.
   if (greek_letters.includes(sym[0].toLowerCase() + sym.substring(1))) {
+    // FIXME: This will not work with textContent below, because the & will be turned into &amp;
+    // https://stackoverflow.com/questions/49197622/how-to-use-an-entity-with-textcontent
     sym = "&" + sym + ";";
   } else if (others[sym]) {
     sym = others[sym];
   }
   const output = document.createElement("span");
-  output.innerHTML = sym;
+  output.textContent = sym;
   if (parts[2]) {
     output.className = "special-symbol";
     const sub = document.createElement("sub");
@@ -273,17 +281,25 @@ function renderSimpleTerm(t) {
 function renderJustification(AST) {
   let justification = document.createElement("div");
   justification.className = "justification";
-  if (AST[0] === "sorry") {
+  if (AST[0] === "Sorry") {
     justification.classList.add("text-warning");
   }
   justification.innerText = AST[0];
   if (AST[1]) {
-    justification.append(" ", AST[1]);
+    if (AST[0].toLowerCase().startsWith("premise")) {
+      justification.append(" ", AST[1]);
+    } else {
+      justification.append(AST[1][0].toUpperCase());
+    }
   }
   if (AST[2]) {
-    justification.append(AST[2]);
+    const sub = document.createElement("sub");
+    sub.textContent = AST[2];
+    justification.appendChild(sub);
   }
   if (AST[3]) {
+    justification.append(",");
+    AST[3] = AST[3].map((item) => item.replace(/-/g, "–"));
     justification.append(" ", AST[3].join(", "));
   }
   return justification;
@@ -292,9 +308,6 @@ function renderJustification(AST) {
 function renderBox(DOM, AST, line, options, type) {
   let box = document.createElement("div");
   box.className = type + "-box";
-  if (type === "FOL") {
-    box.append(renderSimpleTerm(AST[2][1]));
-  }
   const lines = renderRules(box, AST[1], line, options);
   DOM.appendChild(box);
   return lines;

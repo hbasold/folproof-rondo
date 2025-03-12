@@ -96,7 +96,7 @@ case 4: case 28:
  this.$ = []; 
 break;
 case 5:
- this.$ = ['folbox', $$[$0-2], $$[$0-4], this._$];
+ this.$ = ['folbox', [$$[$0-4], ...$$[$0-2]], this._$];
         if ($$[$0-2] && $$[$0-2][0] && $$[$0-2][0][0] == 'rule' && $$[$0-2][0][2].auto)
             $$[$0-2][0][2] = ['hypothesis', null];
     
@@ -118,7 +118,7 @@ case 7:
     
 break;
 case 8:
- this.$ = ['with', $$[$0]]; 
+ this.$ = ['rule', ['id', $$[$0]], [$$[$0-1], null]]; 
 break;
 case 10:
  this.$ = ['error', yytext]; 
@@ -754,19 +754,27 @@ case 10:return 19;
 break;
 case 11:return 21;
 break;
-case 12:return 34;
+case 12:
+    this.pushState('inQuantifier');
+    return yy_.yytext[0] === 'A' ? 'FORALL' : 'EXISTS';
+
 break;
-case 13:return 35;
+case 13:return 34;
 break;
-case 14:return 33;
+case 14:return 35;
 break;
-case 15:return 17;
+case 15:return 33;
 break;
-case 16:return 37;
+case 16:return 17;
 break;
-case 17:return 20;
+case 17:return 37;
 break;
 case 18:
+    this.popState();
+    return 20;
+
+break;
+case 19:
     // remaining DEBOXes implied by EOF
     var tokens = [];
 
@@ -778,16 +786,16 @@ case 18:
     if (tokens.length) return tokens;
 
 break;
-case 19:
+case 20:
     /* manually close an assumption box */
     this._log("MANUAL DEBOX");
     this._iemitstack.shift();
     return ['DEBOX', 'EOL'];
 
 break;
-case 20:/* eat blank lines */
+case 21:/* eat blank lines */
 break;
-case 21:
+case 22:
     /* Similar to the idea of semantic whitespace, we keep track of virtual
      * BOX/DEBOX characters based on a stack of | occurrences
      */
@@ -811,16 +819,16 @@ case 21:
     return tokens;
 
 break;
-case 22:return 8;
+case 23:return 8;
 break;
-case 23:/* ignore whitespace */
+case 24:/* ignore whitespace */
 break;
-case 24:return 2;
+case 25:return 2;
 break;
 }
 },
-rules: [/^(?:[\n\r]?#.*)/,/^(?:and|∧|&)/,/^(?:or|∨|v|\+)/,/^(?:implies|->|→)/,/^(?:iff|<->|↔)/,/^(?:not|~|¬)/,/^(?:=)/,/^(?:with\b)/,/^(?:\d+)/,/^(?:(:.*))/,/^(?:E|∃)/,/^(?:A|∀)/,/^(?:\()/,/^(?:\))/,/^(?:_\|_|⊥|bot\b)/,/^(?:([a-zA-Z_][a-zA-Z_'"0-9\|]*))/,/^(?:,)/,/^(?:\.)/,/^(?:[\n\r]*$)/,/^(?:\n(([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)*-+)/,/^(?:[\n\r]+([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*(?![^\n\r]))/,/^(?:[\n|^]([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\d*(([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)*)/,/^(?:\n)/,/^(?:([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+)/,/^(?:.*)/],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"inclusive":true}}
+rules: [/^(?:[\n\r]?#.*)/,/^(?:(and(?=([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+))|∧|&)/,/^(?:(or(?=([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+))|∨|v|\+)/,/^(?:(implies(?=([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+))|->|→)/,/^(?:(iff(?=([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+))|<->|↔)/,/^(?:(not(?=([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+))|~|¬)/,/^(?:=)/,/^(?:with(?=([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+))/,/^(?:\d+)/,/^(?:(:.*))/,/^(?:∃)/,/^(?:∀)/,/^(?:(A|E)(?=(([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*([a-zA-Z_][a-zA-Z_'"0-9\|]*)([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\.)))/,/^(?:\()/,/^(?:\))/,/^(?:(bot(?=([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+))|_\|_|⊥)/,/^(?:([a-zA-Z_][a-zA-Z_'"0-9\|]*))/,/^(?:,)/,/^(?:\.)/,/^(?:[\n\r]*$)/,/^(?:\n(([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)*-+)/,/^(?:[\n\r]+([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*(?![^\n\r]))/,/^(?:[\n|^]([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\d*(([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])*\|*)*)/,/^(?:\n)/,/^(?:([\t \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000])+)/,/^(?:.*)/],
+conditions: {"inQuantifier":{"rules":[16,18,24],"inclusive":false},"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],"inclusive":true}}
 });
 const jisonLexerFn = lexer.setInput;
 lexer.setInput = function(input) {

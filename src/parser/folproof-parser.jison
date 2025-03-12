@@ -21,7 +21,7 @@ clause_list
 
 box
     : BOX with EOL clause_list EOL? DEBOX
-    { $$ = ['folbox', $clause_list, $with, @$];
+    { $$ = ['folbox', [$with, ...$clause_list], @$];
         if ($clause_list && $clause_list[0] && $clause_list[0][0] == 'rule' && $clause_list[0][2].auto)
             $clause_list[0][2] = ['hypothesis', null];
     }
@@ -43,7 +43,7 @@ box
 
 with
     : WITH ID
-    { $$ = ['with', $2]; }
+    { $$ = ['rule', ['id', $ID], [$WITH, null]]; }
     ;
 
 sentence
@@ -86,15 +86,6 @@ e_not
     { $$ = $1; }
     ;
 
-/*
-e_eq
-    : term1 EQUALS term2
-    { $$ = ['=', $term1, $term2]; }
-    | atom
-    { $$ = $1; }
-    ;
-*/
-
 atom
     : term EQUALS term
     { $$ = ['=', $1, $3]; }
@@ -105,17 +96,6 @@ atom
     | LPAREN sentence RPAREN
     { $$ = $sentence; $$.userParens = true; }
     ;
-
-/*
-pred
-    : ID LPAREN term_list RPAREN
-    { $$ = ['id', $ID, $term_list]; }
-    | ID LPAREN RPAREN
-    { $$ = ['id', $ID, []]; }
-    | ID
-    { $$ = ['id', $ID]; }
-    ;
-*/
 
 term_list
     : term

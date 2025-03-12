@@ -1,5 +1,6 @@
 import parser from "../folproof-parser.js";
 import { strict as assert } from "node:assert";
+import { Verifier as v } from "../src/verifier.mjs";
 
 describe("Parser Tests", function () {
   it("should parse implications as right-associative", function () {
@@ -155,5 +156,19 @@ describe("Parser Tests", function () {
     assert.equal(result[2][1], "R");
     assert.equal(result[2][2][0][1], "x");
     assert.equal(result[2][2][1][1], "y");
+  });
+
+  it("Should parse quantifiers on the right of a connective", () => {
+    const src = "p v Ex. x";
+    const ast = parser.parse(src);
+    const result = v.verifyFromAST(ast);
+    assert.ok(result.valid, result.message);
+  });
+
+  it("Should correctly differentiate between quantifier and id", () => {
+    const src = "E Ex.Ex";
+    const ast = parser.parse(src);
+    const result = v.verifyFromAST(ast);
+    assert.ok(result.valid, result.message);
   });
 });

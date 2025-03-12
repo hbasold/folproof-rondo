@@ -1,3 +1,5 @@
+%x inQuantifier
+
 /*
 objid     [a-z_][a-zA-Z_'"0-9\|]*
 predid    [a-zA-Z][a-zA-Z_'"0-9\|]*
@@ -9,17 +11,18 @@ numrange	[0-9]+(\-[0-9]+)?
 justify     ":".*
 
 %%
-[\n\r]?"#".*        /* comments are ignored */
-"and"|"∧"|"&"		return 'AND';
-"or"|"∨"|"v"|"+"	return 'OR';
-"implies"|"->"|"→"  return 'IMPLIES';
-"iff"|"<->"|"↔"		return 'IFF';
-"not"|"~"|"¬"		return 'NOT';
-"="				    return 'EQUALS';
-/* "every"			return 'EVERY'; */
-"with"				return 'WITH';
-/* "of"				return "OF"; */
-\d+				    /* ignore digits, for now */
+
+[\n\r]?"#".*                /* comments are ignored */
+("and"/{spc}+)|"∧"|"&"		return 'AND';
+("or"/{spc}+)|"∨"|"v"|"+"   return 'OR';
+("implies"/{spc}+)|"->"|"→" return 'IMPLIES';
+("iff"/{spc}+)|"<->"|"↔"	return 'IFF';
+("not"/{spc}+)|"~"|"¬"		return 'NOT';
+"="				            return 'EQUALS';
+/* "every"			        return 'EVERY'; */
+"with"/{spc}+				return 'WITH';
+/* "of"				        return "OF"; */
+\d+				            /* ignore digits, for now */
 
 {justify} %{
     // Syntax: "[...] : ruleName [[elim/intro] [NumOrRange[, NumOrRange]*]]
@@ -65,19 +68,27 @@ justify     ":".*
     return 'JUSTIFICATION';
 %};
 
-"E"|"∃"			return 'EXISTS';
-/* "in"			return 'IN';*/
-/*"empty"		return 'EMPTYSET';*/
-"A"|"∀"			return 'FORALL';
-/* "()"			return 'DOUBLEPAREN'; */
-"("				return 'LPAREN';
-")"				return 'RPAREN';
-"_|_"|"⊥"|"bot" return 'BOTTOM';
-/* {objid}	    return 'OBJID';
-{predid}		return 'PREDID'; */
-{id}			return 'ID';
-","				return 'COMMA';
-"."				return 'DOT';
+"∃" return 'EXISTS';
+"∀" return 'FORALL';
+("A"|"E")/({spc}*{id}{spc}*".") %{
+    this.pushState('inQuantifier');
+    return yytext[0] === 'A' ? 'FORALL' : 'EXISTS';
+%}
+
+/* "in"			            return 'IN';*/
+/*"empty"		            return 'EMPTYSET';*/
+/* "()"			            return 'DOUBLEPAREN'; */
+"("				            return 'LPAREN';
+")"				            return 'RPAREN';
+("bot"/{spc}+)|"_|_"|"⊥"    return 'BOTTOM';
+/* {objid}	                return 'OBJID';
+{predid}		            return 'PREDID'; */
+<*>{id}			            return 'ID';
+","				            return 'COMMA';
+<*>"." %{
+    this.popState();
+    return 'DOT';
+%}
 
 [\n\r]*<<EOF>> %{
     // remaining DEBOXes implied by EOF
@@ -124,11 +135,12 @@ justify     ":".*
     return tokens;
 %}
 
-\n      return 'EOL';
-{spc}+  /* ignore whitespace */
-.*      return 'error';
+\n          return 'EOL';
+<*>{spc}+   /* ignore whitespace */
+.*          return 'error';
 
 %%
+
 const jisonLexerFn = lexer.setInput;
 lexer.setInput = function(input) {
     let debug = false;

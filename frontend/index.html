@@ -155,6 +155,11 @@
               The rules for equality are used as <code>= i</code> instead of
               (Refl) and <code>= e</code> instead of (Repl).
             </li>
+            <li>
+              Proof Rondo now considers variable assumption (e.g.
+              <code>| with x</code>) part of its line numbering, just like Logic
+              Rondo.
+            </li>
           </ul>
         </div>
       </div>
@@ -162,8 +167,8 @@
       <main class="row">
         <div class="col-12">
           <h2>Proof Checker</h2>
-          <p class="d-inline d-xl-none pe-2"><b>Load an example:</b></p>
-          <p class="d-none d-xl-block"><b>Examples:</b></p>
+          <p class="d-inline d-xl-none pe-2 fw-bold">Load an example:</p>
+          <p class="d-none d-xl-block fw-bold">Examples:</p>
           <fieldset class="btn-group d-xl-none" aria-label="Button group">
             <button
               type="button"
@@ -182,8 +187,8 @@
           ></fieldset>
         </div>
 
-        <div class="col-12 col-lg-7">
-          <p class="fs-4 m-1">Proof Input</p>
+        <div id="proof-input-col" class="col-12 col-lg-7">
+          <p class="fs-4 my-2">Proof Input</p>
           <div id="proof-input" class="form-control"></div>
           <p class="pt-2">
             <strong>Note:</strong> Press <kbd>Esc</kbd> + <kbd>Tab</kbd> to
@@ -195,32 +200,80 @@
         </div>
 
         <div class="col">
-          <p class="fs-4 m-1">Output</p>
+          <p class="fs-4 my-2">Output</p>
 
           <div class="alert alert-light" id="render-panel"></div>
 
           <div id="result-box" class="alert alert-light">
-            <p class="fs-4">Result</p>
+            <p class="fs-4 mb-0">Result</p>
+            <hr class="my-2" />
             <div id="result"></div>
           </div>
 
           <div id="settings">
-            <p class="fs-4">Settings</p>
-            <div class="row g-3 align-items-center">
-              <div class="col-auto">
-                <label for="parentheses" class="col-form-label">
-                  <b>Parentheses:</b>
-                </label>
-              </div>
-              <div class="col-auto">
-                <select id="parentheses" class="form-control">
-                  <option value="minimal">
-                    Minimal (order-of-ops overrides)
-                  </option>
-                  <option value="user" selected>User-defined</option>
-                  <option value="explicit">Explicit order-of-ops</option>
-                </select>
-              </div>
+            <p class="fs-4 my-2">Settings</p>
+            <div class="settings-grid">
+              <label for="parentheses-setting" class="col-form-label fw-bold">
+                Parentheses:
+              </label>
+              <select id="parentheses-setting" class="form-select">
+                <option value="minimal">
+                  Minimal (order-of-ops overrides)
+                </option>
+                <option value="user" selected>User-defined</option>
+                <option value="explicit">Explicit order-of-ops</option>
+              </select>
+
+              <label for="layout-setting" class="col-form-label fw-bold">
+                Layout:
+              </label>
+              <select id="layout-setting" class="form-select">
+                <option value="side">Side-by-side</option>
+                <option value="stacked">Stacked</option>
+              </select>
+
+              <span class="col-form-label fw-bold">Strictness:</span>
+
+              <fieldset>
+                <div class="form-check my-1">
+                  <label for="propositional-setting" class="form-check-label"
+                    >Restrict to propositional logic</label
+                  >
+                  <input
+                    type="checkbox"
+                    id="propositional-setting"
+                    class="form-check-input"
+                  />
+                </div>
+
+                <div>
+                  <span class="col-form-label">Restrict to signature:</span>
+                  <div class="input-group my-1">
+                    <span class="input-group-text" id="signature-function"
+                      >ℱ</span
+                    >
+                    <input
+                      id="signature-function-input"
+                      type="text"
+                      class="form-control"
+                      placeholder="e.g. a/0 b/3 c/2"
+                      aria-label="Function symbols/arity"
+                      aria-describedby="signature-function"
+                    />
+                    <span class="input-group-text" id="signature-relation"
+                      >ℛ</span
+                    >
+                    <input
+                      id="signature-relation-input"
+                      type="text"
+                      class="form-control"
+                      placeholder="e.g. P/0 Q/2 R/4"
+                      aria-label="Relation symbols/arity"
+                      aria-describedby="signature-relation"
+                    />
+                  </div>
+                </div>
+              </fieldset>
             </div>
           </div>
         </div>

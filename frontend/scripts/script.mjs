@@ -25,6 +25,11 @@ import {
 import { bracketMatching } from "@codemirror/language";
 import { closeBrackets } from "@codemirror/autocomplete";
 
+/**
+ * Register service worker for offline support.
+ *
+ * @returns {Promise<void>} resolves when the service worker is registered
+ */
 async function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
     try {
@@ -36,8 +41,39 @@ async function registerServiceWorker() {
     }
   }
 }
+
 void registerServiceWorker();
 
+class LineNumberFormatter {
+  constructor() {
+    this.skippedLineCount = 0;
+  }
+
+  skipLines(lineNo, state) {
+    if (lineNo >= 1 && lineNo <= state.doc.lines) {
+      const line = state.doc.line(lineNo);
+      // Skip comments, closing lines, and empty lines
+      if (/^\s*(#.*|-+)?$/.test(line.text)) {
+        this.skippedLineCount++;
+        return "";
+      }
+    }
+
+    return String(lineNo - this.skippedLineCount);
+  }
+
+  reset() {
+    this.skippedLineCount = 0;
+  }
+}
+
+const lineNumberFormatter = new LineNumberFormatter();
+
+/**
+ * The editor view for the proof input.
+ *
+ * @type {EditorView} the editor view
+ */
 let proofInput = new EditorView({
   parent: document.getElementById("proof-input"),
   extensions: [
@@ -52,7 +88,12 @@ let proofInput = new EditorView({
     lineNumbers(),
     highlightActiveLineGutter(),
     folLanguage(),
+    lineNumbers({
+      formatNumber: (lineNo, state) =>
+        lineNumberFormatter.skipLines(lineNo, state),
+    }),
     EditorView.updateListener.of((update) => {
+      lineNumberFormatter.reset();
       if (update.docChanged) {
         updateOutputSection();
       }
@@ -66,10 +107,18 @@ let proofInput = new EditorView({
   ],
 });
 
-const parentheses = document.getElementById("parentheses");
 const resultBox = document.getElementById("result-box");
 const resultElement = document.getElementById("result");
 const renderPanel = document.getElementById("render-panel");
+
+const parentheses = document.getElementById("parentheses-setting");
+const restrictPropositional = document.getElementById("propositional-setting");
+restrictPropositional.addEventListener("change", updateOutputSection);
+
+const signatureFunction = document.getElementById("signature-function-input");
+signatureFunction.addEventListener("input", updateOutputSection);
+const signatureRelation = document.getElementById("signature-relation-input");
+signatureRelation.addEventListener("input", updateOutputSection);
 
 /**
  * Update the output section based on the current proof content and settings.
@@ -82,7 +131,11 @@ function updateOutputSection() {
     };
 
     AST = parser.parse(proofInput.state.doc.toString());
-    const result = Verifier.verifyFromAST(AST);
+    const result = Verifier.verifyFromAST(
+      AST,
+      restrictPropositional.checked,
+      (signatureFunction.value + " " + signatureRelation.value).trim(),
+    );
     const result_HTML = document.createElement("p");
     result_HTML.textContent = result.message;
 
@@ -107,10 +160,10 @@ function updateOutputSection() {
     sorries.textContent = `Remaining sorries: ${result.remainingSorries}`;
     result_HTML.appendChild(sorries);
 
-    resultElement.innerHTML = "";
+    resultElement.textContent = "";
     resultElement.appendChild(result_HTML);
   } catch (ex) {
-    resultElement.innerHTML = ex;
+    resultElement.textContent = ex;
     resultBox.className = resultBox.className.replace(
       /alert-\w*/,
       "alert-danger",
@@ -118,7 +171,7 @@ function updateOutputSection() {
   }
 
   const HTML = render(AST, { parentheses: parentheses.value });
-  renderPanel.innerHTML = "";
+  renderPanel.textContent = "";
   renderPanel.appendChild(HTML);
 }
 
@@ -134,6 +187,30 @@ clearButton.addEventListener("click", () => {
     },
   });
 });
+
+const layoutSetting = document.getElementById("layout-setting");
+
+/**
+ * Update the layout based on the current setting(s).
+ */
+function updateLayout() {
+  const inputContainer = document.getElementById("proof-input-col");
+  const layoutChoice = localStorage.getItem("layoutChoice") || "side";
+  layoutSetting.value = layoutChoice;
+
+  if (layoutChoice === "side") {
+    inputContainer.classList.add("col-lg-7");
+  } else {
+    inputContainer.classList.remove("col-lg-7");
+  }
+}
+
+layoutSetting.addEventListener("change", (event) => {
+  localStorage.setItem("layoutChoice", event.target.value);
+  updateLayout();
+});
+
+updateLayout();
 
 /*!
  * Based on toggler for Bootstrap's docs (https://getbootstrap.com/)
@@ -208,10 +285,11 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-/*
- * Example loading
+/**
+ * Load examples from the examples.json file and populate display elements.
+ *
+ * @returns {Promise<void>} resolves when examples are loaded
  */
-
 async function loadExamples() {
   try {
     const response = await fetch("assets/examples.json");
@@ -236,6 +314,13 @@ async function loadExamples() {
   }
 }
 
+/**
+ * Create a dropdown menu of example proofs.
+ *
+ * Used on small screens.
+ *
+ * @param proofs {Object} the example proofs
+ */
 function createExampleDropdown(proofs) {
   const dropdownMenu = document.getElementById("example-dropdown");
 
@@ -247,6 +332,13 @@ function createExampleDropdown(proofs) {
   }
 }
 
+/**
+ * Create a set of buttons for example proofs.
+ *
+ * Used on larger screens.
+ *
+ * @param proofs {Object} the example proofs
+ */
 function createExampleNavbar(proofs) {
   const container = document.getElementById("example-buttons");
 
@@ -297,6 +389,13 @@ function createExampleNavbar(proofs) {
   });
 }
 
+/**
+ * Create a button for an example proof.
+ *
+ * @param example {Object} the example proof
+ * @param isDropdown {boolean} whether the button is for a dropdown menu
+ * @returns {HTMLButtonElement} the button element
+ */
 function createExampleButton(example, isDropdown = false) {
   const button = document.createElement("button");
   button.type = "button";

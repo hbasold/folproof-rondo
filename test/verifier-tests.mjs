@@ -63,60 +63,52 @@ describe("Verifier Tests", function () {
   });
 
   it("References to ranges should be to a box", () => {
-      const src =
-        "p \n" +
-        "p \n" +
-        "p -> p : -> i 1-2 \n";
-      const ast = p.parse(src);
-      const result = v.verifyFromAST(ast);
-      assert.ok(!result.valid, result.message);
+    const src = "p \n" + "p \n" + "p -> p : -> i 1-2 \n";
+    const ast = p.parse(src);
+    const result = v.verifyFromAST(ast);
+    assert.ok(!result.valid, result.message);
   });
 
   it("Should invalidate references to a closed flag (simple)", () => {
-    const src =
-      "| p\n" +
-      "p : copy 1\n";
+    const src = "| p\n" + "p : copy 1\n";
     const ast = p.parse(src);
     const result = v.verifyFromAST(ast);
     assert.ok(!result.valid, result.message);
   });
 
   it("References into a closed flag should be invalid", () => {
-      const src =
-        "| p \n" +
-        "| p : assum 1\n" +
-        "p -> p : -> i 1-2 \n" +
-        "p : assum 2 \n";
-      const ast = p.parse(src);
-      const result = v.verifyFromAST(ast);
-      assert.ok(!result.valid, result.message);
+    const src =
+      "| p \n" + "| p : assum 1\n" + "p -> p : -> i 1-2 \n" + "p : assum 2 \n";
+    const ast = p.parse(src);
+    const result = v.verifyFromAST(ast);
+    assert.ok(!result.valid, result.message);
   });
 
   it("Should check whether a variable is quantified on E intro", () => {
-    const src =
-      "V(a)\n" +
-      "∃x.V(y) : E.y/a i 1\n";
+    const src = "V(a)\n" + "∃x.V(y) : E.y/a i 1\n";
     const ast = p.parse(src);
     const result = v.verifyFromAST(ast);
     assert.ok(!result.valid, result.message);
   });
 
   it("Should check whether a variable is quantified on A elim", () => {
-    const src =
-      "A x.(P(y) -> ~Q(y))\n" +
-      "P(x0) -> ~Q(x0) : A.y/x0 elim 1\n";
+    const src = "A x.(P(y) -> ~Q(y))\n" + "P(x0) -> ~Q(x0) : A.y/x0 elim 1\n";
     const ast = p.parse(src);
     const result = v.verifyFromAST(ast);
     assert.ok(!result.valid, result.message);
   });
 
   it("Should allow spaces in the final substitution", () => {
-    const src =
-      "Ax. P(x)\n" +
-      "P(g(c, d)) : A.x/g(c, d) e 1\n";
+    const src = "Ax. P(x)\n" + "P(g(c, d)) : A.x/g(c, d) e 1\n";
     const ast = p.parse(src);
     const result = v.verifyFromAST(ast);
     assert.ok(result.valid, result.message);
   });
 
+  it("test2", () => {
+    const src = "P(a,b,c,d)\n";
+    const ast = p.parse(src);
+    const result = v.verifyFromAST(ast);
+    assert.ok(result.valid, result.message);
+  });
 });

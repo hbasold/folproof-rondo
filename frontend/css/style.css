@@ -7,12 +7,12 @@
 }
 
 .justification {
-  float: right;
+  white-space: nowrap;
 }
 
 .FOL-box,
 .simple-box {
-  border: 1px solid black;
+  border: 1px solid var(--bs-body-color);
   border-radius: 3px;
   padding: 2px;
 }
@@ -24,7 +24,9 @@
 }
 
 .rule {
-  clear: both;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
 }
 
 .cm-editor .cm-selectionBackground {
@@ -37,4 +39,11 @@
 
 .cm-editor.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground {
   background: var(--pf-selection-background);
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem 1rem;
+  align-items: baseline;
 }
