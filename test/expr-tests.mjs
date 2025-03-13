@@ -235,4 +235,67 @@ describe("Expression Printer Tests", function () {
     const expected = e; // Since _|_ should remain unchanged
     assert.deepEqual(r, expected);
   });
+
+  it("Formula folding", function () {
+    const src = "Ax. P(x, y) & ~y = z v ⊥";
+    const e = P.parse(src)[0][1];
+    const cr = function () {
+      return ["bot"];
+    }
+    const ec = function (l, r) {
+      return ["=", l, r];
+    }
+    const ic = function (x, args) {
+      if(args.length > 0){
+        return ["id", x, args];
+      } else {
+        return ["id", x];
+      }
+    }
+    const uc = function (t, r) {
+      return [t, r];
+    }
+    const bc = function (t, l, r) {
+      return [t, l, r];
+    }
+    const qc = function (t, x, r) {
+      return [t, x, r];
+    }
+    const f = E.foldForm(cr, ec, ic, uc, bc, qc);
+    const r = f(e);
+    assert.deepEqual(r, e);
+  });
+
+  it("Formula folding with state", function () {
+    const src = "Ax. P(x, y) & ~y = z v ⊥";
+    const e = P.parse(src)[0][1];
+    const s = [];
+    const cr = function (acc) {
+      return ["bot"];
+    }
+    const ec = function (l, r, acc) {
+      return ["=", l(s), r(s)];
+    }
+    const ic = function (x, argCont, acc) {
+      const args = argCont(s);
+      if(args.length > 0){
+        return ["id", x, args];
+      } else {
+        return ["id", x];
+      }
+    }
+    const uc = function (t, r, acc) {
+      return [t, r(s)];
+    }
+    const bc = function (t, l, r, acc) {
+      return [t, l(s), r(s)];
+    }
+    const qc = function (t, x, r, acc) {
+      return [t, x, r(s)];
+    }
+    const f = E.foldFormState(cr, ec, ic, uc, bc, qc);
+    const r = f(e)(s);
+    assert.deepEqual(r, e);
+  });
+
 });
