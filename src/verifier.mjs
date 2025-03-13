@@ -64,7 +64,7 @@ class Verifier {
         const parts = entry.split("/");
         if (parts.length !== 2) {
           result.valid = false;
-          result.message = `Invalid signature format, was '${entry}', expected 
+          result.message = `Invalid signature format, was '${entry}', expected
           ID/arity.`;
           result.errorStep = "Preprocessing";
           return result;
@@ -74,7 +74,7 @@ class Verifier {
         const parsedArity = parseInt(arity);
         if (isNaN(parsedArity)) {
           result.valid = false;
-          result.message = `Invalid signature arity, was '${arity}', expected a 
+          result.message = `Invalid signature arity, was '${arity}', expected a
           number.`;
           result.errorStep = "Preprocessing";
           return result;
