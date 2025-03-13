@@ -111,6 +111,39 @@ function equal(A, B, suba, subb) {
   }
 }
 
+const FormulaType = Object.freeze({
+  Contradiction : 0,
+  Equality : 1,
+  Id : 2,
+  Unary : 3,
+  Binary : 4,
+  Quantifier : 5
+});
+
+const typeLookup = Object.freeze({
+  "bot" : FormulaType.Contradiction,
+  "=" : FormulaType.Equality,
+  "id" : FormulaType.Id,
+  "not" : FormulaType.Unary,
+  "<->" : FormulaType.Binary, "->" : FormulaType.Binary, "and" : FormulaType.Binary, "or" : FormulaType.Binary,
+  "forall" : FormulaType.Quantifier, "exists" : FormulaType.Quantifier
+});
+
+function formulaType(expr){
+  console.assert(
+    Array.isArray(expr) && expr.length > 0,
+    "formulaType: Expected expression but got %o",
+    expr
+  );
+  const type = typeLookup[expr[0]];
+  console.assert(
+    type !== undefined,
+    `formulaType: Unexpected connective ${expr[0]} in %o`,
+    expr
+  );
+  return type;
+}
+
 function isContradiction(s) {
   debugMessage("isContradiction", s);
   return s[0] === "bot";
@@ -246,6 +279,102 @@ function prettySubst(subst) {
   return doc;
 }
 
+function foldForm(contraRes, equalityComb, idComb, unaryComb, binaryComb, quantifierComb, exprComb){
+  const go_ = function(expr){
+    switch(formulaType(expr)){
+    case FormulaType.Contradiction: {
+      return contraRes();
+    }
+      break;
+    case FormulaType.Equality: {
+      const l = go_(expr[1]);
+      const r = go_(expr[2]);
+      return equalityComb(l, r);
+    }
+      break;
+    case FormulaType.Id: {
+      let args = [];
+      if(expr.length === 3){
+        expr[2].forEach((arg) => {
+          args.push(go_(arg));
+        });
+      }
+      return idComb(expr[1], args);
+    }
+      break;
+    case FormulaType.Unary: {
+      const c = go_(expr[1]);
+      return unaryComb(expr[0], c);
+    }
+      break;
+    case FormulaType.Binary: {
+      const l = go_(expr[1]);
+      const r = go_(expr[2]);
+      return binaryComb(expr[0], l, r);
+    }
+      break;
+    case FormulaType.Quantifier: {
+      const c = go_(expr[2]);
+      return quantifierComb(expr[0], expr[1], c);
+    }
+      break;
+    default:
+      console.assert(false, `foldForm: unexpected formula type for ${expr}`);
+    }
+  }
+  return go_;
+}
+
+// Allows folding over formulas with a state that is handled via continuation passing style
+function foldFormState(contraRes, equalityComb, idComb, unaryComb, binaryComb, quantifierComb, exprComb){
+  const go_ = function(expr){
+    switch(formulaType(expr)){
+    case FormulaType.Contradiction: {
+      return (state) => contraRes(state);
+    }
+      break;
+    case FormulaType.Equality: {
+      const l = go_(expr[1]);
+      const r = go_(expr[2]);
+      return (state) => equalityComb(l, r, state);
+    }
+      break;
+    case FormulaType.Id: {
+      let argCont = function(state){
+        let args = [];
+        if(expr.length === 3){
+          expr[2].forEach((arg) => {
+            args.push(go_(arg)(state));
+          });
+        }
+        return args;
+      }
+      return (state) => idComb(expr[1], argCont, state);
+    }
+      break;
+    case FormulaType.Unary: {
+      const c = go_(expr[1]);
+      return (state) => unaryComb(expr[0], c, state);
+    }
+      break;
+    case FormulaType.Binary: {
+      const l = go_(expr[1]);
+      const r = go_(expr[2]);
+      return (state) => binaryComb(expr[0], l, r, state);
+    }
+      break;
+    case FormulaType.Quantifier: {
+      const c = go_(expr[2]);
+      return (state) => quantifierComb(expr[0], expr[1], c, state);
+    }
+      break;
+    default:
+      console.assert(false, `foldFormState: unexpected formula type for ${expr}`);
+    }
+  }
+  return go_;
+}
+
 export {
   substitute,
   equal,
@@ -254,4 +383,6 @@ export {
   isPropositional,
   pretty,
   prettySubst,
+  foldForm,
+  foldFormState
 };
