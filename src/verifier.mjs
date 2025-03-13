@@ -1,6 +1,6 @@
 import { debugMessage } from "./util.mjs";
 import { rules } from "./rules.mjs";
-import { isPropositional } from "./expr.mjs";
+import { isPropositional, foldForm } from "./expr.mjs";
 
 class Statement {
   constructor(sentenceAST, justificationAST, scope, loc, isFirst, isLast) {
@@ -81,13 +81,17 @@ class Verifier {
         }
 
         if (!acc[id]) {
-          acc[id] = new Set();
+          acc[id] = parsedArity;
+        } else {
+          result.valid = false;
+          result.message = `Duplicated arity declaration in signature arity for '${id}'.`;
+          result.errorStep = "Preprocessing";
+          return result;
         }
-        acc[id].add(parsedArity);
-
         return acc;
       }, {});
 
+      debugMessage("Parsed signature", parsedSignature);
       if (!result.valid) {
         return result;
       }
@@ -187,47 +191,68 @@ class Verifier {
     restrictSignature,
     prevInID = false,
   ) {
-    const curInID = statement[0] === "id";
-    if (
-      (restrictPropositional && !isPropositional(statement)) ||
-      (restrictPropositional && prevInID && curInID)
-    ) {
-      result.valid = false;
-      result.message =
-        "Propositional restriction: Only propositional logic is allowed.";
-      return;
+
+    const checkBot = function () {
+      return true;
     }
 
-    if (restrictSignature && curInID && statement.length === 3) {
-      const arities = restrictSignature[statement[1]];
-      if (arities === undefined) {
-        result.valid = false;
-        result.message = `Signature restriction: '${statement[1]}' not in 
-        signature.`;
-        return;
+    const checkEq = function (l, r) {
+      if(restrictPropositional){
+        result.message = "Propositional restriction: equality is not allowed in propositional logic.";
+        return false;
+      } else {
+        return l && r;
       }
+    }
 
-      if (!arities.has(statement[2].length)) {
-        result.valid = false;
-        const aritiesString = Array.from(arities).sort().join(", ");
-        result.message = `Signature restriction: '${statement[1]}' got 
-        ${statement[2].length} argument(s), but expected: ${aritiesString}.`;
-        return;
-      }
+    const checkId = function (x, args) {
+      if(args.length > 0){
+        if(restrictPropositional){
+          result.message = `Propositional restriction: only propositional variables allowed, but ${x} uses ${args.length} arguments.`
+          return false;
+        } else if (restrictSignature) {
+          const arity = restrictSignature[x];
+          if (arity === undefined) {
+            result.message = `Signature restriction: '${x}' not in signature.`;
+            return false;
+          }
 
-      for (const arg of statement[2]) {
-        Verifier.checkRestrictions(
-          result,
-          arg,
-          restrictPropositional,
-          restrictSignature,
-          curInID,
-        );
-        if (!result.valid) {
-          return;
+          if (arity !== args.length) {
+            result.valid = false;
+            result.message = `Signature restriction: '${x}' got ${args.length} argument(s), but expected: ${arity}.`;
+            return false;
+          }
+          return true;
+        } else {
+          return true;
         }
+      } else {
+        return true;
       }
     }
+
+    const checkUnary = function (t, r) {
+      return r;
+    }
+
+    const checkBinary = function (t, l, r) {
+      return l && r;
+    }
+
+    const checkQuantifier = function (t, x, r) {
+      if(restrictPropositional){
+        result.message = "Propositional restriction: quantifiers are forbidden in propositional logic.";
+        return false;
+      } else {
+        return r;
+      }
+    }
+
+    const check = foldForm(checkBot, checkEq, checkId, checkUnary, checkBinary, checkQuantifier);
+
+    result.valid = check(statement);
+    console.log("checkRestrictions: ", result.valid, result.message);
+    return;
   }
 
   static lookupValidator(why) {
