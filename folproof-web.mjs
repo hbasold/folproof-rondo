@@ -265,13 +265,15 @@ function renderSimpleTerm(t) {
   }
   const output = document.createElement("span");
   output.innerHTML = sym;
+  output.className = "symbol";
   if (parts[2]) {
-    output.className = "special-symbol";
-    const sub = document.createElement("sub");
-    sub.textContent = parts[2];
-    output.appendChild(sub);
-  } else {
-    output.className = "symbol";
+    if (sym !== '\'') {
+      const sub = document.createElement("sub");
+      sub.textContent = parts[2];
+      output.appendChild(sub);
+    } else {
+      output.textContent += parts[2];
+    }
   }
   return output;
 }
