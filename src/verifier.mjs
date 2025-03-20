@@ -1,6 +1,6 @@
 import { debugMessage } from "./util.mjs";
 import { rules } from "./rules.mjs";
-import { isPropositional, foldForm } from "./expr.mjs";
+import { foldForm } from "./expr.mjs";
 
 class Statement {
   constructor(sentenceAST, justificationAST, scope, loc, isFirst, isLast) {
@@ -189,26 +189,25 @@ class Verifier {
     statement,
     restrictPropositional,
     restrictSignature,
-    prevInID = false,
   ) {
-
     const checkBot = function () {
       return true;
-    }
+    };
 
     const checkEq = function (l, r) {
-      if(restrictPropositional){
-        result.message = "Propositional restriction: equality is not allowed in propositional logic.";
+      if (restrictPropositional) {
+        result.message =
+          "Propositional restriction: equality is not allowed in propositional logic.";
         return false;
       } else {
         return l && r;
       }
-    }
+    };
 
     const checkId = function (x, args) {
-      if(args.length > 0){
-        if(restrictPropositional){
-          result.message = `Propositional restriction: only propositional variables allowed, but ${x} uses ${args.length} arguments.`
+      if (args.length > 0) {
+        if (restrictPropositional) {
+          result.message = `Propositional restriction: only propositional variables allowed, but ${x} uses ${args.length} arguments.`;
           return false;
         } else if (restrictSignature) {
           const arity = restrictSignature[x];
@@ -229,30 +228,37 @@ class Verifier {
       } else {
         return true;
       }
-    }
+    };
 
     const checkUnary = function (t, r) {
       return r;
-    }
+    };
 
     const checkBinary = function (t, l, r) {
       return l && r;
-    }
+    };
 
     const checkQuantifier = function (t, x, r) {
-      if(restrictPropositional){
-        result.message = "Propositional restriction: quantifiers are forbidden in propositional logic.";
+      if (restrictPropositional) {
+        result.message =
+          "Propositional restriction: quantifiers are forbidden in propositional logic.";
         return false;
       } else {
         return r;
       }
-    }
+    };
 
-    const check = foldForm(checkBot, checkEq, checkId, checkUnary, checkBinary, checkQuantifier);
+    const check = foldForm(
+      checkBot,
+      checkEq,
+      checkId,
+      checkUnary,
+      checkBinary,
+      checkQuantifier,
+    );
 
     result.valid = check(statement);
     console.log("checkRestrictions: ", result.valid, result.message);
-    return;
   }
 
   static lookupValidator(why) {

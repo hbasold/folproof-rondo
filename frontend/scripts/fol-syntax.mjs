@@ -40,7 +40,7 @@ const folSyntax = StreamLanguage.define({
   token(stream, state) {
     if (stream.eatSpace()) return null;
 
-    if (state.inQuantifier && stream.match(/^[a-zA-Z_][a-zA-Z_'"0-9|]*/)) {
+    if (state.inQuantifier && stream.match(/^[a-zA-Z_'][a-zA-Z_'"0-9|]*/)) {
       return "variable";
     }
 
@@ -61,7 +61,7 @@ const folSyntax = StreamLanguage.define({
     // A or E are only valid quantifiers if followed by a variable and dot
     if (
       quantifiers.has(stream.peek()) &&
-      stream.match(/^[∀A∃E]\s*[a-zA-Z_][a-zA-Z_'"0-9|]*\s*\./, false)
+      stream.match(/^[∀A∃E]\s*[a-zA-Z_'][a-zA-Z_'"0-9|]*\s*\./, false)
     ) {
       stream.next();
       state.inQuantifier = true;
@@ -77,7 +77,7 @@ const folSyntax = StreamLanguage.define({
     if (stream.match(/^((->)|(<->)|(_\|_))/)) return "operator";
 
     // Ensures that | is not matched below when it is in a variable (see lexer)
-    if (stream.match(/^[a-zA-Z_][a-zA-Z_'"0-9|]*/)) return "variable";
+    if (stream.match(/^[a-zA-Z_'][a-zA-Z_'"0-9|]*/)) return "variable";
 
     // Ensures that - is not matched below when it is in numrange (see lexer)
     if (stream.match(/^\d+(-\d+)?/)) return "number";
