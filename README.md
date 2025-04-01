@@ -1,6 +1,12 @@
-# Proof Rondo
+# Proof Rondo v1
 
 A First-Order Logic (FOL) proof verifier written in JavaScript.
+
+## Project Status
+This repository is maintained **only** for **bug fixes and compatibility updates**.
+**No new features** will be added here.
+
+Further development, including new features and improvements, will continue at: [https://gitlab.com/hbasold/proof-rondo](https://gitlab.com/hbasold/proof-rondo).
 
 ## Demo
 
@@ -49,7 +55,7 @@ _For help with using Logic Rondo from the terminal, provide the `--help` flag._
 ## Architecture Overview
 
 | File/Directory       | Description                                                                                   |
-| -------------------- | --------------------------------------------------------------------------------------------- |
+|----------------------|-----------------------------------------------------------------------------------------------|
 | `doc/`               | Describes the language accepted by Proof Rondo.                                               |
 | `frontend/`          | Code specific to the frontend we built for Proof Rondo.                                       |
 | `frontend/bundle.js` | Is created using ESBuild (see the `package.json`).                                            |
