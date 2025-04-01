@@ -217,7 +217,15 @@ updateLayout();
  * Copyright 2011- The Bootstrap Authors
  * Licensed under the Creative Commons Attribution 3.0 Unported License.
  */
-const getStoredTheme = () => localStorage.getItem("theme");
+const getStoredTheme = () => {
+  const storedTheme = localStorage.getItem("theme");
+  if (storedTheme === "system") {
+    return "auto";
+  } else {
+    return storedTheme;
+  }
+}
+
 const setStoredTheme = (theme) => localStorage.setItem("theme", theme);
 
 const getPreferredTheme = () => {
